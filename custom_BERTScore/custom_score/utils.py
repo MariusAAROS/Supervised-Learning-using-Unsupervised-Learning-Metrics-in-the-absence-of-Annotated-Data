@@ -100,7 +100,6 @@ def computeMetrics(refToCand, candToRef, references, candidates):
     :output (tuple): Tuple containing R, P and F for the current corpus.
     """
 
-
     # R computation
     fullSum = []
     for individualSimilarity in candToRef:
