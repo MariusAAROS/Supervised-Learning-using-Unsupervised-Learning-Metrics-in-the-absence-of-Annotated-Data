@@ -109,7 +109,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         fullSum.append(currentSum)
     R = []
     for sum, reference in zip(fullSum, references):
-        R.append((1/norm(reference))*sum)
+        R.append((1/len(reference))*sum)
 
     # P computation
     fullSum = []
@@ -120,7 +120,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         fullSum.append(currentSum)
     P = []
     for sum, candidate in zip(fullSum, candidates):
-        P.append((1/norm(candidate))*sum)
+        P.append((1/len(candidate))*sum)
     
     # F computation
     F = []
