@@ -18,8 +18,11 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"]):
 
     #cosine similarity
     candToRef = SimilarityCandToRef(references, candidates)
-    refToCand = np.transpose(candToRef)
 
+    refToCand = []
+    for similarityMatrix in candToRef:
+        refToCand.append(np.transpose(similarityMatrix))
+        
     #Metrics calculation
     (R, P, F) = computeMetrics(refToCand, candToRef, references, candidates)
 
