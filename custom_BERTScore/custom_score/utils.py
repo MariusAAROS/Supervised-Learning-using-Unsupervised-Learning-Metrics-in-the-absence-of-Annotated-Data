@@ -129,3 +129,21 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         F.append(f)
     
     return (R, P, F)
+
+def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
+    """
+    Calculates R, P and F measures for a given corpus using an IDF weighting.
+
+    :param1 refToCand (list): List of similarity matrix between each reference/candidate couple.
+    :param2 candToRef (list): List of similarity matrix between each reference/candidate couple.
+    :param3 references (list): List of reference sentences.
+    :param4 candidates (list): List of candidate sentences.
+
+    :output (tuple): Tuple containing R, P and F for the current corpus.
+    """
+    R = []
+    P = []
+    F = []
+
+
+    return (R, P, F)
