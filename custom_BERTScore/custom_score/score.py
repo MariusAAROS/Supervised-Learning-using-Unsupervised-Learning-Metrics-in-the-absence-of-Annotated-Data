@@ -19,7 +19,7 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"]):
     candidates, _ = encode(candidates, model)
 
     #cosine similarity
-    candToRef = SimilarityCandToRef(references, candidates)
+    candToRef = similarityCandToRef(references, candidates)
 
     refToCand = []
     for similarityMatrix in candToRef:

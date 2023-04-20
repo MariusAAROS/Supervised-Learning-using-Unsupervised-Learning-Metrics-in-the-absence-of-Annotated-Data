@@ -42,7 +42,7 @@ def encode(corpus, model):
         encoded_corpus.append(encoded_sentence)
     return np.array(encoded_corpus, dtype=object), unknown
 
-def SimilarityCandToRef(references, candidates):
+def similarityCandToRef(references, candidates):
     """
     Computes cosine similarity for every reference with respect to each candidate.
 
@@ -65,7 +65,7 @@ def SimilarityCandToRef(references, candidates):
         all_proximities.append(proximities)
     return all_proximities
 
-def SimilarityRefToCand(references, candidates):
+def similarityRefToCand(references, candidates):
     """
     Computes cosine similarity for every reference with respect to each candidate.
 
@@ -129,6 +129,36 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         F.append(f)
     
     return (R, P, F)
+
+def computeIdf(reference, candidate):
+    """
+    Calculates IDF all words of a corpus
+    Inspired from : https://www.freecodecamp.org/news/how-to-process-textual-data-using-tf-idf-in-python-cd2bbc0a94a3/
+
+    :param1 references (list): List of reference sentences.
+    :param2 candidates (list): List of candidate sentences.
+
+    :output1 idfDict (dict): IDf dictionnary for a given corpus.
+    """
+    corpus = reference + " " + candidate
+    idfDict = {}
+    splitCorpus = corpus.split(" ")
+    N = len(splitCorpus)
+    #idfDict = dict.fromkeys(set(splitCorpus), 0)
+    for word in splitCorpus:
+        idfDict[word.lower()] = 1/N * splitCorpus.count(word)
+    return idfDict
+
+def getIdf(idfDict, word):
+    """
+    Returns the IDF of a word in a given corpus.
+
+    :param1 idfDict (dict): Dictionnary of all IDFs of a document.
+    :param2 word (string): Word whose IDF is desired.
+
+    :output (float): IDF of the desired word.
+    """
+    return idfDict[word.lower()]
 
 def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
     """
