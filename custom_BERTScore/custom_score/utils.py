@@ -102,7 +102,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
 
     # R computation
     fullSum = []
-    for individualSimilarity in candToRef:
+    for individualSimilarity in refToCand:
         currentSum = 0
         for row in individualSimilarity:
             currentSum += np.max(row)
@@ -113,7 +113,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
 
     # P computation
     fullSum = []
-    for individualSimilarity in refToCand:
+    for individualSimilarity in candToRef:
         currentSum = 0
         for row in individualSimilarity:
             currentSum += np.max(row)
