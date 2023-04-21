@@ -137,7 +137,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
 def computeIdf(corpus):
     """
     Calculates IDF all words of a corpus
-    Inspired from : https://www.freecodecamp.org/news/how-to-process-textual-data-using-tf-idf-in-python-cd2bbc0a94a3/
+    Inspired by : https://www.freecodecamp.org/news/how-to-process-textual-data-using-tf-idf-in-python-cd2bbc0a94a3/
 
     :param1 corpus (String): Reference document.
 
@@ -160,9 +160,14 @@ def getIdf(idfDict, word):
     :param1 idfDict (dict): Dictionnary of all IDFs of a document.
     :param2 word (string): Word whose IDF is desired.
 
-    :output (float): IDF of the desired word.
+    :output idf (float): IDF of the desired word.
     """
-    return idfDict[word.lower()]
+    try:
+        idf = idfDict[word.lower()]
+    except:
+        idf = 1.
+
+    return idf
 
 def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
     """
