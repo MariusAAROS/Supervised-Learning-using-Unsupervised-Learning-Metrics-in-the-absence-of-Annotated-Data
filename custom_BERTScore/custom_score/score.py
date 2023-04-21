@@ -3,7 +3,7 @@ import numpy as np
 from datetime import datetime
 import bert_score 
 
-def score(model, candidates=["I am Marius"], references=["Marius is my name"]):
+def score(model, candidates=["I am Marius"], references=["Marius is my name"], withIdf = False):
     """
     Computes BERTScore using a custom embedding amongst Word2Vec, Fasttext and Glove.
 
@@ -13,6 +13,15 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"]):
 
     :output (tuple): Tuple containing R, P and F for each couple of the current corpus.
     """
+    #storing raw references for IDF Calculus
+    raw_references = [reference for reference in references]
+
+    #parsing non-encoded sentences
+    word_references = []
+    word_candidates = []
+    for reference, candidate in zip(references, candidates):
+        word_references.append(reference.split(" "))
+        word_candidates.append(candidate.split(" "))
 
     #encoding to vectors
     references, _ = encode(references, model)
@@ -24,9 +33,16 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"]):
     refToCand = []
     for similarityMatrix in candToRef:
         refToCand.append(np.transpose(similarityMatrix))
-        
+
+    allIdfDicts = []
+    for reference in raw_references:
+        allIdfDicts.append(computeIdf(reference))
+
     #Metrics calculation
-    (R, P, F) = computeMetrics(refToCand, candToRef, references, candidates)
+    if withIdf == True:
+        (R, P, F) = computeMetricsWithIdf(refToCand, candToRef, word_references, word_candidates, allIdfDicts)
+    else:
+        (R, P, F) = computeMetrics(refToCand, candToRef, references, candidates)
 
     return (R, P, F)
 
@@ -71,7 +87,7 @@ def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nb
     runtime = (datetime.now() - init_time).total_seconds()
     return scores, runtime
 
-def StaticEmbeddingSampleTest(data, model, limit=3):
+def StaticEmbeddingSampleTest(data, model, limit=3, withIdf = False):
     """
     Benchmarking function allowing to compute static bertscore as well as its runtime.
 
@@ -91,7 +107,7 @@ def StaticEmbeddingSampleTest(data, model, limit=3):
         curRef = [" ".join(row[1][0].split("\n"))]
         assert len(curCand) == len(curRef)
         
-        (P, R, F) = score(model, curCand, curRef)
+        (P, R, F) = score(model, curCand, curRef, withIdf=withIdf)
         P = P[0]
         R = R[0]
         F = F[0]

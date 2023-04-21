@@ -169,7 +169,7 @@ def getIdf(idfDict, word):
 
     return idf
 
-def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
+def computeMetricsWithIdf(refToCand, candToRef, referencesWords, candidatesWords, allIdfDicts):
     """
     Calculates R, P and F measures for a given corpus using an IDF weighting.
 
@@ -182,18 +182,42 @@ def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
     """
     # R computation
     fullSum = []
-    for individualSimilarity in refToCand:
+    fullIdfSum = []
+    for individualSimilarity, candidate, idfDict in zip(refToCand, candidatesWords, allIdfDicts):
         currentSum = 0
-        for row in individualSimilarity:
-            currentSum += np.max(row)
+        currentIdfSum = 0
+        for row, word in zip(individualSimilarity, candidate):
+            currentMax = np.max(row)
+            currentIdf = getIdf(idfDict, word)
+            currentIdfSum += currentIdf
+            currentSum += (currentMax * currentIdf)
+        fullIdfSum.append(currentIdfSum)
         fullSum.append(currentSum)
     R = []
-    for sum, reference in zip(fullSum, references):
-        R.append((1/len(reference))*sum)
+    for sum, idfSum in zip(fullSum, fullIdfSum):
+        R.append((1/idfSum)*sum)
 
-
+    # P computation
+    fullSum = []
+    fullIdfSum = []
+    for individualSimilarity, reference, idfDict in zip(candToRef, referencesWords, allIdfDicts):
+        currentSum = 0
+        currentIdfSum = 0
+        for row, word in zip(individualSimilarity, reference):
+            currentMax = np.max(row)
+            currentIdf = getIdf(idfDict, word)
+            currentIdfSum += currentIdf
+            currentSum += (currentMax * currentIdf)
+        fullIdfSum.append(currentIdfSum)
+        fullSum.append(currentSum)
     P = []
-    F = []
+    for sum, idfSum in zip(fullSum, fullIdfSum):
+        P.append((1/idfSum)*sum)
 
+    # F computation
+    F = []
+    for r, p in zip(R, P):
+        f = 2*((p*r)/(p+r))
+        F.append(f)
 
     return (R, P, F)
