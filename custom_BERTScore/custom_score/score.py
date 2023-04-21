@@ -34,7 +34,7 @@ def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nb
     """
     Benchmarking function allowing to compute classical bertscore as well as its runtime.
 
-    :param1 data (DataFrame) : Dataframe containing all references and candidates. 
+    :param1 data (DataFrame) : Dataframe containing all references and candidates. Required Format : [col0: Reference, col1: Candidate].
     :param2 limit (int): Number of individuals to compute.
     :param3 modelPath (string): Path to the wanted model in the HuggingFace repository.
     :param4 model (object): Model to use directly for computation.
@@ -48,10 +48,8 @@ def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nb
     scores = []
     init_time = datetime.now()
     for row in data.iterrows():
-        curCand = [row[1][2]]
-        curRef = row[1][1]
-        curCand = [" ".join(row[1][2].split("\n"))]
-        curRef = [" ".join(row[1][1].split("\n"))]
+        curCand = [" ".join(row[1][1].split("\n"))]
+        curRef = [" ".join(row[1][0].split("\n"))]
         assert len(curCand) == len(curRef)
         if modelPath != None:
             (P, R, F), hashname = bert_score.score(curCand, curRef, lang="en", 
@@ -84,14 +82,13 @@ def StaticEmbeddingSampleTest(data, model, limit=3):
     :output1 scores (list): List of Precision, Recall and F1score for each computed individual.
     :output2 runtime (float): Elasped time between the start and end of score computation for all individuals.
     """
+
     nbIter = 1
     scores = []
     init_time = datetime.now()
     for row in data.iterrows():
-        curCand = [row[1][2]]
-        curRef = row[1][1]
-        curCand = [" ".join(row[1][2].split("\n"))]
-        curRef = [" ".join(row[1][1].split("\n"))]
+        curCand = [" ".join(row[1][1].split("\n"))]
+        curRef = [" ".join(row[1][0].split("\n"))]
         assert len(curCand) == len(curRef)
         
         (P, R, F) = score(model, curCand, curRef)

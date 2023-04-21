@@ -14,8 +14,12 @@ def model_load(model):
     """
     assert(type(model) == str)
     if model == "Word2Vec":
-        wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\custom_BERTScore\GoogleNews-vectors-negative300.bin.gz'
-        emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+        try:
+            wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\custom_BERTScore\GoogleNews-vectors-negative300.bin.gz'
+            emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+        except:
+            wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\GoogleNews-vectors-negative300.bin.gz'
+            emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
     else:
         print("Model not currently supported")
     return emb
@@ -130,23 +134,23 @@ def computeMetrics(refToCand, candToRef, references, candidates):
     
     return (R, P, F)
 
-def computeIdf(reference, candidate):
+def computeIdf(corpus):
     """
     Calculates IDF all words of a corpus
     Inspired from : https://www.freecodecamp.org/news/how-to-process-textual-data-using-tf-idf-in-python-cd2bbc0a94a3/
 
-    :param1 references (list): List of reference sentences.
-    :param2 candidates (list): List of candidate sentences.
+    :param1 corpus (String): Reference document.
 
     :output1 idfDict (dict): IDf dictionnary for a given corpus.
     """
-    corpus = reference + " " + candidate
+
     idfDict = {}
     splitCorpus = corpus.split(" ")
     N = len(splitCorpus)
     #idfDict = dict.fromkeys(set(splitCorpus), 0)
     for word in splitCorpus:
-        idfDict[word.lower()] = 1/N * splitCorpus.count(word)
+        wordFreq = splitCorpus.count(word)
+        idfDict[word.lower()] = -np.log(1/N * wordFreq) 
     return idfDict
 
 def getIdf(idfDict, word):
@@ -171,7 +175,18 @@ def computeMetricsWithIdf(refToCand, candToRef, references, candidates):
 
     :output (tuple): Tuple containing R, P and F for the current corpus.
     """
+    # R computation
+    fullSum = []
+    for individualSimilarity in refToCand:
+        currentSum = 0
+        for row in individualSimilarity:
+            currentSum += np.max(row)
+        fullSum.append(currentSum)
     R = []
+    for sum, reference in zip(fullSum, references):
+        R.append((1/len(reference))*sum)
+
+
     P = []
     F = []
 
