@@ -123,7 +123,10 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         fullSum.append(currentSum)
     R = []
     for sum, reference in zip(fullSum, references):
-        R.append((1/len(reference))*sum)
+        try:
+            R.append((1/len(reference))*sum)
+        except ZeroDivisionError:
+            R.append(0)
 
     # P computation
     fullSum = []
@@ -134,12 +137,18 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         fullSum.append(currentSum)
     P = []
     for sum, candidate in zip(fullSum, candidates):
-        P.append((1/len(candidate))*sum)
+        try:
+            P.append((1/len(candidate))*sum)
+        except ZeroDivisionError:
+            P.append(0.)
     
     # F computation
     F = []
     for r, p in zip(R, P):
-        f = 2*((p*r)/(p+r))
+        try:
+            f = 2*((p*r)/(p+r))
+        except ZeroDivisionError:
+            f = 0
         F.append(f)
     
     return (R, P, F)
