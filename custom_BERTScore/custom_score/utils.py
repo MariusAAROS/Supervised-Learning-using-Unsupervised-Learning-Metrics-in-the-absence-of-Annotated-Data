@@ -1,9 +1,10 @@
 import numpy as np
 from numpy.linalg import norm
 from gensim.models import KeyedVectors
+import pickle
 
 
-def model_load(model):
+def model_load(model, serialized=False):
     """
     Loads Keyed-vectors for the desired model.
 
@@ -14,14 +15,23 @@ def model_load(model):
     """
     assert(type(model) == str)
     if model == "Word2Vec":
-        try:
-            wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\custom_BERTScore\GoogleNews-vectors-negative300.bin.gz'
-            emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
-        except:
-            wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\GoogleNews-vectors-negative300.bin.gz'
-            emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+        if not serialized:
+            try:
+                wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\custom_BERTScore\GoogleNews-vectors-negative300.bin.gz'
+                emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+            except:
+                wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\GoogleNews-vectors-negative300.bin.gz'
+                emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+        else:
+            try:
+                serialized_wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Models\serialized_w2v.pkl'
+                with open(serialized_wordvector_path, 'rb') as f:
+                    emb = pickle.load(f)
+                    f.close()
+            except:
+                pass
     else:
-        print("Model not currently supported")
+        print("Model not supported yet")
     return emb
 
 def encode(corpus, model):
