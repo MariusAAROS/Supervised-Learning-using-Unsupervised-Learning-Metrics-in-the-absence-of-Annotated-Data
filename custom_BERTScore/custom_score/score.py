@@ -118,3 +118,41 @@ def StaticEmbeddingSampleTest(data, model, limit=3, withIdf = False):
         nbIter += 1
     runtime = (datetime.now() - init_time).total_seconds()
     return scores, runtime
+
+def simplify(reference, model, reductionFactor=2, maxSpacing=10):
+    """
+    Return a reduced string computed using static embedding vectors similarity. Also denoises the data by removing superfluous elements such as "\n" or useless signs.
+ 
+    :param1 reference (string): Document to simplify.
+    :param2 model (dict): Dictionnary of keyed-vectors.
+    :param3 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
+    :param4 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
+
+    :output simplified (string): Simplified version of the initial document.
+    """
+
+    #preprocess corpus
+    clean = cleanString(reference, maxSpacing)
+    sentences = clean.split(".")
+    sentences.pop()
+    respaced_sentences = []
+    for sentence in sentences:
+        if sentence[0] == " ":
+            sentence = sentence[1:]
+        respaced_sentences.append(sentence)
+    
+    corpus = " ".join(respaced_sentences)
+    scores = []
+    for sentence in respaced_sentences:
+        (R, _, _) = score(model, [sentence], [corpus])
+        scores.append(R[0])
+
+    indices = sentenceSelection(respaced_sentences, scores, reductionFactor)
+    
+    simplified = []
+    for index in indices:
+        simplified.append(respaced_sentences[index])
+    
+    simplified = " ".join(simplified)
+
+    return simplified

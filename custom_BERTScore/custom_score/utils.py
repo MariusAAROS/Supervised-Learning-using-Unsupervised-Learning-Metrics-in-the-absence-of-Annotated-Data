@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 from gensim.models import KeyedVectors
 import pickle
+from random import uniform
 
 
 def model_load(model, serialized=False):
@@ -240,3 +241,45 @@ def computeMetricsWithIdf(refToCand, candToRef, referencesWords, candidatesWords
         F.append(f)
 
     return (R, P, F)
+
+def cleanString(string, maxSpacing=10):
+    """
+    :param1 string (string): Initial corpus
+    :param2 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
+
+    :output clean (string): Cleansed corpus
+    """
+
+    clean = string[:]
+
+    #remove linebreaks  
+    clean = clean.replace("\n", " ")
+    clean = clean.replace("-", "")
+
+    #remove surplus spacing
+    spacing = "".join([" " for _ in range(maxSpacing)])
+    for _ in range(maxSpacing-1):
+        spacing = spacing[:-1]
+        clean = clean.replace(spacing, " ")
+    
+    return clean
+
+def sentenceSelection(corpus, scores, reductionFactor=2):
+    """
+    Returns a list of selected indices of sentence that will constituate the new corpus.
+
+    :param1 corpus (list): List of sentences of the reference document.
+    :param2 scores (list): List of the similarity scores of each sentence of the reference compared to the entire reference document.
+    :param3 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
+
+    :output selected_indexes (list): List of indexes of the initial corpus sentences that have been selected.
+    """
+    totalLength = len(corpus)
+    targetLength = int(totalLength/reductionFactor)
+    selected_indexes = []
+    
+    randomized_scores = [np.mean([curScore, uniform(0, 1)]) for curScore in scores]
+    ranking = np.argsort(randomized_scores)[::-1]
+    selected_indexes = ranking[:targetLength]
+
+    return selected_indexes
