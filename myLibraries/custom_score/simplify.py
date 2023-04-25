@@ -32,14 +32,16 @@ class Simplifier:
             if sentence[0] == " ":
                 sentence = sentence[1:]
             respaced_sentences.append(sentence)
-        
         corpus = " ".join(respaced_sentences)
+
+        #compute ranking
         scores = []
         for sentence in respaced_sentences:
             scoreOut = score(self.model, [sentence], [corpus])
             R = parseScore(scoreOut)
             scores.append(R)
 
+        #selection of best individuals
         indices = sentenceSelection(respaced_sentences, scores, self.rf)
         
         simplified = []
