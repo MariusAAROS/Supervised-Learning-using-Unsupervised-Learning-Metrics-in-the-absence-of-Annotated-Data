@@ -321,5 +321,5 @@ def parseScore(evalScore, position=0):
     if castedEvalScore.ndim == 1:
         parsedScore = evalScore[0]
     if castedEvalScore.ndim == 2:
-        parsedScore = evalScore[0][position] #considering recall is the first element
+        parsedScore = evalScore[0][position]
     return parsedScore
