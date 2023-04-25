@@ -283,3 +283,20 @@ def sentenceSelection(corpus, scores, reductionFactor=2):
     selected_indexes = ranking[:targetLength]
 
     return selected_indexes
+
+def parseScore(evalScore, position=0):
+    """
+    Extracted the metric of interrest from the output structure of the scorer function.
+
+    :param1 evalScore (unknown): Output of the scorer function.
+    
+    :output parsedScore (float): Extracted score value. 
+    """
+    castedEvalScore = np.array(evalScore)
+    if castedEvalScore.ndim == 0:
+        parsedScore = evalScore
+    if castedEvalScore.ndim == 1:
+        parsedScore = evalScore[0]
+    if castedEvalScore.ndim == 2:
+        parsedScore = evalScore[0][position] #considering recall is the first element
+    return parsedScore

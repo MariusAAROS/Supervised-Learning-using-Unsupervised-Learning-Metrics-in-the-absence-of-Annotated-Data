@@ -4,9 +4,10 @@ from .score import score
 
 class Simplifier:
 
-    def __init__(self, corpus, model, reductionFactor=2, maxSpacing=10):
+    def __init__(self, corpus, model, scorer=score, reductionFactor=2, maxSpacing=10):
         self.corpus = corpus
         self.model = model
+        self.scorer = scorer
         self.rf = reductionFactor
         self.ms = maxSpacing
 
@@ -35,8 +36,9 @@ class Simplifier:
         corpus = " ".join(respaced_sentences)
         scores = []
         for sentence in respaced_sentences:
-            (R, _, _) = score(self.model, [sentence], [corpus])
-            scores.append(R[0])
+            scoreOut = score(self.model, [sentence], [corpus])
+            R = parseScore(scoreOut)
+            scores.append(R)
 
         indices = sentenceSelection(respaced_sentences, scores, self.rf)
         
