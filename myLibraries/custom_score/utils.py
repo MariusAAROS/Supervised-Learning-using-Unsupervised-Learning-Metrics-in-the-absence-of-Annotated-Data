@@ -6,15 +6,28 @@ from random import uniform
 
 
 def model_to_serialized(model, path):
+    """
+    Dumps a model to the specified path.
+
+    :param1 model (Any): Variable of the system.
+    :param2 path (string): Path to save the searialized model.
+    """
     with open(path, 'wb') as f:
         pickle.dump(model, f)
         f.close()
 
 def serialized_to_model(path):
+    """
+    Loads a serialized model saved to the specified path.
+
+    :param1 path (string): Path where the serialized model is saved.
+
+    :output model (Any): Variable loaded from the dumped memory.
+    """
     with open(path, 'rb') as f:
-        w2v = pickle.load(f)
+        model = pickle.load(f)
         f.close()
-    return w2v
+    return model
 
 def model_load(model, serialized=False):
     """
