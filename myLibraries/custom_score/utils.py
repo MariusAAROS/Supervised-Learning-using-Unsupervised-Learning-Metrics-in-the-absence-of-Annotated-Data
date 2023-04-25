@@ -5,6 +5,17 @@ import pickle
 from random import uniform
 
 
+def model_to_serialized(model, path):
+    with open(path, 'wb') as f:
+        pickle.dump(model, f)
+        f.close()
+
+def serialized_to_model(path):
+    with open(path, 'rb') as f:
+        w2v = pickle.load(f)
+        f.close()
+    return w2v
+
 def model_load(model, serialized=False):
     """
     Loads Keyed-vectors for the desired model.
@@ -26,11 +37,10 @@ def model_load(model, serialized=False):
         else:
             try:
                 serialized_wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Models\serialized_w2v.pkl'
-                with open(serialized_wordvector_path, 'rb') as f:
-                    emb = pickle.load(f)
-                    f.close()
+                emb = serialized_to_model(serialized_wordvector_path)
             except:
-                pass
+                serialized_wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\serialized_w2v.pkl'
+                emb = serialized_to_model(serialized_wordvector_path)
     else:
         print("Model not supported yet")
     return emb
