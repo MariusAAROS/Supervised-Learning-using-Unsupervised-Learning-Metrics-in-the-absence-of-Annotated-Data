@@ -53,7 +53,7 @@ class Simplifier:
             #compute ranking
             scores = []
             for sentence in respaced_sentences:
-                scoreOut = score(self.model, [sentence], [indiv])
+                scoreOut = self.scorer(self.model, [sentence], [indiv])
                 R = parseScore(scoreOut)
                 scores.append(R)
 
@@ -79,14 +79,15 @@ class Simplifier:
         assert self.simplified != None, "simplified corpus doesn't exists"
 
         #Static BERTScore computation
-        customScore = score(self.model, self.simplified, self.corpus)
+        scoreOut = self.scorer(self.model, self.simplified, self.corpus)
+        customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
         rougeScore = [rougeScorer.score(s, c) for s, c in zip(self.simplified, self.corpus)]
 
         #Data formating
-        custom_R = [round(t[0], 2) for t in customScore]
+        custom_R = [round(t, 2) for t in customScore]
         rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
         rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
 
@@ -96,8 +97,8 @@ class Simplifier:
                                 })
 
         #Correlation estimation
-        pearsonCor_c_r1 = pearsonr(custom_R, rouge1_R)
-        pearsonCor_c_rl = pearsonr(custom_R, rougeL_R)
+        pearsonCor_c_r1 = np.round(pearsonr(custom_R, rouge1_R), 2)
+        pearsonCor_c_rl = np.round(pearsonr(custom_R, rougeL_R), 2)
 
         dfCor = pd.DataFrame({'pearson_CBERT_R-1' : pearsonCor_c_r1,
                             'pearson_CBERT_R-L' : pearsonCor_c_rl}, index=["Pearson score", "p-value"])

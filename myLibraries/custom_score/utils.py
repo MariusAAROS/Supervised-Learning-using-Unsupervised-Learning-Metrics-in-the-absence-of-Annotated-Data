@@ -297,13 +297,20 @@ def sentenceSelection(corpus, scores, reductionFactor=2):
 
     :output selected_indexes (list): List of indexes of the initial corpus sentences that have been selected.
     """
-    totalLength = len(corpus)
+    totalLength = len(" ".join(corpus))
     targetLength = int(totalLength/reductionFactor)
     selected_indexes = []
     
     randomized_scores = [np.mean([curScore, uniform(0, 1)]) for curScore in scores]
     ranking = np.argsort(randomized_scores)[::-1]
-    selected_indexes = ranking[:targetLength]
+
+    selectedLength = 0
+    selected_indexes = []
+    cur = 0
+    while(selectedLength < targetLength):
+        selected_indexes.append(ranking[cur])
+        selectedLength += len(corpus[ranking[cur]])
+        cur += 1
 
     return selected_indexes
 
