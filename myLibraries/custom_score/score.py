@@ -11,7 +11,7 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"], w
     :param2 references (list): List of reference sentences.
     :param3 candidates (list): List of candidate sentences.
 
-    :output (tuple): Tuple containing R, P and F for each couple of the current corpus.
+    :output formatedScores (List): List containing tuples of R, P and F for each couple of the current corpus.
     """
     #storing raw references for IDF Calculus
     raw_references = [reference for reference in references]
@@ -44,7 +44,8 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"], w
     else:
         (R, P, F) = computeMetrics(refToCand, candToRef, references, candidates)
 
-    return (R, P, F)
+    formatedScores = [(r, p, f) for r, p, f in zip(R, P, F)]
+    return formatedScores
 
 def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nbLayers = 24):
     """
