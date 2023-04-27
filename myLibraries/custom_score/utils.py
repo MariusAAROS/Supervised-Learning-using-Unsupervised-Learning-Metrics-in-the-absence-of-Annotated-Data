@@ -42,7 +42,7 @@ def model_load(model, serialized=False):
     if model == "Word2Vec":
         if not serialized:
             try:
-                wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\custom_BERTScore\GoogleNews-vectors-negative300.bin.gz'
+                wordvector_path = r'C:\Pro\Stages\A4 - DVRC\Work\Models\GoogleNews-vectors-negative300.bin.gz'
                 emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
             except:
                 wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\GoogleNews-vectors-negative300.bin.gz'

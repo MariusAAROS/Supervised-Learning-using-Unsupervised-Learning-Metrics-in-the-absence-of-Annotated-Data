@@ -47,7 +47,7 @@ def score(model, candidates=["I am Marius"], references=["Marius is my name"], w
     formatedScores = [(r, p, f) for r, p, f in zip(R, P, F)]
     return formatedScores
 
-def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nbLayers = 24):
+def BERTScoreDynamicSampleTest(data, limit=3, modelPath = None, model = None, nbLayers = 24):
     """
     Benchmarking function allowing to compute classical bertscore as well as its runtime.
 
@@ -88,7 +88,7 @@ def DynamicEmbeddingSampleTest(data, limit=3, modelPath = None, model = None, nb
     runtime = (datetime.now() - init_time).total_seconds()
     return scores, runtime
 
-def StaticEmbeddingSampleTest(data, model, limit=3, withIdf = False):
+def BERTScoreStaticSampleTest(data, model, limit=3, withIdf = False):
     """
     Benchmarking function allowing to compute static bertscore as well as its runtime.
 
@@ -108,12 +108,8 @@ def StaticEmbeddingSampleTest(data, model, limit=3, withIdf = False):
         curRef = [" ".join(row[1][0].split("\n"))]
         assert len(curCand) == len(curRef)
         
-        (P, R, F) = score(model, curCand, curRef, withIdf=withIdf)
-        P = P[0]
-        R = R[0]
-        F = F[0]
-        scores.append((P, R, F))
-
+        out = score(model, curCand, curRef, withIdf=withIdf)
+        scores.append(out[0])
         if nbIter >= limit:
             break
         nbIter += 1
