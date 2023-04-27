@@ -1,7 +1,10 @@
 from .utils import *
 import numpy as np
 from datetime import datetime
-import bert_score 
+import bert_score
+import sys 
+sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\BARTScore")
+from bart_score import BARTScorer
 
 def score(model, candidates=["I am Marius"], references=["Marius is my name"], withIdf = False):
     """
@@ -114,4 +117,39 @@ def BERTScoreStaticSampleTest(data, model, limit=3, withIdf = False):
             break
         nbIter += 1
     runtime = (datetime.now() - init_time).total_seconds()
+    return scores, runtime
+
+def BARTScoreDynamicSampleTest(data, limit=3):
+    """
+    Benchmarking function allowing to compute classical bertscore as well as its runtime.
+
+    :param1 data (DataFrame) : Dataframe containing all references and candidates. Required Format : [col0: Reference, col1: Candidate].
+    :param2 limit (int): Number of individuals to compute.
+    :param3 modelPath (string): Path to the wanted model in the HuggingFace repository.
+    :param4 model (object): Model to use directly for computation.
+    :param5 nbLayers (int): Number of layers in the custom model (has to be filled-in if modelPath!=None or model!=None).  
+    
+    :output1 scores (list): List of Precision, Recall and F1score for each computed individual.
+    :output2 runtime (float): Elasped time between the start and end of score computation for all individuals.
+    """
+
+    
+    nbIter = 1
+    scores = []
+    bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
+    init_time = datetime.now()
+    for row in data.iterrows():
+        curCand = [" ".join(row[1][1].split("\n"))]
+        curRef = [" ".join(row[1][0].split("\n"))]
+        assert len(curCand) == len(curRef)
+        
+        score = bart_scorer.score(curRef, curCand, batch_size=4)
+        score = score[0]
+        
+        scores.append(score)
+        if nbIter >= limit:
+            break
+        nbIter += 1
+    runtime = (datetime.now() - init_time).total_seconds()
+    #scores = np.exp(scores)
     return scores, runtime
