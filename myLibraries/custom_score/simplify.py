@@ -104,3 +104,14 @@ class Simplifier:
                             'pearson_CBERT_R-L' : pearsonCor_c_rl}, index=["Pearson score", "p-value"])
 
         return {"scores": dfCustom, "correlations": dfCor}
+    
+    def __str__(self) -> str:
+        printout = "--------SIMPLIFIER OBJECT--------\n\n"
+        printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
+        printout += "Corpus Avg Size     : " + str(np.average([len(x) for x in self.corpus])) + "\n"
+        printout += "Simplified Avg Size : " + str(np.average([len(x) for x in self.simplified])) + "\n"
+        printout += "Reduction Factor    : " + str(self.rf) + "\n"
+        printout += "Maximum Spacing     : " + str(self.ms) + "\n"
+        printout += "--------------------------------"
+        return printout
+        
