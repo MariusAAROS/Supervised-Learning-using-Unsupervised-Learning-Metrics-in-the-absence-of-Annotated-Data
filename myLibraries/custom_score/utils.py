@@ -150,7 +150,7 @@ def computeMetrics(refToCand, candToRef, references, candidates):
         try:
             R.append((1/len(reference))*sum)
         except ZeroDivisionError:
-            R.append(0)
+            R.append(0.)
 
     # P computation
     fullSum = []
