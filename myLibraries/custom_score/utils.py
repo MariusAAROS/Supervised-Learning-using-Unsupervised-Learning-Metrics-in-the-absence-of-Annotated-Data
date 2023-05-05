@@ -287,7 +287,7 @@ def cleanString(string, maxSpacing=10):
     
     return clean
 
-def sentenceSelection(corpus, scores, reductionFactor=2):
+def sentenceSelection(corpus, scores, distances, reductionFactor=2):
     """
     Returns a list of selected indices of sentence that will constituate the new corpus.
 
@@ -306,10 +306,18 @@ def sentenceSelection(corpus, scores, reductionFactor=2):
 
     selectedLength = 0
     selected_indexes = []
+    current_distance = lambda x: norm([distances[ranking[x]][i] for i in selected_indexes])
     cur = 0
     while(selectedLength < targetLength):
-        selected_indexes.append(ranking[cur])
-        selectedLength += len(corpus[ranking[cur]])
+        if cur == 0:
+            selected_indexes.append(ranking[cur])
+            selectedLength += len(corpus[ranking[cur]])
+        else:
+            updated_scores = [randomized_scores[i]*current_distance(i) for i in range(len(randomized_scores))]
+            updated_ranking = np.argsort(updated_scores)[::-1]
+            updated_ranking = [index for index in updated_ranking if index not in selected_indexes]
+            selected_indexes.append(updated_ranking[0])
+            selectedLength += len(corpus[updated_ranking[0]])
         cur += 1
 
     return selected_indexes
@@ -330,3 +338,36 @@ def parseScore(evalScore, position=0):
     if castedEvalScore.ndim == 2:
         parsedScore = evalScore[0][position]
     return parsedScore
+
+def parseDistances(distances):
+    """
+    Converts score to a value interpretable as distance (the greatest the value, the greatest the distance).
+
+    :param1 distances (List): List of distances values for each sentences of a corpus with respect to all the others sentences.
+
+    :output parsedDisctances (List): List of converted distances. 
+    """
+    refDist = distances[0][0]
+    toPositive = False 
+    toInverse = False
+
+    if refDist < 0:
+        toPositive = True
+    if refDist >=-1 and refDist <=1:
+        toInverse = True
+    
+    parsedDistances = []
+    for distance in distances:
+        parsedDistance = []
+        for value in distance:
+            cur = value
+            if toPositive:
+                cur = -cur
+            if toInverse:
+                try:
+                    cur = 1/cur
+                except ZeroDivisionError:
+                    cur = 1
+            parsedDistance.append(cur)
+        parsedDistances.append(parsedDistance)
+    return parsedDistances

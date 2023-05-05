@@ -3,6 +3,7 @@ from .score import score
 from rouge_score import rouge_scorer
 import pandas as pd
 from scipy.stats import pearsonr
+from numpy.linalg import norm
 
 
 class Refiner:
@@ -27,7 +28,7 @@ class Refiner:
     def refine(self):
         """
         Return a reduced string computed using static embedding vectors similarity. Also denoises the data by removing superfluous elements such as "\n" or useless signs.
-    
+
         :param1 self (Refiner): Refiner Object (see __init__ function for more details).
 
         :output refined (string): refined version of the initial document.
@@ -56,9 +57,26 @@ class Refiner:
                 scoreOut = self.scorer(self.model, [sentence], [indiv])
                 R = parseScore(scoreOut)
                 scores.append(R)
+            
+            #compute distances
+            distances = []
+            for x in range(len(respaced_sentences)):
+                distance = []
+                for y in range(len(respaced_sentences)):
+                    if x != y:
+                        try:
+                            scoreOut = self.scorer(self.model, [respaced_sentences[x]], [respaced_sentences[y]])
+                            curDistance = parseScore(scoreOut)
+                        except:
+                            curDistance = -1
+                    else:
+                        curDistance = 1
+                    distance.append(curDistance)
+                distances.append(distance)
+            distances = parseDistances(distances)
 
             #selection of best individuals
-            indices = sentenceSelection(respaced_sentences, scores, self.rf)
+            indices = sentenceSelection(respaced_sentences, scores, distances, self.rf)
             
             curRefined = []
             for index in indices:
@@ -106,11 +124,11 @@ class Refiner:
         return {"scores": dfCustom, "correlations": dfCor}
     
     def __str__(self) -> str:
-        printout = "--------REFINER OBJECT--------\n\n"
+        printout = "--------REFINER OBJECT--------\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
         printout += "Reduction Factor    : " + str(self.rf) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
-        printout += "--------------------------------"
+        printout += "------------------------------"
         return printout
