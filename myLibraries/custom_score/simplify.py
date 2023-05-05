@@ -108,8 +108,8 @@ class Simplifier:
     def __str__(self) -> str:
         printout = "--------SIMPLIFIER OBJECT--------\n\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
-        printout += "Corpus Avg Size     : " + str(np.average([len(x) for x in self.corpus])) + "\n"
-        printout += "Simplified Avg Size : " + str(np.average([len(x) for x in self.simplified])) + "\n"
+        printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
+        printout += "Simplified Avg Size : " + str(int(np.average([len(x) for x in self.simplified]))+1) + "\n"
         printout += "Reduction Factor    : " + str(self.rf) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         printout += "--------------------------------"
