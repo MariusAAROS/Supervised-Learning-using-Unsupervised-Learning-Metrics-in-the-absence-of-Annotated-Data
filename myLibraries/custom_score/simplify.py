@@ -5,13 +5,13 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 
-class Simplifier:
+class Refiner:
 
     def __init__(self, corpus, model, scorer=score, reductionFactor=2, maxSpacing=10):
         """
-        Constructor of the Simplifier class. Aims at reducing the size and noise of a given independant list of documents.
+        Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
-        :param1 self (Simplifier): Object to initialize.
+        :param1 self (Refiner): Object to initialize.
         :param2 corpus (List): List of documents to simplify.
         :param3 model (Any): Model used to compute scores and create sentence's ranking.
         :param4 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
@@ -22,17 +22,17 @@ class Simplifier:
         self.scorer = scorer
         self.rf = reductionFactor
         self.ms = maxSpacing
-        self.simplified = None
+        self.refined = None
 
-    def simplify(self):
+    def refine(self):
         """
         Return a reduced string computed using static embedding vectors similarity. Also denoises the data by removing superfluous elements such as "\n" or useless signs.
     
-        :param1 self (Simplifier): Simplifier Object (see __init__ function for more details).
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
 
-        :output simplified (string): Simplified version of the initial document.
+        :output refined (string): refined version of the initial document.
         """
-        self.simplified = []
+        self.refined = []
         for indiv in self.corpus:
             #preprocess corpus
             clean = cleanString(indiv, self.ms)
@@ -60,31 +60,31 @@ class Simplifier:
             #selection of best individuals
             indices = sentenceSelection(respaced_sentences, scores, self.rf)
             
-            curSimplified = []
+            curRefined = []
             for index in indices:
-                curSimplified.append(respaced_sentences[index])
+                curRefined.append(respaced_sentences[index])
             
-            curSimplified = " ".join(curSimplified)
-            self.simplified.append(curSimplified)
+            curRefined = " ".join(curRefined)
+            self.refined.append(curRefined)
 
     def assess(self, verbose=True):
         """
-        Assesses quality of the simplified corpus by computing Static BERTscore and Rouge-Score on the simplified version compared to it's initial version.
+        Assesses quality of the refined corpus by computing Static BERTscore and Rouge-Score on the refined version compared to it's initial version.
 
-        :param1 self (Simplifier): Simplifier Object (see __init__ function for more details).
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
         :param2 verbose (Boolean): When put to true, assess results will be printed.
 
         :output (dict): Dictionnary containing both the scores of Static BERTScore and Rouge as well as their correlation
         """
-        assert self.simplified != None, "simplified corpus doesn't exists"
+        assert self.refined != None, "refined corpus doesn't exists"
 
         #Static BERTScore computation
-        scoreOut = self.scorer(self.model, self.simplified, self.corpus)
+        scoreOut = self.scorer(self.model, self.refined, self.corpus)
         customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
-        rougeScore = [rougeScorer.score(s, c) for s, c in zip(self.simplified, self.corpus)]
+        rougeScore = [rougeScorer.score(s, c) for s, c in zip(self.refined, self.corpus)]
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
@@ -106,10 +106,10 @@ class Simplifier:
         return {"scores": dfCustom, "correlations": dfCor}
     
     def __str__(self) -> str:
-        printout = "--------SIMPLIFIER OBJECT--------\n\n"
+        printout = "--------REFINER OBJECT--------\n\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
-        printout += "Simplified Avg Size : " + str(int(np.average([len(x) for x in self.simplified]))+1) + "\n"
+        printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
         printout += "Reduction Factor    : " + str(self.rf) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         printout += "--------------------------------"
