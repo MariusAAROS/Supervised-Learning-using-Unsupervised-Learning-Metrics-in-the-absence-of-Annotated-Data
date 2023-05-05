@@ -77,7 +77,7 @@ class Refiner:
 
             #selection of best individuals
             indices = sentenceSelection(respaced_sentences, scores, distances, self.rf)
-            
+            indices.sort()
             curRefined = []
             for index in indices:
                 curRefined.append(respaced_sentences[index])
