@@ -4,11 +4,12 @@ from rouge_score import rouge_scorer
 import pandas as pd
 from scipy.stats import pearsonr
 from numpy.linalg import norm
+from colorama import Fore, Style
 
 
 class Refiner:
 
-    def __init__(self, corpus, model, scorer=score, reductionFactor=2, maxSpacing=10):
+    def __init__(self, corpus, model, scorer=score, reductionFactor=2, maxSpacing=10, printSlice=slice(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
@@ -17,13 +18,17 @@ class Refiner:
         :param3 model (Any): Model used to compute scores and create sentence's ranking.
         :param4 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
         :param5 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
+        :param6 printSlice (slice): Sclice of corpus that should be displayed when the Refiner object in printed. 
         """
         self.corpus = corpus
+        self.processedCorpus = None
         self.model = model
         self.scorer = scorer
         self.rf = reductionFactor
         self.ms = maxSpacing
         self.refined = None
+        self.printSlice = printSlice
+        self.selectedIndexes = None
 
     def refine(self):
         """
@@ -34,6 +39,7 @@ class Refiner:
         :output refined (string): refined version of the initial document.
         """
         self.refined = []
+        self.selectedIndexes = []
         for indiv in self.corpus:
             #preprocess corpus
             clean = cleanString(indiv, self.ms)
@@ -49,7 +55,7 @@ class Refiner:
                 if sentence[0] == " ":
                     sentence = sentence[1:]
                 respaced_sentences.append(sentence)
-            corpus = " ".join(respaced_sentences)
+            self.processedCorpus = respaced_sentences
 
             #compute ranking
             scores = []
@@ -82,7 +88,8 @@ class Refiner:
             for index in indices:
                 curRefined.append(respaced_sentences[index])
             
-            curRefined = " ".join(curRefined)
+            curRefined = ". \n".join(curRefined)
+            self.selectedIndexes.append(indices)
             self.refined.append(curRefined)
 
     def assess(self, verbose=True):
@@ -130,5 +137,10 @@ class Refiner:
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
         printout += "Reduction Factor    : " + str(self.rf) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
-        printout += "------------------------------"
+        #printout += "\nCorpus: \n" + str(".\n".join(self.corpus[self.printRange]))
+        printout += "\nCorpus: \n" + str(".\n".join([f'{Fore.LIGHTGREEN_EX}{self.processedCorpus[i]}{Style.RESET_ALL}'
+                                                     if i in self.selectedIndexes[0]
+                                                     else f"{Fore.RED}{self.processedCorpus[i]}{Style.RESET_ALL}" 
+                                                     for i in range(len(self.processedCorpus))])) + "."
+        printout += "\n------------------------------"
         return printout
