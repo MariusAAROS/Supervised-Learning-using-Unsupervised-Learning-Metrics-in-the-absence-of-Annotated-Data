@@ -275,11 +275,14 @@ def cleanString(string, maxSpacing=10):
 
     clean = string[:]
 
-    #remove linebreaks  
+    #remove linebreaks and superfluous characters 
     clean = clean.replace("\n", " ")
     clean = clean.replace("-", "")
+    clean = clean.replace("''", "")
+    clean = clean.replace("``", "")
+    clean = clean.replace('""', "")
 
-    #remove surplus spacing
+    #remove overspacing
     spacing = "".join([" " for _ in range(maxSpacing)])
     for _ in range(maxSpacing-1):
         spacing = spacing[:-1]
