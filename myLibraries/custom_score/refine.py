@@ -39,6 +39,7 @@ class Refiner:
         """
         self.refined = []
         self.selectedIndexes = []
+        self.processedCorpus = []
         for indiv in self.corpus:
             #preprocess corpus
             clean = cleanString(indiv, self.ms)
@@ -54,7 +55,7 @@ class Refiner:
                 if sentence[0] == " ":
                     sentence = sentence[1:]
                 respaced_sentences.append(sentence)
-            self.processedCorpus = respaced_sentences
+            self.processedCorpus.append(respaced_sentences)
 
             #compute ranking
             scores = []
@@ -126,6 +127,12 @@ class Refiner:
 
         dfCor = pd.DataFrame({'pearson_CBERT_R-1' : pearsonCor_c_r1,
                             'pearson_CBERT_R-L' : pearsonCor_c_rl}, index=["Pearson score", "p-value"])
+        if verbose:
+            printout = "Scores: \n"
+            printout += dfCustom.to_string() + "\n\n"
+            printout += "Correlations: \n"
+            printout += dfCor.to_string()
+            print(printout)
 
         return {"scores": dfCustom, "correlations": dfCor}
     
@@ -138,9 +145,9 @@ class Refiner:
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         #printout += "\nCorpus: \n" + str(".\n".join(self.corpus[self.printRange]))
         for index in self.printRange:
-            printout += f"\nCorpus no.{index} : \n" + str(".\n".join([f'{Fore.LIGHTGREEN_EX}{self.processedCorpus[i]}{Style.RESET_ALL}'
-                                                        if i in self.selectedIndexes[0]
-                                                        else f"{Fore.RED}{self.processedCorpus[i]}{Style.RESET_ALL}" 
-                                                        for i in range(len(self.processedCorpus))])) + "." + "\n"
+            printout += f"\nCorpus no.{index} : \n" + str(".\n".join([f'{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}'
+                                                        if i in self.selectedIndexes[index]
+                                                        else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}" 
+                                                        for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
         printout += "\n------------------------------"
         return printout
