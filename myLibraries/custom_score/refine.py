@@ -5,6 +5,7 @@ import bert_score
 import pandas as pd
 from scipy.stats import pearsonr
 from colorama import Fore, Style
+import contextlib
 
 
 class Refiner:
@@ -115,7 +116,9 @@ class Refiner:
         #BERTScore computation
         
         #bertscore = [bert_score.score([r], [c], lang="en", verbose=0) for c, r in zip(self.corpus, self.refined)]
-        bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
+        with open(os.devnull, 'w') as devnull:
+            with contextlib.redirect_stdout(devnull):
+                bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
