@@ -1,6 +1,7 @@
 from .utils import *
 from .score import score 
 from rouge_score import rouge_scorer
+import bert_score
 import pandas as pd
 from scipy.stats import pearsonr
 from colorama import Fore, Style
@@ -109,14 +110,21 @@ class Refiner:
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
-        rougeScore = [rougeScorer.score(s, c) for s, c in zip(self.refined, self.corpus)]
+        rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.corpus, self.refined)]
+
+        #BERTScore computation
+        
+        #bertscore = [bert_score.score([r], [c], lang="en", verbose=0) for c, r in zip(self.corpus, self.refined)]
+        bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
+        bertscore_R = [round(t.item(), 2) for t in bertscore[1]]
         rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
         rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
 
         dfCustom = pd.DataFrame({'CBERT' : custom_R,
+                                 'BERTScore' : bertscore_R,
                                 'R-1' : rouge1_R,
                                 'R-L' : rougeL_R
                                 })
@@ -124,9 +132,13 @@ class Refiner:
         #Correlation estimation
         pearsonCor_c_r1 = np.round(pearsonr(custom_R, rouge1_R), 2)
         pearsonCor_c_rl = np.round(pearsonr(custom_R, rougeL_R), 2)
+        pearsonCor_bertscore_r1 = np.round(pearsonr(bertscore_R, rouge1_R), 2)
+        pearsonCor_bertscore_rl = np.round(pearsonr(bertscore_R, rougeL_R), 2)
 
         dfCor = pd.DataFrame({'pearson_CBERT_R-1' : pearsonCor_c_r1,
-                            'pearson_CBERT_R-L' : pearsonCor_c_rl}, index=["Pearson score", "p-value"])
+                              'pearson_CBERT_R-L' : pearsonCor_c_rl,
+                              'pearson_BERT_R-1' : pearsonCor_bertscore_r1,
+                              'pearson_BERT_R-l' : pearsonCor_bertscore_rl}, index=["Pearson score", "p-value"])
         if verbose:
             printout = "Scores: \n"
             printout += dfCustom.to_string() + "\n\n"

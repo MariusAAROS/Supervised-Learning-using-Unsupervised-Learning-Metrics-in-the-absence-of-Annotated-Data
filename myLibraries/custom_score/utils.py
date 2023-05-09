@@ -3,6 +3,8 @@ from numpy.linalg import norm
 from gensim.models import KeyedVectors
 import pickle
 from random import uniform
+from contextlib import contextmanager
+import sys, os
 
 
 def model_to_serialized(model, path):
@@ -374,3 +376,16 @@ def parseDistances(distances):
             parsedDistance.append(cur)
         parsedDistances.append(parsedDistance)
     return parsedDistances
+
+@contextmanager
+def suppress_stdout():
+    """
+    Decorator supressing console output. Source : http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
+    """
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
