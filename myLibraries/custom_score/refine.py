@@ -9,14 +9,14 @@ from colorama import Fore, Style
 
 class Refiner:
 
-    def __init__(self, corpus, model, scorer=score, reductionFactor=2, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, model, scorer=score, ratio=2, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
         :param1 self (Refiner): Object to initialize.
         :param2 corpus (List): List of documents to simplify.
         :param3 model (Any): Model used to compute scores and create sentence's ranking.
-        :param4 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
+        :param4 ratio (float or int): Number determining how much the reference text will be shortened. 
         :param5 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
         :param6 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
         """
@@ -24,7 +24,7 @@ class Refiner:
         self.processedCorpus = None
         self.model = model
         self.scorer = scorer
-        self.rf = reductionFactor
+        self.ratio = ratio
         self.ms = maxSpacing
         self.refined = None
         self.printRange = printRange
@@ -82,7 +82,7 @@ class Refiner:
             distances = parseDistances(distances)
 
             #selection of best individuals
-            indices = sentenceSelection(respaced_sentences, scores, distances, self.rf)
+            indices = sentenceSelection(respaced_sentences, scores, distances, self.ratio)
             indices.sort()
             curRefined = []
             for index in indices:
@@ -131,11 +131,11 @@ class Refiner:
         return {"scores": dfCustom, "correlations": dfCor}
     
     def __str__(self) -> str:
-        printout = "--------REFINER OBJECT--------\n"
+        printout = "--------REFINER OBJECT--------\n\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
-        printout += "Reduction Factor    : " + str(self.rf) + "\n"
+        printout += "Reduction Factor    : " + str(self.ratio) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         #printout += "\nCorpus: \n" + str(".\n".join(self.corpus[self.printRange]))
         for index in self.printRange:
