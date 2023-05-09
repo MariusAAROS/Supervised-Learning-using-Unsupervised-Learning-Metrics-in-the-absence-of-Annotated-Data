@@ -145,9 +145,9 @@ class Refiner:
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         #printout += "\nCorpus: \n" + str(".\n".join(self.corpus[self.printRange]))
         for index in self.printRange:
-            printout += f"\nCorpus no.{index} : \n" + str(".\n".join([f'{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}'
+            printout += f"\nCorpus no.{index} : \n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         if i in self.selectedIndexes[index]
-                                                        else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}" 
+                                                        else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
         printout += "\n------------------------------"
         return printout
