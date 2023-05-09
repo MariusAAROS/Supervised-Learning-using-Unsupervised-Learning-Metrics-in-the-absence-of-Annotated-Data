@@ -143,9 +143,11 @@ class Refiner:
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
         printout += "Reduction Factor    : " + str(self.ratio) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
-        #printout += "\nCorpus: \n" + str(".\n".join(self.corpus[self.printRange]))
+        
+        self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
+
         for index in self.printRange:
-            printout += f"\nCorpus no.{index} : \n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+            printout += f"\nCorpus no.{index+1} : \n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         if i in self.selectedIndexes[index]
                                                         else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
