@@ -3,7 +3,6 @@ from .score import score
 from rouge_score import rouge_scorer
 import pandas as pd
 from scipy.stats import pearsonr
-from numpy.linalg import norm
 from colorama import Fore, Style
 
 
