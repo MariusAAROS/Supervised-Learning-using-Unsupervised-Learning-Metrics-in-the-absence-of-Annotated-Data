@@ -180,6 +180,12 @@ class Refiner:
 
         return {"scores": dfCustom, "correlations": dfCor}
     
+    def to_dataframe(self):
+        output = pd.DataFrame({"text": self.corpus,
+                               "summary": self.refined,
+                               "processedText": [". ".join(c) for c in self.processedCorpus]})
+        return output
+
     def __str__(self) -> str:
         printout = "--------REFINER OBJECT--------\n\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
