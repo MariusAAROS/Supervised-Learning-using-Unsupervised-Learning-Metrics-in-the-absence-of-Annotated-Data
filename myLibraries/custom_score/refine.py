@@ -116,9 +116,8 @@ class Refiner:
         #BERTScore computation
         
         #bertscore = [bert_score.score([r], [c], lang="en", verbose=0) for c, r in zip(self.corpus, self.refined)]
-        with open(os.devnull, 'w') as devnull:
-            with contextlib.redirect_stdout(devnull):
-                bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
+        with nostd():
+            bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
