@@ -3,7 +3,7 @@
 <head><meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>refine_sandbox</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>refine_sandboxV2</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
 
 
@@ -15102,7 +15102,71 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --></head>
+<body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 
+<div  class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Libraries">Libraries<a class="anchor-link" href="#Libraries">&#182;</a></h3>
+</div>
+</div>
+</div>
+</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">custom_score.score</span> <span class="kn">import</span> <span class="n">score</span>
+<span class="kn">from</span> <span class="nn">custom_score.utils</span> <span class="kn">import</span> <span class="n">serialized_to_model</span>
+
+<span class="kn">from</span> <span class="nn">custom_score.refine</span> <span class="kn">import</span> <span class="n">Refiner</span>
+<span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="nn">tfds</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
+<pre>c:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\.venv\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div  class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="Test-on-Billsum">Test on Billsum<a class="anchor-link" href="#Test-on-Billsum">&#182;</a></h3>
 </div>
 </div>
@@ -15115,12 +15179,10 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">billsum</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;huggingface:billsum&#39;</span><span class="p">)</span>
-<span class="n">billsum_test</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">as_dataframe</span><span class="p">(</span><span class="n">billsum</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">billsum_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:\Pro\Stages\A4 - DVRC\Work\Datasets\billsum&quot;</span>
+<span class="n">billsum_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path_or_buf</span> <span class="o">=</span> <span class="n">billsum_path</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\us_test_data_final_OFFICIAL.jsonl&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">billsum_test</span> <span class="o">=</span> <span class="n">billsum_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;summary&quot;</span><span class="p">]]</span>
-<span class="n">billsum_test</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">billsum_test</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="n">billsum_test</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">billsum_test</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="n">billsum_test</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">billsum_test</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15167,27 +15229,17 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     <tr>
       <th>0</th>
       <td>SECTION 1. SHORT TITLE.\n\n    This Act may be...</td>
-      <td>Local Innovation and Coastal Protection Act of...</td>
+      <td>National Science Education Tax Incentive for B...</td>
     </tr>
     <tr>
       <th>1</th>
       <td>SECTION 1. SHORT TITLE.\n\n    This Act may be...</td>
-      <td>Gun Show Background Check Act of 2008 - Amends...</td>
+      <td>Small Business Expansion and Hiring Act of 201...</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>SECTION 1. SHORT TITLE.\n\n    This Act may be...</td>
-      <td>Recycled Roads Act of 2003 - Directs the Secre...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>SECTION 1. SHORT TITLE.\n\n    This Act may be...</td>
-      <td>Prosthetic and Custom Orthotic Parity Act of 2...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>SECTION 1. SHORT TITLE.\n\n    This Act may be...</td>
-      <td>Investing in Neighborhood-focused, Vital, Evid...</td>
+      <td>SECTION 1. RELEASE OF DOCUMENTS CAPTURED IN IR...</td>
+      <td>Requires the Director of National Intelligence...</td>
     </tr>
   </tbody>
 </table>
@@ -15208,7 +15260,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">subset</span> <span class="o">=</span> <span class="n">billsum_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">subset</span> <span class="o">=</span> <span class="n">billsum_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
 <span class="n">subset</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 
@@ -15231,7 +15283,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>(3, 2)</pre>
+<pre>(2, 2)</pre>
 </div>
 
 </div>
@@ -15264,7 +15316,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">Refiner</span><span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">w2v</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">reductionFactor</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">maxSpacing</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">Refiner</span><span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">w2v</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">maxSpacing</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">printRange</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 </pre></div>
 
      </div>
@@ -15296,198 +15348,6 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-----------------Example for 1 corpus-----------------</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;------Initial Corpus------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">corpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;------Refined Corpus------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">refined</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>-----------------Example for 1 corpus-----------------
-
- ------Initial Corpus------
- SECTION 1. SHORT TITLE.
-
-    This Act may be cited as the ``Local Innovation and Coastal 
-Protection Act of 1993&#39;&#39;.
-
-SEC. 2. PROGRAM AUTHORITY.
-
-    (a) In General.--Chapter III of the National Flood Insurance Act of 
-1968 (42 U.S.C. 4101 et seq.) is amended by adding at the end the 
-following new section:
-
-``SEC. 1366. EROSION MITIGATION DEMONSTRATION PROGRAM.
-
-    ``(a) In General.--The Director shall make grants, with amounts 
-made available from the Coastal Erosion Control Fund established under 
-section 1367, to demonstrate the feasibility of innovative mitigation 
-activities designed to minimize coastal erosion, preserve shorelines, 
-and avoid environmental degradation.
-    ``(b) Eligible Recipients.--The Director may make grants under this 
-section to--
-            ``(1) any State; and
-            ``(2) any community participating in the national flood 
-        insurance program under this title that--
-                    ``(A) has suffered recurring flood damages and 
-                claims, as determined by the Director; and
-                    ``(B) is in full compliance with the requirements 
-                under the national flood insurance program.
-    ``(c) Eligible Activities.--
-            ``(1) In general.--A grant under this section may be used 
-        to develop and test innovative techniques to minimize coastal 
-        erosion and preserve shorelines.
-            ``(2) Priority.--In making grants under this section, the 
-        Director shall give a priority to eligible recipients that 
-        conduct projects to demonstrate the feasibility of techniques 
-        that--
-                    ``(A) have application to more than 1 location;
-                    ``(B) substantially broaden the applicability of 
-                proven erosion control techniques; or
-                    ``(C) avoid permanent structural alterations and 
-                rely instead on natural designs, including the use of 
-                vegetation, or temporary structures, to accomplish 
-                their goal.
-    ``(d) Applications.--The Director shall make grants under this 
-section on the basis of a nationwide competition, in accordance with 
-such application forms and procedures as the Director may establish.
-    ``(e) Maximum Amount.--The total amount of any grant under this 
-section may not exceed $500,000 for any project assisted under this 
-section.
-    ``(f) Program Requirements.--
-            ``(1) Matching requirements.--
-                    ``(A) In general.--Except as provided in 
-                subparagraph (C), a grant under this section may not 
-                exceed 3 times the amount that the recipient certifies, 
-                as the Director shall require, that the recipient will 
-                contribute from non-Federal funds to carry out 
-                activities assisted with amounts provided under this 
-                section.
-                    ``(B) Non-federal funds.--For purposes of this 
-                subsection, the term `non-Federal funds&#39; includes--
-                            ``(i) State or local agency funds,
-                            ``(ii) any salary paid to staff to carry 
-                        out the activities of the recipient,
-                            ``(iii) the value of the time and services 
-                        contributed by volunteers to carry out such 
-                        activities (at a rate determined by the 
-                        Director), and
-                            ``(iv) the value of any donated material or 
-                        building and the value of any lease on a 
-                        building.
-                    ``(C) No match required for evaluation.--No non-
-                Federal contribution is required for the conduct of 
-                evaluations under paragraph (2).
-            ``(2) Report.--Not later than 5 years after the receipt of 
-        a grant under this section, the recipient of the grant shall 
-        transmit to the Director a report that--
-                    ``(A) evaluates the long-term effectiveness of the 
-                techniques that were developed under this section; and
-                    ``(B) assesses any impact that such techniques have 
-                had on adjacent coastal areas.
-    ``(g) Report to Congress.--The Director shall transmit to the 
-Congress an annual report that--
-            ``(1) summarizes the erosion mitigation techniques 
-        developed pursuant to this section;
-            ``(2) describes the status of the Coastal Erosion Control 
-        Fund established under section 1367; and
-            ``(3) recommends any legislative or administrative action 
-        necessary to further the purpose of this section.
-    ``(h) Authorization.--There are authorized to be appropriated to 
-carry out this section, from the Coastal Erosion Control Fund under 
-section 1367, $12,500,000 for each of the fiscal years 1994 through 
-1997.&#39;&#39;.
-
-SEC. 3. ESTABLISHMENT OF COASTAL EROSION CONTROL FUND.
-
-    Chapter III of the National Flood Insurance Act of 1968 (42 U.S.C. 
-4101 et seq.), as amended by section 2, is further amended by adding at 
-the end the following new section:
-
-``SEC. 1367. ESTABLISHMENT OF COASTAL EROSION CONTROL FUND.
-
-    ``(a) In General.--The Director shall establish in the Treasury of 
-the United States a fund to be known as the Coastal Erosion Control 
-Fund (hereafter in this section referred to as the `Fund&#39;), which shall 
-be available, to the extent provided in appropriation Acts, for grants 
-under section 1366.
-    ``(b) Credits.--The Fund shall be credited with any premium 
-surcharges assessed under section 1308(e).&#39;&#39;.
-
-SEC. 4. INSURANCE PREMIUM MITIGATION SURCHARGE.
-
-    (a) In General.--Section 1308 of the National Flood Insurance Act 
-of 1968 (42 U.S.C. 4015) is amended by adding at the end the following 
-new subsections:
-    ``(e) Notwithstanding any other provision of this title, the 
-Director shall assess, with respect to each contract for flood 
-insurance coverage under this title, an annual mitigation surcharge of 
-$5. The surcharges shall be paid into the Coastal Erosion Control Fund 
-under section 1367, and shall not be subject to any agents&#39; 
-commissions, company expenses allowances, or State or local premium 
-taxes.
-    ``(f) The Director shall not assess any surcharge under subsection 
-(e) if the balance of the Fund exceeds $15,000,000.
-    ``(g) The Director shall transmit to those who paid a surcharge 
-under subsection (e)--
-            ``(1) an annual report describing the expenditures of the 
-        Fund during the preceding fiscal year; and
-            ``(2) any unobligated funds that remain in the Fund at the 
-        end of fiscal year 1997.&#39;&#39;.
-    (b) Applicability.--The amendment made by subsection (a) shall 
-apply to any contract for flood insurance under the National Flood 
-Insurance Act of 1968 issued or renewed after the date of enactment of 
-this Act.
-
-SEC. 5. INSURANCE RATE INCENTIVES FOR EROSION MITIGATION EFFORTS.
-
-    Chapter III of the National Flood Insurance Act of 1968 (42 U.S.C. 
-4101 et seq.), as amended by sections 2 and 3, is further amended by 
-adding at the end the following new section:
-
-``SEC. 1368. INSURANCE RATE INCENTIVES FOR EROSION MITIGATION EFFORTS.
-
-    ``(a) Preferred Erosion Mitigation Measures.--The Director shall 
-evaluate the effectiveness of the erosion mitigation measures funded 
-under section 1366 and shall publish a list of the most effective of 
-such measures in the Federal Register.
-    ``(b) Rate Incentives for Communities.--The Director shall provide 
-incentives in the form of adjustments in the premium rates for flood 
-insurance coverage in areas that the Director determines have 
-implemented erosion mitigation measures contained in the list published 
-pursuant to subsection (a).&#39;&#39;. 
-
- ------Refined Corpus------
- Except as provided in subparagraph (C), a grant under this section may not exceed 3 times the amount that the recipient certifies, as the Director shall require, that the recipient will contribute from nonFederal funds to carry out activities assisted with amounts provided under this section The surcharges shall be paid into the Coastal Erosion Control Fund under section 1367, and shall not be subject to any agents&#39; commissions, company expenses allowances, or State or local premium taxes ), as amended by sections 2 and 3, is further amended by adding at the end the following new section: ``SEC ``(1) In general The Director shall make grants, with amounts made available from the Coastal Erosion Control Fund established under section 1367, to demonstrate the feasibility of innovative mitigation activities designed to minimize coastal erosion, preserve shorelines, and avoid environmental degradation Chapter III of the National Flood Insurance Act of 1968 (42 U 4015) is amended by adding at the end the following new subsections: ``(e) Notwithstanding any other provision of this title, the Director shall assess, with respect to each contract for flood insurance coverage under this title, an annual mitigation surcharge of $5 &#39;&#39; ``(b) Eligible Recipients ``(C) No match required for evaluation The Director shall make grants under this section on the basis of a nationwide competition, in accordance with such application forms and procedures as the Director may establish Chapter III of the National Flood Insurance Act of 1968 (42 U INSURANCE PREMIUM MITIGATION SURCHARGE ``(g) The Director shall transmit to those who paid a surcharge under subsection (e) ``(1) an annual report describing the expenditures of the Fund during the preceding fiscal year; and ``(2) any unobligated funds that remain in the Fund at the end of fiscal year 1997
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </pre></div>
 
@@ -15509,11 +15369,114 @@ pursuant to subsection (a).&#39;&#39;.
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>--------REFINER OBJECT--------
-Number of Documents : 3
-Corpus Avg Size     : 12694
-Refined Avg Size    : 2791
-Reduction Factor    : 4
+
+Number of Documents : 2
+Corpus Avg Size     : 7509
+Refined Avg Size    : 2208
+Ratio(s)            : [1. 3.]
+Threshold           : 0.7
 Maximum Spacing     : 15
+
+Corpus no.1 : 
+<span class="ansi-red-fg">SECTION 1</span>.
+<span class="ansi-red-fg">SHORT TITLE</span>.
+<span class="ansi-red-fg">This Act may be cited as the National Science Education Tax Incentive for Businesses Act of 2007</span>.
+<span class="ansi-red-fg">SEC</span>.
+<span class="ansi-red-fg">2</span>.
+<span class="ansi-red-fg">CREDITS FOR CERTAIN CONTRIBUTIONS BENEFITING SCIENCE, TECHNOLOGY, ENGINEERING, AND MATHEMATICS EDUCATION AT THE ELEMENTARY AND SECONDARY SCHOOL LEVEL</span>.
+<span class="ansi-red-fg">(a) In General</span>.
+<span class="ansi-green-intense-fg">Subpart D of part IV of subchapter A of chapter 1 of the Internal Revenue Code of 1986 (relating to business related credits) is amended by adding at the end the following new section: SEC</span>.
+<span class="ansi-red-fg">45O</span>.
+<span class="ansi-green-intense-fg">CONTRIBUTIONS BENEFITING SCIENCE, TECHNOLOGY, ENGINEERING, AND MATHEMATICS EDUCATION AT THE ELEMENTARY AND SECONDARY SCHOOL LEVEL</span>.
+<span class="ansi-green-intense-fg">(a) In General</span>.
+<span class="ansi-green-intense-fg">For purposes of section 38, the elementary and secondary science, technology, engineering, and mathematics (STEM) contributions credit determined under this section for the taxable year is an amount equal to 100 percent of the qualified STEM contributions of the taxpayer for such taxable year</span>.
+<span class="ansi-red-fg">(b) Qualified STEM Contributions</span>.
+<span class="ansi-green-intense-fg">For purposes of this section, the term `qualified STEM contributions&#39; means (1) STEM school contributions, (2) STEM teacher externship expenses, and (3) STEM teacher training expenses</span>.
+<span class="ansi-red-fg">(c) STEM School Contributions</span>.
+<span class="ansi-red-fg">For purposes of this section (1) In general</span>.
+<span class="ansi-red-fg">The term `STEM school contributions&#39; means (A) STEM property contributions, and (B) STEM service contributions</span>.
+<span class="ansi-green-intense-fg">(2) STEM property contributions</span>.
+<span class="ansi-red-fg">The term `STEM property contributions&#39; means the amount which would (but for subsection (f)) be allowed as a deduction under section 170 for a charitable contribution of STEM inventory property if (A) the donee is an elementary or secondary school described in section 170(b)(1)(A)(ii), (B) substantially all of the use of the property by the donee is within the United States or within the defense dependents&#39; education system for educational purposes in any of the grades K12 that are related to the purpose or function of the donee, (C) the original use of the property begins with the donee, (D) the property will fit productively into the donee&#39;s education plan, (E) the property is not transferred by the donee in exchange for money, other property, or services, except for shipping, installation and transfer costs, and (F) the donee&#39;s use and disposition of the property will be in accordance with the provisions of subparagraphs (B) and (E)</span>.
+<span class="ansi-red-fg">The determination of the amount of deduction under section 170 for purposes of this paragraph shall be made as if the limitation under section 170(e)(3)(B) applied to all STEM inventory property</span>.
+<span class="ansi-red-fg">(3) STEM service contributions</span>.
+<span class="ansi-red-fg">The term `STEM service contributions&#39; means the amount paid or incurred during the taxable year for STEM services provided in the United States or in the defense dependents&#39; education system for the exclusive benefit of students at an elementary or secondary school described in section 170(b)(1)(A)(ii) but only if (A) the taxpayer is engaged in the trade or business of providing such services on a commercial basis, and (B) no charge is imposed for providing such services</span>.
+<span class="ansi-green-intense-fg">(4) STEM inventory property</span>.
+<span class="ansi-red-fg">The term `STEM inventory property&#39; means, with respect to any contribution to a school, any property (A) which is described in paragraph (1) or (2) of section 1221(a) with respect to the donor, and (B) which is determined by the school to be needed by the school in providing education in grades K12 in the areas of science, technology, engineering, or mathematics</span>.
+<span class="ansi-green-intense-fg">(5) STEM services</span>.
+<span class="ansi-red-fg">The term `STEM services&#39; means, with respect to any contribution to a school, any service determined by the school to be needed by the school in providing education in grades K12 in the areas of science, technology, engineering, or mathematics, including teaching courses of instruction at such school in any such area</span>.
+<span class="ansi-green-intense-fg">(6) Defense dependents&#39; education system</span>.
+<span class="ansi-red-fg">For purposes of this subsection, the term `defense dependents&#39; education system&#39; means the program established and operated under the Defense Dependents&#39; Education Act of 1978 (20 U</span>.
+<span class="ansi-red-fg">S</span>.
+<span class="ansi-red-fg">C</span>.
+<span class="ansi-red-fg">921 et seq</span>.
+<span class="ansi-red-fg">)</span>.
+<span class="ansi-green-intense-fg">(d) STEM Teacher Externship Expenses</span>.
+<span class="ansi-red-fg">For purposes of this section (1) In general</span>.
+<span class="ansi-red-fg">The term `STEM teacher externship expenses&#39; means any amount paid or incurred to carry out a STEM externship program of the taxpayer but only to the extent that such amount is attributable to the participation in such program of any eligible STEM teacher, including amounts paid to such a teacher as a stipend while participating in such program</span>.
+<span class="ansi-green-intense-fg">(2) STEM externship program</span>.
+<span class="ansi-red-fg">The term `STEM externship program&#39; means any program (A) established by a taxpayer engaged in a trade or business within an area of science, technology, engineering, or mathematics, and (B) under which eligible STEM teachers receive training to enhance their teaching skills in the areas of science, technology, engineering, or mathematics or otherwise improve their knowledge in such areas</span>.
+<span class="ansi-red-fg">(3) Eligible stem teacher</span>.
+<span class="ansi-red-fg">The term `eligible STEM teacher&#39; means any individual (A) who is a teacher in grades K12 at an educational organization described in section 170(b)(1)(A)(ii) which is located in the United States or which is located on a United States military base outside the United States, and (B) whose teaching responsibilities at such school include, or are likely to include, any course in the areas of science, technology, engineering, or mathematics</span>.
+<span class="ansi-red-fg">(e) STEM Teacher Training Expenses</span>.
+<span class="ansi-green-intense-fg">The term `STEM teacher training expenses&#39; means any amount paid or incurred by a taxpayer engaged in a trade or business within an area of science, technology, engineering, or mathematics which is attributable to the participation of any eligible STEM teacher in a regular training program provided to employees of the taxpayer which is determined by such teacher&#39;s school as enhancing such teacher&#39;s teaching skills in the areas of science, technology, engineering, or mathematics</span>.
+<span class="ansi-green-intense-fg">(f) Denial of Double Benefit</span>.
+<span class="ansi-green-intense-fg">No deduction shall be allowed under this chapter for any amount allowed as a credit under this section</span>.
+<span class="ansi-red-fg">(b) Conforming Amendments</span>.
+<span class="ansi-green-intense-fg">(1) Section 38(b) of such Code is amended by striking plus at the end of paragraph (30), by striking the period at the end of paragraph (31), and inserting , plus, and by adding at the end the following new paragraph: (32) the elementary and secondary science, technology, engineering, and mathematics (STEM) contributions credit determined under section 45O</span>.
+<span class="ansi-green-intense-fg">(2) The table of sections for subpart D of part IV of subchapter A of chapter 1 of such Code is amended by adding at the end the following new item: Sec</span>.
+<span class="ansi-green-intense-fg">45O</span>.
+<span class="ansi-green-intense-fg">Contributions benefiting science, technology, engineering, and mathematics education at the elementary and secondary school level</span>.
+<span class="ansi-green-intense-fg">(c) Effective Date</span>.
+<span class="ansi-green-intense-fg">The amendments made by this section shall apply to taxable years beginning after the date of the enactment of this Act</span>.
+
+Corpus no.2 : 
+<span class="ansi-red-fg">SECTION 1</span>.
+<span class="ansi-red-fg">SHORT TITLE</span>.
+<span class="ansi-red-fg">This Act may be cited as the Small Business Expansion and Hiring Act of 2011</span>.
+<span class="ansi-red-fg">SEC</span>.
+<span class="ansi-red-fg">2</span>.
+<span class="ansi-red-fg">BUSINESS CREDIT FOR RETENTION OF CERTAIN INDIVIDUALS NEWLY HIRED BEFORE 2013</span>.
+<span class="ansi-red-fg">(a) In General</span>.
+<span class="ansi-green-intense-fg">Subpart D of part IV of subchapter A of chapter 1 of the Internal Revenue Code of 1986 (relating to businessrelated credits) is amended by adding at the end the following new section: SEC</span>.
+<span class="ansi-red-fg">45S</span>.
+<span class="ansi-red-fg">RETENTION OF CERTAIN INDIVIDUALS NEWLY HIRED BEFORE 2013</span>.
+<span class="ansi-red-fg">(a) In General</span>.
+<span class="ansi-green-intense-fg">For purposes of section 38, in the case of any taxable year ending after the date of the enactment of this section and beginning before January 1, 2013, the retained worker credit determined under this section for the taxable year is the aggregate of the lesser of (1) $4,000 ($6,000 in the case of a longterm unemployed individual), or (2) 6</span>.
+<span class="ansi-red-fg">2 percent of the wages (as defined in section 3401(a)) paid by the taxpayer to such retained worker during the 52 consecutive week period referred to in subsection (c)(2)</span>.
+<span class="ansi-red-fg">(b) Limitations</span>.
+<span class="ansi-red-fg">(1) Increase in employment</span>.
+<span class="ansi-red-fg">The number of retained workers taken into account under subsection (a) shall not exceed the excess of (if any) (A) the number of employees of the taxpayer at the end of the taxable year, over (B) the number of employees of the taxpayer at the beginning of the taxable year</span>.
+<span class="ansi-red-fg">(2) Dollar limitation</span>.
+<span class="ansi-red-fg">The amount allowed as a credit under subsection (a) for a taxable year with respect to any business location of the employer shall not exceed $400,000</span>.
+<span class="ansi-red-fg">(3) Special rules</span>.
+<span class="ansi-red-fg">(A) Businesslocation specific</span>.
+<span class="ansi-green-intense-fg">All determinations under this section regarding the number of employees shall be determined on a location basis</span>.
+<span class="ansi-red-fg">(B) Employees rotated among business not eligible</span>.
+<span class="ansi-red-fg">An employee who is moved from one location of the taxpayer to another location shall not be taken into account for purposes of paragraph (1)</span>.
+<span class="ansi-red-fg">(c) Definitions</span>.
+<span class="ansi-red-fg">For purposes of this section (1) Retained worker</span>.
+<span class="ansi-red-fg">The term `retained worker&#39; means any qualified individual (A) who was employed by the taxpayer on any date during the taxable year, (B) who was so employed by the taxpayer for a period of not less than 52 consecutive weeks, and (C) whose wages (as defined in section 3401(a)) for such employment during the last 26 weeks of such period equaled at least 80 percent of such wages for the first 26 weeks of such period</span>.
+<span class="ansi-red-fg">(2) Qualified individual</span>.
+<span class="ansi-green-intense-fg">The term `qualified individual&#39; means any individual who (A) begins employment with a qualified employer after December 31, 2010, and before January 1, 2014, (B) certifies by signed affidavit, under penalties of perjury, that such individual has not been employed for 40 hours or more per week during the 60 day period ending on the date such individual begins such employment, (C) is not employed by the qualified employer to replace another employee of such employer unless such other employee separated from employment voluntarily or for cause, and (D) is not an individual described in section 51(i)(1) (applied by substituting `qualified employer&#39; for `taxpayer&#39; each place it appears)</span>.
+<span class="ansi-red-fg">(3) Qualified employer</span>.
+<span class="ansi-green-intense-fg">(A) In general</span>.
+<span class="ansi-red-fg">The term `qualified employer&#39; means any employer other than the United States, any State, or any political subdivision thereof, or any instrumentality of the foregoing which employed an average of less than 100 employees on business days during such taxable year</span>.
+<span class="ansi-red-fg">(B) Treatment of employees of postsecondary educational institutions</span>.
+<span class="ansi-green-intense-fg">Notwithstanding subparagraph (A), the term `qualified employer&#39; includes any employer which is a public institution of higher education (as defined in section 101(b) of the Higher Education Act of 1965)</span>.
+<span class="ansi-red-fg">(4) Longterm unemployed individual</span>.
+<span class="ansi-red-fg">The term `longterm unemployed individual&#39; means an individual who was in receipt of unemployment compensation under State or Federal law for not less than 26 weeks during the 1year period ending on the day the individual is hired by the employer</span>.
+<span class="ansi-green-intense-fg">(b) Credit Allowed as Business Credit</span>.
+<span class="ansi-red-fg">Section 38(b) of the Internal Revenue Code of 1986 (relating to current year business credit) is amended by striking plus at the end of paragraph (35), by striking the period at the end of paragraph (36) and inserting , plus, and by adding at the end the following new paragraph: (37) the retained worker credit determined under section 45S</span>.
+<span class="ansi-red-fg">(c) Limitation on Carryforward</span>.
+<span class="ansi-red-fg">Section 39(a) of such Code is amended by adding at the end the following: (5) 3year carryforward for retained worker credit</span>.
+<span class="ansi-green-intense-fg">In the case of the retained worker credit, paragraph (2) shall be applied (A) by substituting `3 taxable years&#39; for `21 taxable years&#39; in subparagraph (A) thereof, and (B) by substituting `2 taxable years&#39; for `20 taxable years&#39; in subparagraph (B) thereof</span>.
+<span class="ansi-red-fg">(d) Clerical Amendment</span>.
+<span class="ansi-red-fg">The table of sections for subpart D of part IV of subchapter A of chapter 1 of the Internal Revenue Code of 1986 is amended by inserting after the item relating to section 45R the following new item: Sec</span>.
+<span class="ansi-red-fg">45S</span>.
+<span class="ansi-red-fg">Retention of certain individuals newly hired before 2013</span>.
+<span class="ansi-red-fg">(e) Effective Date</span>.
+<span class="ansi-green-intense-fg">The amendments made by this section shall apply to taxable years beginning after the date of the enactment of this Act</span>.
+
 ------------------------------
 </pre>
 </div>
@@ -15523,7 +15486,7 @@ Maximum Spacing     : 15
 
 </div>
 
-</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15539,155 +15502,52 @@ Maximum Spacing     : 15
 </div>
 </div>
 
-</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputArea-child">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
-
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>CBERT</th>
-      <th>R-1</th>
-      <th>R-L</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.85</td>
-      <td>0.28</td>
-      <td>0.19</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.86</td>
-      <td>0.26</td>
-      <td>0.15</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.87</td>
-      <td>0.34</td>
-      <td>0.21</td>
-    </tr>
-  </tbody>
-</table>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
+<pre>Some weights of the model checkpoint at roberta-large were not used when initializing RobertaModel: [&#39;lm_head.layer_norm.weight&#39;, &#39;lm_head.dense.bias&#39;, &#39;lm_head.layer_norm.bias&#39;, &#39;lm_head.decoder.weight&#39;, &#39;lm_head.bias&#39;, &#39;lm_head.dense.weight&#39;]
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+</pre>
 </div>
 </div>
-
-</div>
-
-</div>
-
-</div>
-
-</div><div  class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputArea-child">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>Scores: 
+   CBERT  BERTScore  BARTScore   R-1   R-L
+0   0.88       0.83       0.46  1.00  1.00
+1   0.88       0.80       0.42  0.99  0.99
 
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>pearson_CBERT_R-1</th>
-      <th>pearson_CBERT_R-L</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Pearson score</th>
-      <td>0.72</td>
-      <td>0.33</td>
-    </tr>
-    <tr>
-      <th>p-value</th>
-      <td>0.49</td>
-      <td>0.79</td>
-    </tr>
-  </tbody>
-</table>
+Correlations: 
+               pearson_CBERT_R-1  pearson_CBERT_R-L  pearson_BERT_R-1  pearson_BERT_R-l  pearson_BART_R-1  pearson_BART_R-l
+Pearson score                NaN                NaN               1.0               1.0               1.0               1.0
+p-value                      NaN                NaN               1.0               1.0               1.0               1.0
+</pre>
 </div>
 </div>
+<div class="jp-OutputArea-child">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
+<pre>c:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\.venv\Lib\site-packages\scipy\stats\_stats_py.py:4424: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+  warnings.warn(stats.ConstantInputWarning(msg))
+</pre>
+</div>
 </div>
 
 </div>
