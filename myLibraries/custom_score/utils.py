@@ -292,18 +292,18 @@ def cleanString(string, maxSpacing=10):
     
     return clean
 
-def sentenceSelection(corpus, scores, distances, reductionFactor=2):
+def sentenceSelection(corpus, scores, distances, ratio=2):
     """
     Returns a list of selected indices of sentence that will constituate the new corpus.
 
     :param1 corpus (list): List of sentences of the reference document.
     :param2 scores (list): List of the similarity scores of each sentence of the reference compared to the entire reference document.
-    :param3 reductionFactor (float or int): Number determining how much the reference text will be shortened. 
+    :param3 ratio (float or int): Number determining how much the reference text will be shortened. 
 
     :output selected_indexes (list): List of indexes of the initial corpus sentences that have been selected.
     """
     totalLength = len(" ".join(corpus))
-    targetLength = int(totalLength/reductionFactor)
+    targetLength = int(totalLength/ratio)
     selected_indexes = []
     
     randomized_scores = [np.mean([curScore, uniform(0, 1)]) for curScore in scores]
@@ -376,19 +376,6 @@ def parseDistances(distances):
             parsedDistance.append(cur)
         parsedDistances.append(parsedDistance)
     return parsedDistances
-
-@contextmanager
-def suppress_stdout():
-    """
-    Decorator supressing console output. Source : http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
-    """
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        sys.stdout = devnull
-        try:  
-            yield
-        finally:
-            sys.stdout = old_stdout
 
 @contextmanager
 def nostd():
