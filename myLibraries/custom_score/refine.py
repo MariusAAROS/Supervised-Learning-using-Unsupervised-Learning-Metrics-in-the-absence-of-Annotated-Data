@@ -1,5 +1,5 @@
-from .utils import *
-from .score import score 
+from custom_score.utils import *
+from custom_score.score import score 
 from rouge_score import rouge_scorer
 import bert_score
 import pandas as pd
@@ -12,22 +12,24 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, model, scorer=score, ratio=2, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, model, scorer=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
         :param1 self (Refiner): Object to initialize.
         :param2 corpus (List): List of documents to simplify.
         :param3 model (Any): Model used to compute scores and create sentence's ranking.
-        :param4 ratio (float or int): Number determining how much the reference text will be shortened. 
-        :param5 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
-        :param6 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
+        :param4 ratio (float, int or array-like): Number determining how much the reference text will be shortened. 
+        :param5 threshold (float): Number between 0 and 1 indicating the lowest acceptable quality when tuning the length of the summary.
+        :param6 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
+        :param7 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
         """
         self.corpus = corpus
         self.processedCorpus = None
         self.model = model
         self.scorer = scorer
         self.ratio = ratio
+        self.threshold = threshold
         self.ms = maxSpacing
         self.refined = None
         self.printRange = printRange
@@ -86,12 +88,30 @@ class Refiner:
             distances = parseDistances(distances)
 
             #selection of best individuals
-            indices = sentenceSelection(respaced_sentences, scores, distances, self.ratio)
+            indices = None
+            if type(self.ratio) == int or type(self.ratio) == float: 
+                indices = sentenceSelection(respaced_sentences, scores, distances, self.ratio)
+            else:
+                for curRatio in sorted(self.ratio):
+                    curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
+                    subCurRefined = [respaced_sentences[i] for i in curIndices]
+                    scoreOut = score(self.model, [" ".join(subCurRefined)], [indiv])
+                    curScore = parseScore(scoreOut)
+                    if curScore < self.threshold:
+                        try:
+                            indices = curBest
+                        except:
+                            indices = curIndices
+                        finally:
+                            break
+                    else:
+                        curBest = curIndices
+                if indices is None:
+                    indices = curIndices
             indices.sort()
             curRefined = []
             for index in indices:
                 curRefined.append(respaced_sentences[index])
-            
             curRefined = ". \n".join(curRefined) + "."
             self.selectedIndexes.append(indices)
             self.refined.append(curRefined)
@@ -103,7 +123,7 @@ class Refiner:
         :param1 self (Refiner): Refiner Object (see __init__ function for more details).
         :param2 verbose (Boolean): When put to true, assess results will be printed.
 
-        :output (dict): Dictionnary containing both the scores of Static BERTScore and Rouge as well as their correlation
+        :output (dict): Dictionnary containing both the scores of Static BERTScore, BERTScore, BARTScore and Rouge as well as their correlation.
         """
         assert self.refined != None, "refined corpus doesn't exists"
 
@@ -133,8 +153,8 @@ class Refiner:
         dfCustom = pd.DataFrame({'CBERT' : custom_R,
                                  'BERTScore' : bertscore_R,
                                  'BARTScore' : bartscore,
-                                'R-1' : rouge1_R,
-                                'R-L' : rougeL_R
+                                 'R-1' : rouge1_R,
+                                 'R-L' : rougeL_R
                                 })
 
         #Correlation estimation
@@ -165,7 +185,8 @@ class Refiner:
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
-        printout += "Ratio               : " + str(self.ratio) + "\n"
+        printout += "Ratio(s)            : " + str(self.ratio) + "\n"
+        printout += "Threshold           : " + str(self.threshold) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
