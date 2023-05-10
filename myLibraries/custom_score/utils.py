@@ -313,17 +313,20 @@ def sentenceSelection(corpus, scores, distances, ratio=2):
     selected_indexes = []
     current_distance = lambda x: norm([distances[ranking[x]][i] for i in selected_indexes])
     cur = 0
-    while(selectedLength < targetLength):
-        if cur == 0:
-            selected_indexes.append(ranking[cur])
-            selectedLength += len(corpus[ranking[cur]])
-        else:
-            updated_scores = [randomized_scores[i]*current_distance(i) for i in range(len(randomized_scores))]
-            updated_ranking = np.argsort(updated_scores)[::-1]
-            updated_ranking = [index for index in updated_ranking if index not in selected_indexes]
-            selected_indexes.append(updated_ranking[0])
-            selectedLength += len(corpus[updated_ranking[0]])
-        cur += 1
+    if targetLength != totalLength:
+        while(selectedLength < targetLength):
+            if cur == 0:
+                selected_indexes.append(ranking[cur])
+                selectedLength += len(corpus[ranking[cur]])
+            else:
+                updated_scores = [randomized_scores[i]*current_distance(i) for i in range(len(randomized_scores))]
+                updated_ranking = np.argsort(updated_scores)[::-1]
+                updated_ranking = [index for index in updated_ranking if index not in selected_indexes]
+                selected_indexes.append(updated_ranking[0])
+                selectedLength += len(corpus[updated_ranking[0]])
+            cur += 1
+    else:
+        selected_indexes = ranking
 
     return selected_indexes
 
@@ -376,6 +379,13 @@ def parseDistances(distances):
             parsedDistance.append(cur)
         parsedDistances.append(parsedDistance)
     return parsedDistances
+
+def isIncreasingRange(r):
+    assert type(r) == range, "Error: not a range object"
+    if r.start <= r.stop and r.step > 0:
+        return True
+    else:
+        return False
 
 @contextmanager
 def nostd():

@@ -5,7 +5,6 @@ import bert_score
 import pandas as pd
 from scipy.stats import pearsonr
 from colorama import Fore, Style
-import contextlib
 
 import sys
 sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data")
@@ -166,7 +165,7 @@ class Refiner:
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
-        printout += "Reduction Factor    : " + str(self.ratio) + "\n"
+        printout += "Ratio               : " + str(self.ratio) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
