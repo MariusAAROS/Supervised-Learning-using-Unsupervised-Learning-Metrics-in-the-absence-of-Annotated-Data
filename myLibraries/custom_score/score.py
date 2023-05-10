@@ -2,9 +2,12 @@ from .utils import *
 import numpy as np
 from datetime import datetime
 import bert_score
-import sys 
-sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\BARTScore")
-from bart_score import BARTScorer
+
+import sys
+bart_path = r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data"
+if bart_path not in sys.path:
+    sys.path.append(bart_path)
+from BARTScore.bart_score import BARTScorer
 
 def score(model, candidates=["I am Marius"], references=["Marius is my name"], withIdf = False):
     """

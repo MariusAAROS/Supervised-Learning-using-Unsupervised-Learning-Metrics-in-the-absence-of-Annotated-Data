@@ -7,9 +7,9 @@ from scipy.stats import pearsonr
 from colorama import Fore, Style
 import contextlib
 
-import sys 
-sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\BARTScore")
-from bart_score import BARTScorer
+import sys
+sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data")
+from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
