@@ -7,6 +7,9 @@ from scipy.stats import pearsonr
 from colorama import Fore, Style
 import contextlib
 
+import sys 
+sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\BARTScore")
+from bart_score import BARTScorer
 
 class Refiner:
 
@@ -114,19 +117,23 @@ class Refiner:
         rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.corpus, self.refined)]
 
         #BERTScore computation
-        
-        #bertscore = [bert_score.score([r], [c], lang="en", verbose=0) for c, r in zip(self.corpus, self.refined)]
         with nostd():
             bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
+
+        #bartscore
+        bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
+        bartscore = bart_scorer.score(self.corpus.to_list(), self.refined, batch_size=4)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
         bertscore_R = [round(t.item(), 2) for t in bertscore[1]]
+        bartscore = [round(t, 2) for t in bartscore]
         rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
         rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
 
         dfCustom = pd.DataFrame({'CBERT' : custom_R,
                                  'BERTScore' : bertscore_R,
+                                 'BARTScore' : bartscore,
                                 'R-1' : rouge1_R,
                                 'R-L' : rougeL_R
                                 })
@@ -136,11 +143,15 @@ class Refiner:
         pearsonCor_c_rl = np.round(pearsonr(custom_R, rougeL_R), 2)
         pearsonCor_bertscore_r1 = np.round(pearsonr(bertscore_R, rouge1_R), 2)
         pearsonCor_bertscore_rl = np.round(pearsonr(bertscore_R, rougeL_R), 2)
+        pearsonCor_bartscore_r1 = np.round(pearsonr(bartscore, rouge1_R), 2)
+        pearsonCor_bartscore_rl = np.round(pearsonr(bartscore, rougeL_R), 2)
 
         dfCor = pd.DataFrame({'pearson_CBERT_R-1' : pearsonCor_c_r1,
                               'pearson_CBERT_R-L' : pearsonCor_c_rl,
                               'pearson_BERT_R-1' : pearsonCor_bertscore_r1,
-                              'pearson_BERT_R-l' : pearsonCor_bertscore_rl}, index=["Pearson score", "p-value"])
+                              'pearson_BERT_R-l' : pearsonCor_bertscore_rl,
+                              'pearson_BART_R-1' : pearsonCor_bartscore_r1,
+                              'pearson_BART_R-l' : pearsonCor_bartscore_rl}, index=["Pearson score", "p-value"])
         if verbose:
             printout = "Scores: \n"
             printout += dfCustom.to_string() + "\n\n"
