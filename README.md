@@ -4,6 +4,7 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 
 ## 📋 Table of Contents
 
+- [✔️ Installation](#-installation)
 - [👋 Introduction](#-introduction)
 - [🔍 Background and Related Work](#-background-and-related-work)
 - [📊 Data](#-data)
@@ -11,6 +12,15 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 - [📈 Results and Analysis](#-results-and-analysis)
 - [👉 Conclusion and Future Work](#-conclusion-and-future-work)
 - [📚 References](#-references)
+
+## ✔️ Installation
+
+### Refiner Class
+
+```python
+os.path.join(ressources_path, r'GoogleNews-vectors-negative300.bin.gz'
+```
+
 
 ## 👋 Introduction
 
