@@ -17,9 +17,19 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 
 ### Refiner Class
 
-```python
-os.path.join(ressources_path, r'GoogleNews-vectors-negative300.bin.gz'
-```
+Get the repository locally: 
+<code> 
+  git clone https://github.com/MariusAAROS/Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data.git
+</code>
+Then, go to the repository root. Using a command prompt, execute the following commands: 
+<code>
+  pip install -r requirements.txt
+  python init.py
+</code>
+Enter the path where you want the models and various data to be downloaded: 
+<code>
+  </path/to/your/ressource/folder/>
+<code>
 
 
 ## 👋 Introduction
