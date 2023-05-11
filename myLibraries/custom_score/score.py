@@ -4,9 +4,8 @@ from datetime import datetime
 import bert_score
 
 import sys
-bart_path = r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data"
-if bart_path not in sys.path:
-    sys.path.append(bart_path)
+sys.path.append(get_git_root())
+
 from BARTScore.bart_score import BARTScorer
 
 def score(model, candidates=["I am Marius"], references=["Marius is my name"], withIdf = False):

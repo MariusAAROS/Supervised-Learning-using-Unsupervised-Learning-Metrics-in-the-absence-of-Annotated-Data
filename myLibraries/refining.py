@@ -6,6 +6,10 @@ from custom_score.score import score
 import os
 from datetime import datetime
 
+
+#params
+size = 2
+
 #utils
 def updateFileCount(path):
     """
@@ -27,7 +31,6 @@ def updateFileCount(path):
 billsum_path = r"C:\Pro\Stages\A4 - DVRC\Work\Datasets\billsum"
 billsum_test = pd.read_json(path_or_buf = billsum_path + r"\us_test_data_final_OFFICIAL.jsonl", lines=True)
 billsum_test = billsum_test.loc[:, ["text", "summary"]]
-size = 2
 subset = billsum_test.iloc[:size, :]
 
 #refine

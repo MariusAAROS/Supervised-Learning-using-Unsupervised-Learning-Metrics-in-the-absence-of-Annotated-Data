@@ -7,7 +7,8 @@ from scipy.stats import pearsonr
 from colorama import Fore, Style
 
 import sys
-sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data")
+sys.path.append(get_git_root())
+
 from BARTScore.bart_score import BARTScorer
 
 class Refiner:

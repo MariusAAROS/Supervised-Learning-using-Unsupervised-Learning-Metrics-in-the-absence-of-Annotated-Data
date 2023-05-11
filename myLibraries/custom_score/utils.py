@@ -5,6 +5,7 @@ import pickle
 from random import uniform
 from contextlib import contextmanager
 import sys, os, io
+import git
 
 
 def model_to_serialized(model, path):
@@ -41,21 +42,26 @@ def model_load(model, serialized=False):
     :output1 emb (dict): Dictionnary containing vectors and the word it's associated to.
     """
     assert(type(model) == str)
+
+    #get ressource folder
+    repo_path = os.path.join(get_git_root(), "myPaths.txt")
+    if os.path.exists(repo_path):
+        with open(repo_path, "r") as f:
+            ressources_path = f.readlines()[1].strip()
+
     if model == "Word2Vec":
         if not serialized:
             try:
-                wordvector_path = r'C:\Pro\Stages\A4 - DVRC\Work\Models\GoogleNews-vectors-negative300.bin.gz'
+                wordvector_path = os.path.join(ressources_path, r'GoogleNews-vectors-negative300.bin.gz')
                 emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
             except:
-                wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\GoogleNews-vectors-negative300.bin.gz'
-                emb = KeyedVectors.load_word2vec_format(wordvector_path, binary=True)
+                return False
         else:
             try:
-                serialized_wordvector_path = r'D:\COURS\A4\S8\Stage\Documents\Models\serialized_w2v.pkl'
+                serialized_wordvector_path = os.path.join(ressources_path, r'serialized_w2v.pkl')
                 emb = serialized_to_model(serialized_wordvector_path)
             except:
-                serialized_wordvector_path = r'D:\COURS\A4\S8 - ESILV\Stage\Work\Models\serialized_w2v.pkl'
-                emb = serialized_to_model(serialized_wordvector_path)
+                return False
     else:
         print("Model not supported yet")
     return emb
@@ -192,7 +198,6 @@ def computeIdf(corpus):
     idfDict = {}
     splitCorpus = corpus.split(" ")
     N = len(splitCorpus)
-    #idfDict = dict.fromkeys(set(splitCorpus), 0)
     for word in splitCorpus:
         wordFreq = splitCorpus.count(word)
         idfDict[word.lower()] = -np.log(1/N * wordFreq) 
@@ -211,7 +216,6 @@ def getIdf(idfDict, word):
         idf = idfDict[word.lower()]
     except:
         idf = 1.
-
     return idf
 
 def computeMetricsWithIdf(refToCand, candToRef, referencesWords, candidatesWords, allIdfDicts):
@@ -399,3 +403,8 @@ def nostd():
     yield
     sys.stdout = save_stdout
     sys.stderr = save_stderr
+
+def get_git_root():
+    git_repo = git.Repo(os.path.abspath(__file__), search_parent_directories=True)
+    git_root = git_repo.git.rev_parse("--show-toplevel")
+    return git_root
