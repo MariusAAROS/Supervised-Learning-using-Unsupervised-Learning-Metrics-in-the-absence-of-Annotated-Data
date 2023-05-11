@@ -182,12 +182,27 @@ class Refiner:
         return {"scores": dfCustom, "correlations": dfCor}
     
     def to_dataframe(self):
+        """
+        Transforms a Refiner object to a dataframe.
+
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+
+        :output output (DataFrame): DataFrame containing both the corpus and the refined texts of the Refiner class. 
+        """
         output = pd.DataFrame({"text": self.corpus,
                                "summary": self.refined,
                                "processedText": [". ".join(c) for c in self.processedCorpus]})
         return output
 
     def __str__(self) -> str:
+        """
+        Summarizes Refiner object to a string.
+
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+
+        :output printout (string): Summarized informations about the refiner object.
+        """
+
         printout = "--------REFINER OBJECT--------\n\n"
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
