@@ -1,7 +1,7 @@
 from custom_score.refine import Refiner
 import pandas as pd
 import numpy as np
-from custom_score.utils import serialized_to_model
+from custom_score.utils import model_load, get_git_root
 from custom_score.score import score
 import os
 from datetime import datetime
@@ -28,14 +28,15 @@ def updateFileCount(path):
     return updated
 
 #load dataset
-billsum_path = r"C:\Pro\Stages\A4 - DVRC\Work\Datasets\billsum"
-billsum_test = pd.read_json(path_or_buf = billsum_path + r"\us_test_data_final_OFFICIAL.jsonl", lines=True)
+billsumTest_url='https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link'
+billsumTest_url='https://drive.google.com/uc?id=' + billsumTest_url.split('/')[-2]
+billsum_test = pd.read_json(billsumTest_url, lines=True)
 billsum_test = billsum_test.loc[:, ["text", "summary"]]
 subset = billsum_test.iloc[:size, :]
 
 #refine
 start = datetime.now()
-w2v = serialized_to_model(r'C:\Pro\Stages\A4 - DVRC\Work\Models\serialized_w2v.pkl')
+w2v = model_load("Word2Vec", True)
 r = Refiner(subset["text"], w2v, score, ratio=np.linspace(1, 3, 2), maxSpacing=15, printRange=range(0, 3))
 r.refine()
 assessement = r.assess()
@@ -45,7 +46,7 @@ stop = datetime.now()
 runtime = (stop - start)
 
 #write output
-main_folder_path = r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\myLibraries\refining_output"
+main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output")
 countfile_name = r"count.txt"
 count = updateFileCount(os.path.join(main_folder_path, countfile_name))
 
