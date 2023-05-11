@@ -18,18 +18,18 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 ### Refiner Class
 
 Get the repository locally: 
-``
+```sh
   git clone https://github.com/MariusAAROS/Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data.git
-``
+```
 Then, go to the repository root. Using a command prompt, execute the following commands: 
-``
+```sh
   pip install -r requirements.txt
   python init.py
-``
+```
 Enter the path where you want the models and various data to be downloaded: 
-``
+```sh
   /path/to/your/ressource/folder/
-``
+```
 
 
 ## 👋 Introduction
