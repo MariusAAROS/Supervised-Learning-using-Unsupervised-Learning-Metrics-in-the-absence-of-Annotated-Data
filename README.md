@@ -5,13 +5,6 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 ## 📋 Table of Contents
 
 - [✔️ Installation](#-installation)
-- [👋 Introduction](#-introduction)
-- [🔍 Background and Related Work](#-background-and-related-work)
-- [📊 Data](#-data)
-- [🧪 Methods and Experiments](#-methods-and-experiments)
-- [📈 Results and Analysis](#-results-and-analysis)
-- [👉 Conclusion and Future Work](#-conclusion-and-future-work)
-- [📚 References](#-references)
 
 ## ✔️ Installation
 
@@ -30,26 +23,9 @@ Enter the path where you want the models and various data to be downloaded:
 ```sh
   /path/to/your/ressource/folder/
 ```
-
-
-## 👋 Introduction
-
-
-## 🔍 Background and Related Work
-
-
-## 📊 Data and Models
-
-You can find all the models, and Datasets we used locally on our [google drive](https://drive.google.com/drive/folders/1pNH8_-6YiCam8diVJ2NICbjJsQQDX6X1?usp=share_link).
-
-
-## 🧪 Methods and Experiments
-
-
-## 📈 Results and Analysis
-
-
-## 👉 Conclusion and Future Work
-
-
-## 📚 References
+Finally, test that the library works correctly: 
+```sh
+  cd myLibraries
+  python refining.py
+```
+It should take around 2 minutes to compile.
