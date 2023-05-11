@@ -5,13 +5,6 @@ Textual data invades our lives. Searching for relevant documents that meet busin
 ## 📋 Table of Contents
 
 - [✔️ Installation](#-installation)
-- [👋 Introduction](#-introduction)
-- [🔍 Background and Related Work](#-background-and-related-work)
-- [📊 Data](#-data)
-- [🧪 Methods and Experiments](#-methods-and-experiments)
-- [📈 Results and Analysis](#-results-and-analysis)
-- [👉 Conclusion and Future Work](#-conclusion-and-future-work)
-- [📚 References](#-references)
 
 ## ✔️ Installation
 
@@ -36,26 +29,3 @@ Finally, test that the library works correctly:
   python refining.py
 ```
 It should take around 2 minutes to compile.
-
-
-## 👋 Introduction
-
-
-## 🔍 Background and Related Work
-
-
-## 📊 Data and Models
-
-You can find all the models, and Datasets we used locally on our [google drive](https://drive.google.com/drive/folders/1pNH8_-6YiCam8diVJ2NICbjJsQQDX6X1?usp=share_link).
-
-
-## 🧪 Methods and Experiments
-
-
-## 📈 Results and Analysis
-
-
-## 👉 Conclusion and Future Work
-
-
-## 📚 References
