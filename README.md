@@ -30,6 +30,12 @@ Enter the path where you want the models and various data to be downloaded:
 ```sh
   /path/to/your/ressource/folder/
 ```
+Finally, test that the library works correctly: 
+```sh
+  cd myLibraries
+  python refining.py
+```
+It should take around 2 minutes to compile.
 
 
 ## 👋 Introduction
