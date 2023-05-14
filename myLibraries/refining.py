@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 #params
-size = 2
+size = 500
 
 #utils
 def updateFileCount(path):

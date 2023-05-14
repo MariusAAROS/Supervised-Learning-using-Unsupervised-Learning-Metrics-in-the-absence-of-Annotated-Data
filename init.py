@@ -2,6 +2,9 @@ import git
 import os
 import gdown
 
+#settings
+download = False
+
 def get_git_root(path):
     git_repo = git.Repo(path, search_parent_directories=True)
     git_root = git_repo.git.rev_parse("--show-toplevel")
@@ -31,7 +34,7 @@ with open(os.path.join(repository_path, "myPaths.txt"), "w") as f:
         f.write(path + "\n")
 
 #loading required data
-
-downloadRequirements(ressources_path)
+if download:
+    downloadRequirements(ressources_path)
 
 print("Packages ready to be used")
