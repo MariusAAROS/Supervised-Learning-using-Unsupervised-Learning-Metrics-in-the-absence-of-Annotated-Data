@@ -357,7 +357,7 @@ def parseDistances(distances):
 
     :param1 distances (List): List of distances values for each sentences of a corpus with respect to all the others sentences.
 
-    :output parsedDisctances (List): List of converted distances. 
+    :output parsedDistances (List): List of converted distances. 
     """
     refDist = distances[0][0]
     toPositive = False 

@@ -40,13 +40,20 @@ fonttools==4.39.3
 frozenlist==1.3.3
 fsspec==2023.4.0
 gast==0.4.0
+gdown==4.7.1
 gensim==4.3.1
+gitdb==4.0.10
+GitPython==3.1.31
+google-api-core==2.11.0
+google-api-python-client==2.86.0
 google-auth==2.17.3
+google-auth-httplib2==0.1.0
 google-auth-oauthlib==1.0.0
 google-pasta==0.2.0
 googleapis-common-protos==1.59.0
 grpcio==1.54.0
 h5py==3.8.0
+httplib2==0.22.0
 huggingface-hub==0.14.1
 idna==3.4
 importlib-resources==5.12.0
@@ -64,6 +71,7 @@ keras==2.12.0
 kiwisolver==1.4.4
 langcodes==3.3.0
 libclang==16.0.0
+lxml==4.9.2
 Markdown==3.4.3
 MarkupSafe==2.1.2
 matplotlib==3.7.1
@@ -81,6 +89,7 @@ nest-asyncio==1.5.6
 networkx==3.0
 nltk==3.8.1
 numpy==1.23.5
+oauth2client==4.1.3
 oauthlib==3.2.2
 opt-einsum==3.3.0
 packaging==23.1
@@ -102,9 +111,11 @@ pyarrow==11.0.0
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pydantic==1.10.7
+PyDrive==1.3.1
 Pygments==2.15.1
 pyparsing==3.0.9
 pyrsistent==0.19.3
+PySocks==1.7.1
 python-dateutil==2.8.2
 pytz==2023.3
 pywin32==306
@@ -119,6 +130,7 @@ rsa==4.9
 scipy==1.10.1
 six==1.16.0
 smart-open==6.3.0
+smmap==5.0.0
 soupsieve==2.4.1
 spacy==3.5.2
 spacy-legacy==3.0.12
@@ -140,6 +152,9 @@ thinc==8.1.9
 tinycss2==1.2.1
 tokenizers==0.13.3
 toml==0.10.2
+torch==2.0.0+cu117
+torchaudio==2.0.1+cu117
+torchvision==0.15.1+cu117
 tornado==6.3.1
 tqdm==4.65.0
 traitlets==5.9.0
@@ -147,6 +162,7 @@ transformers==4.28.1
 typer==0.7.0
 typing_extensions==4.5.0
 tzdata==2023.3
+uritemplate==4.1.1
 urllib3==1.26.15
 wasabi==1.1.1
 wcwidth==0.2.6
