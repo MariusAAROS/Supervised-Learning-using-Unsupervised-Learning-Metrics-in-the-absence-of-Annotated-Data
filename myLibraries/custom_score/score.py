@@ -3,10 +3,13 @@ import numpy as np
 from datetime import datetime
 import bert_score
 
+import os 
 import sys
 sys.path.append(get_git_root())
+sys.path.append(os.path.join(get_git_root(), "MENLI"))
 
 from BARTScore.bart_score import BARTScorer
+from MENLI.MENLI import MENLI
 
 def score(model, candidates=["I am Marius"], references=["Marius is my name"], withIdf = False):
     """
@@ -100,6 +103,7 @@ def BERTScoreStaticSampleTest(data, model, limit=3, withIdf = False):
     :param1 data (DataFrame) : Dataframe containing all references and candidates. 
     :param2 model (dict): Dictionnary of the embedding. 
     :param3 limit (int): Number of individuals to compute.
+    :param4 withIdf (bool): If true, includes idf in static BERTScore calculation.
     
     :output1 scores (list): List of Precision, Recall and F1score for each computed individual.
     :output2 runtime (float): Elasped time between the start and end of score computation for all individuals.
@@ -127,11 +131,8 @@ def BARTScoreDynamicSampleTest(data, limit=3):
 
     :param1 data (DataFrame) : Dataframe containing all references and candidates. Required Format : [col0: Reference, col1: Candidate].
     :param2 limit (int): Number of individuals to compute.
-    :param3 modelPath (string): Path to the wanted model in the HuggingFace repository.
-    :param4 model (object): Model to use directly for computation.
-    :param5 nbLayers (int): Number of layers in the custom model (has to be filled-in if modelPath!=None or model!=None).  
     
-    :output1 scores (list): List of Precision, Recall and F1score for each computed individual.
+    :output1 scores (list): List of scores for each computed individual.
     :output2 runtime (float): Elasped time between the start and end of score computation for all individuals.
     """
 
@@ -154,4 +155,35 @@ def BARTScoreDynamicSampleTest(data, limit=3):
         nbIter += 1
     runtime = (datetime.now() - init_time).total_seconds()
     #scores = np.exp(scores)
+    return scores, runtime
+
+def MENLIScoreSampleTest(data, limit=3):
+    """
+    Benchmarking function allowing to compute MENLI as well as its runtime.
+
+    :param1 data (DataFrame) : Dataframe containing all references and candidates. Required Format : [col0: Reference, col1: Candidate].
+    :param2 limit (int): Number of individuals to compute. 
+    
+    :output1 scores (list): List of scores for each computed individual.
+    :output2 runtime (float): Elasped time between the start and end of score computation for all individuals.
+    """
+
+    
+    nbIter = 1
+    scores = []
+    menliScorer = MENLI(direction='avg', formula='e', src=False, nli_weight=0.3, combine_with='BERTScore-F')
+    init_time = datetime.now()
+    for row in data.iterrows():
+        curCand = [" ".join(row[1][1].split("\n"))]
+        curRef = [" ".join(row[1][0].split("\n"))]
+        assert len(curCand) == len(curRef)
+        
+        score = menliScorer.score_all(srcs=[], refs=curRef, hyps=curCand)
+        score = score[0]
+        
+        scores.append(score)
+        if nbIter >= limit:
+            break
+        nbIter += 1
+    runtime = (datetime.now() - init_time).total_seconds()
     return scores, runtime
