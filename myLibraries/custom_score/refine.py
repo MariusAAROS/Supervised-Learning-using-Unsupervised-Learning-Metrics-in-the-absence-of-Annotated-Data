@@ -5,6 +5,7 @@ import bert_score
 import pandas as pd
 from scipy.stats import pearsonr
 from colorama import Fore, Style
+from datetime import datetime
 
 import sys
 sys.path.append(get_git_root())
@@ -38,17 +39,24 @@ class Refiner:
         self.printRange = printRange
         self.selectedIndexes = None
 
-    def refine(self):
+    def refine(self, checkpoints=False, saveRate=50):
         """
         Return a reduced string computed using static embedding vectors similarity. Also denoises the data by removing superfluous elements such as "\n" or useless signs.
 
         :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+        :param2 checkpoints (bool): Indicates whether the refining should save partial outputs along computation to prevent from losing data in the context of a crash.
+        :param3 saveRate (int): Only applicable id safe equals True. Specify the number of consicutive iterations after which a checkpoint should be created. 
 
         :output refined (string): refined version of the initial document.
         """
         self.refined = []
         self.selectedIndexes = []
         self.processedCorpus = []
+        if checkpoints:
+            iter = 0
+            start = datetime.now()
+            tempSave = False
+
         for indiv in self.corpus:
             #preprocess corpus
             clean = cleanString(indiv, self.ms)
@@ -98,7 +106,7 @@ class Refiner:
                 for curRatio in sorted(self.ratio):
                     curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
                     subCurRefined = [respaced_sentences[i] for i in curIndices]
-                    scoreOut = score(self.model, [" ".join(subCurRefined)], [indiv])
+                    scoreOut = self.scorer(self.model, [" ".join(subCurRefined)], [indiv])
                     curScore = parseScore(scoreOut)
                     if curScore < self.threshold:
                         try:
@@ -119,32 +127,52 @@ class Refiner:
             self.selectedIndexes.append(indices)
             self.refined.append(curRefined)
 
-    def assess(self, verbose=True):
+            #checkpoint verification
+            if checkpoints:
+                if iter % saveRate == 0 and iter != 0:
+                    stop = datetime.now()
+                    partial_runtime = stop - start
+                    self.save(runtime=partial_runtime)
+                    tempSave = True
+                iter += 1
+        if checkpoints:
+            stop = datetime.now()
+            runtime = stop - start
+            self.save(runtime=runtime, new=not(tempSave))
+
+    def assess(self, start=0, stop=None, verbose=True):
         """
         Assesses quality of the refined corpus by computing Static BERTscore and Rouge-Score on the refined version compared to it's initial version.
 
         :param1 self (Refiner): Refiner Object (see __init__ function for more details).
-        :param2 verbose (Boolean): When put to true, assess results will be printed.
+        :param2 start (int): Starting index to assess.
+        :param3 stop (int): Ending index to assess.
+        :param4 verbose (Boolean): When put to True, assess results will be printed.
 
         :output (dict): Dictionnary containing both the scores of Static BERTScore, BERTScore, BARTScore and Rouge as well as their correlation.
         """
         assert self.refined != None, "refined corpus doesn't exists"
+        
+        if stop == None:
+            stop = len(self.refined)
+        subset_refined = self.refined[start:stop]
+        subset_gold = self.gold[start:stop]
 
         #Static BERTScore computation
-        scoreOut = self.scorer(self.model, self.refined, self.gold)
+        scoreOut = score(self.model, subset_refined, subset_gold)
         customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-        rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.gold, self.refined)]
+        rougeScore = [rougeScorer.score(c, r) for c, r in zip(subset_gold, subset_refined)]
 
         #BERTScore computation
         with nostd():
-            bertscore = bert_score.score(self.refined, self.gold, lang="en", verbose=0)
+            bertscore = bert_score.score(subset_refined, subset_gold, lang="en", verbose=0)
 
         #bartscore
         bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
-        bartscore = bart_scorer.score(self.corpus, self.gold, batch_size=4)
+        bartscore = bart_scorer.score(subset_refined, subset_gold, batch_size=4)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
@@ -203,6 +231,43 @@ class Refiner:
                                "summary": self.refined,
                                "processedText": [". ".join(c) for c in self.processedCorpus]})
         return output
+
+    def save(self, runtime=None, new=True):
+        """
+        Saves Refiner output to a local folder.
+
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+        :param2 new (bool): Indicates if a new folder should be created. If false, output is append to the most recent ouput folder.
+        """
+
+        #evaluation
+        start = 0
+        stop = len(self.refined)
+        assessement = self.assess(start=start, stop=stop)
+
+        #mainDf = r.to_dataframe()
+        scoreDf = assessement["scores"]
+        corDf = assessement["correlations"]
+
+        #write output
+        main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output")
+        countfile_name = r"count.txt"
+        if new:
+            count = updateFileCount(os.path.join(main_folder_path, countfile_name))
+        else:
+            count = readFileCount(os.path.join(main_folder_path, countfile_name))
+
+        current_path = os.path.join(main_folder_path, f"experimentation_{count}")
+        try:
+            os.mkdir(current_path)
+        except FileExistsError:
+            pass
+
+        #mainDf.to_csv(os.path.join(current_path, "main.csv"))
+        scoreDf.to_csv(os.path.join(current_path, "scores.csv"))
+        corDf.to_csv(os.path.join(current_path, "correlations.csv"))
+        with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
+            f.write(str(runtime))
 
     def __str__(self) -> str:
         """

@@ -8,7 +8,9 @@ from datetime import datetime
 
 
 #params
-size = 2
+size = 4
+save = True
+savePace = 2
 
 #utils
 def updateFileCount(path):
@@ -24,7 +26,7 @@ def updateFileCount(path):
     else:
         updated = 1
     with open(path, "w") as f:
-        f.write(str(updated))    
+        f.write(str(updated))
     return updated
 
 #load dataset
@@ -35,10 +37,12 @@ billsum_test = billsum_test.loc[:, ["text", "summary"]]
 subset = billsum_test.iloc[:size, :]
 
 #refine
-start = datetime.now()
+#start = datetime.now()
 w2v = model_load("Word2Vec", True)
 r = Refiner(subset["text"].to_list(), subset["summary"].to_list(), w2v, score, ratio=np.linspace(1, 3, 2), maxSpacing=15, printRange=range(0, 3))
-r.refine()
+r.refine(checkpoints=save, saveRate=savePace)
+
+"""
 assessement = r.assess()
 stop = datetime.now()
 
@@ -62,3 +66,5 @@ scoreDf.to_csv(os.path.join(current_path, "scores.csv"))
 corDf.to_csv(os.path.join(current_path, "correlations.csv"))
 with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
     f.write(str(runtime))
+
+"""
