@@ -13,19 +13,21 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, model, scorer=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, gold, model, scorer=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
         :param1 self (Refiner): Object to initialize.
         :param2 corpus (List): List of documents to simplify.
-        :param3 model (Any): Model used to compute scores and create sentence's ranking.
-        :param4 ratio (float, int or array-like): Number determining how much the reference text will be shortened. 
-        :param5 threshold (float): Number between 0 and 1 indicating the lowest acceptable quality when tuning the length of the summary.
-        :param6 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
-        :param7 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
+        :param3 gold (List): List of gold summaries to compare to the extractive summary created with the refiner.
+        :param4 model (Any): Model used to compute scores and create sentence's ranking.
+        :param5 ratio (float, int or array-like): Number determining how much the reference text will be shortened. 
+        :param6 threshold (float): Number between 0 and 1 indicating the lowest acceptable quality when tuning the length of the summary.
+        :param7 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
+        :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
         """
         self.corpus = corpus
+        self.gold = gold
         self.processedCorpus = None
         self.model = model
         self.scorer = scorer
