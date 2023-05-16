@@ -131,20 +131,20 @@ class Refiner:
         assert self.refined != None, "refined corpus doesn't exists"
 
         #Static BERTScore computation
-        scoreOut = self.scorer(self.model, self.refined, self.corpus)
+        scoreOut = self.scorer(self.model, self.refined, self.gold)
         customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
-        rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.corpus, self.refined)]
+        rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.gold, self.refined)]
 
         #BERTScore computation
         with nostd():
-            bertscore = bert_score.score(self.refined, self.corpus, lang="en", verbose=0)
+            bertscore = bert_score.score(self.refined, self.gold, lang="en", verbose=0)
 
         #bartscore
         bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
-        bartscore = bart_scorer.score(self.corpus, self.refined, batch_size=4)
+        bartscore = bart_scorer.score(self.corpus, self.gold, batch_size=4)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
