@@ -135,7 +135,7 @@ class Refiner:
         customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
-        rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
+        rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
         rougeScore = [rougeScorer.score(c, r) for c, r in zip(self.gold, self.refined)]
 
         #BERTScore computation
@@ -151,28 +151,36 @@ class Refiner:
         bertscore_R = [round(t.item(), 2) for t in bertscore[1]]
         bartscore = [round(t, 2) for t in bartscore]
         rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
+        rouge2_R = [round(t['rouge2'][0], 2) for t in rougeScore]
         rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
 
         dfCustom = pd.DataFrame({'CBERT' : custom_R,
                                  'BERTScore' : bertscore_R,
                                  'BARTScore' : bartscore,
                                  'R-1' : rouge1_R,
+                                 'R-2' : rouge2_R,
                                  'R-L' : rougeL_R
                                 })
 
         #Correlation estimation
         pearsonCor_c_r1 = np.round(pearsonr(custom_R, rouge1_R), 2)
+        pearsonCor_c_r2 = np.round(pearsonr(custom_R, rouge2_R), 2)
         pearsonCor_c_rl = np.round(pearsonr(custom_R, rougeL_R), 2)
         pearsonCor_bertscore_r1 = np.round(pearsonr(bertscore_R, rouge1_R), 2)
+        pearsonCor_bertscore_r2 = np.round(pearsonr(bertscore_R, rouge2_R), 2)
         pearsonCor_bertscore_rl = np.round(pearsonr(bertscore_R, rougeL_R), 2)
         pearsonCor_bartscore_r1 = np.round(pearsonr(bartscore, rouge1_R), 2)
+        pearsonCor_bartscore_r2 = np.round(pearsonr(bartscore, rouge2_R), 2)
         pearsonCor_bartscore_rl = np.round(pearsonr(bartscore, rougeL_R), 2)
 
         dfCor = pd.DataFrame({'pearson_CBERT_R-1' : pearsonCor_c_r1,
+                              'pearson_CBERT_R-2' : pearsonCor_c_r2,
                               'pearson_CBERT_R-L' : pearsonCor_c_rl,
                               'pearson_BERT_R-1' : pearsonCor_bertscore_r1,
+                              'pearson_BERT_R-2' : pearsonCor_bertscore_r2,
                               'pearson_BERT_R-l' : pearsonCor_bertscore_rl,
                               'pearson_BART_R-1' : pearsonCor_bartscore_r1,
+                              'pearson_BART_R-2' : pearsonCor_bartscore_r2,
                               'pearson_BART_R-l' : pearsonCor_bartscore_rl}, index=["Pearson score", "p-value"])
         if verbose:
             printout = "Scores: \n"
