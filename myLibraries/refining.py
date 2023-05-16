@@ -37,7 +37,7 @@ subset = billsum_test.iloc[:size, :]
 #refine
 start = datetime.now()
 w2v = model_load("Word2Vec", True)
-r = Refiner(subset["text"], subset["summary"], w2v, score, ratio=np.linspace(1, 3, 2), maxSpacing=15, printRange=range(0, 3))
+r = Refiner(subset["text"].to_list(), subset["summary"].to_list(), w2v, score, ratio=np.linspace(1, 3, 2), maxSpacing=15, printRange=range(0, 3))
 r.refine()
 assessement = r.assess()
 stop = datetime.now()

@@ -140,11 +140,11 @@ class Refiner:
 
         #BERTScore computation
         with nostd():
-            bertscore = bert_score.score(self.refined, self.corpus.to_list(), lang="en", verbose=0)
+            bertscore = bert_score.score(self.refined, self.corpus, lang="en", verbose=0)
 
         #bartscore
         bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
-        bartscore = bart_scorer.score(self.corpus.to_list(), self.refined, batch_size=4)
+        bartscore = bart_scorer.score(self.corpus, self.refined, batch_size=4)
 
         #Data formating
         custom_R = [round(t, 2) for t in customScore]
