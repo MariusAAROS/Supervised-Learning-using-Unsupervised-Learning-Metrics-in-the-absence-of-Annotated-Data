@@ -55,7 +55,7 @@ class Refiner:
         if checkpoints:
             iter = 0
             start = datetime.now()
-            tempSave = False
+            createFolder = True
 
         for indiv in self.corpus:
             #preprocess corpus
@@ -132,13 +132,13 @@ class Refiner:
                 if iter % saveRate == 0 and iter != 0:
                     stop = datetime.now()
                     partial_runtime = stop - start
-                    self.save(runtime=partial_runtime)
-                    tempSave = True
+                    self.save(runtime=partial_runtime, new=createFolder)
+                    createFolder = False
                 iter += 1
         if checkpoints:
             stop = datetime.now()
             runtime = stop - start
-            self.save(runtime=runtime, new=not(tempSave))
+            self.save(runtime=runtime, new=createFolder)
 
     def assess(self, start=0, stop=None, verbose=True):
         """
