@@ -8,9 +8,9 @@ from datetime import datetime
 
 
 #params
-size = 500
+size = 2
 save = True
-savePace = 50
+savePace = 3
 
 #load dataset
 billsumTest_url='https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link'
