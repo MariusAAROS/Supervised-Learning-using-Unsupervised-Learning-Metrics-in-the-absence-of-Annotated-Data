@@ -6,7 +6,7 @@ from custom_score.score import score
 
 #params
 size = 2
-dataset_name = "Pubmed"
+dataset_name = "Billsum"
 save = True
 savePace = 3
 

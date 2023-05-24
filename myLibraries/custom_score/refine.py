@@ -77,7 +77,7 @@ class Refiner:
             #compute ranking
             scores = []
             for sentence in respaced_sentences:
-                scoreOut = self.scorer(self.model, [sentence], [indiv])
+                scoreOut = self.scorer(self.model, [sentence], [indiv.replace(sentence+".", "")])
                 R = parseScore(scoreOut)
                 scores.append(R)
             
