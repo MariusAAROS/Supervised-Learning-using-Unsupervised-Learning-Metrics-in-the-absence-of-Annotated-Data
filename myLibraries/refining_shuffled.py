@@ -6,13 +6,13 @@ from custom_score.score import score
 
 #params
 size = 2
-dataset_name = "Billsum"
+dataset_name = "Pubmed"
 save = True
 savePace = 3
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
-                 "Pubmed": r'C:\Pro\Stages\A4 - DVRC\Work\Datasets\pubmed\test.json'}
+                 "Pubmed": r'D:\COURS\A4\S8 - ESILV\Stage\Work\Datasets\Summary Evaluation\Pubmed\test.json'}
 
 #load dataset
 if dataset_name == "Billsum":
