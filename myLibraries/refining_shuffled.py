@@ -38,5 +38,5 @@ subset = dataset.iloc[:size, :]
 
 #refine
 w2v = model_load("Word2Vec", True)
-r = Refiner(subset["text"].to_list(), subset["summary"].to_list(), w2v, score, ratio=np.linspace(1, 3, 2), maxSpacing=15, printRange=range(0, 3))
+r = Refiner(subset["text"].to_list(), subset["summary"].to_list(), w2v, score, ratio=3, maxSpacing=15, printRange=range(0, 3)) #ratio=np.linspace(1, 3, 2)
 r.refine(checkpoints=save, saveRate=savePace)
