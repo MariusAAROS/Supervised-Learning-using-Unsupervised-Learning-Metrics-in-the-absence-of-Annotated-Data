@@ -106,7 +106,8 @@ class Refiner:
                 for curRatio in sorted(self.ratio):
                     curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
                     subCurRefined = [respaced_sentences[i] for i in curIndices]
-                    scoreOut = self.scorer(self.model, [" ".join(subCurRefined)], [indiv])
+                    curSentence = " ".join(subCurRefined)
+                    scoreOut = self.scorer(self.model, [curSentence], [indiv.replace(curSentence+".", "")])
                     curScore = parseScore(scoreOut)
                     if curScore < self.threshold:
                         try:
