@@ -5,10 +5,10 @@ from custom_score.utils import model_load
 from custom_score.score import score
 
 #params
-size = 2
+size = 100
 dataset_name = "Pubmed"
 save = True
-savePace = 3
+savePace = 25
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
