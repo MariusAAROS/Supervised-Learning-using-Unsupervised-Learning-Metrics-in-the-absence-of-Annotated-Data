@@ -314,21 +314,22 @@ def sentenceSelection(corpus, scores, distances, ratio=2):
     ranking = np.argsort(randomized_scores)[::-1]
 
     selectedLength = 0
-    selected_indexes = []
+    selected_indexes = set()
     current_distance = lambda x: np.median([distances[ranking[x]][i] for i in selected_indexes])
     cur = 0
     if targetLength != totalLength:
         while(selectedLength < targetLength):
             if cur == 0:
-                selected_indexes.append(ranking[cur])
+                selected_indexes.add(ranking[cur])
                 selectedLength += len(corpus[ranking[cur]])
             else:
                 updated_scores = [randomized_scores[i]*current_distance(i) for i in range(len(randomized_scores))]
                 updated_ranking = np.argsort(updated_scores)[::-1]
                 updated_ranking = [index for index in updated_ranking if index not in selected_indexes]
-                selected_indexes.append(updated_ranking[0])
+                selected_indexes.add(updated_ranking[0])
                 selectedLength += len(corpus[updated_ranking[0]])
             cur += 1
+        selected_indexes = list(selected_indexes)
     else:
         selected_indexes = ranking
 
