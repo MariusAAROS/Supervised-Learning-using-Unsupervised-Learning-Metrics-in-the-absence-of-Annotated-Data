@@ -5,10 +5,10 @@ from custom_score.utils import model_load
 from custom_score.score import score
 
 #params
-size = 100
-dataset_name = "Pubmed"
-save = True
-savePace = 25
+size = 2
+dataset_name = "Billsum"
+save = False
+savePace = 2
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
@@ -39,3 +39,5 @@ subset = dataset.iloc[:size, :]
 w2v = model_load("Word2Vec", True)
 r = Refiner(subset["text"].to_list(), subset["summary"].to_list(), w2v, score, ratio=3, maxSpacing=15, printRange=range(0, 3)) #ratio=np.linspace(2, 3, 2)
 r.refine(checkpoints=save, saveRate=savePace)
+if not(save):
+    r.assess()

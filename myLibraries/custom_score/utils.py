@@ -315,7 +315,7 @@ def sentenceSelection(corpus, scores, distances, ratio=2):
 
     selectedLength = 0
     selected_indexes = []
-    current_distance = lambda x: np.mean([distances[ranking[x]][i] for i in selected_indexes])
+    current_distance = lambda x: np.median([distances[ranking[x]][i] for i in selected_indexes])
     cur = 0
     if targetLength != totalLength:
         while(selectedLength < targetLength):
