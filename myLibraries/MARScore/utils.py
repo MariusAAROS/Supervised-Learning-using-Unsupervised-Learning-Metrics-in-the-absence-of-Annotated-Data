@@ -80,6 +80,12 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
         embs = [emb.tolist() for emb in embs]
     return embs
 
+def cleanVectors(data, labels):
+    token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
+    for k in data.keys():
+            data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
+    return data
+
 def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, dim=2):
     """
     Create a visual representation of the vectorized corpus using Plotly express. 
@@ -120,14 +126,15 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
 
     if labels_cluster.all() != None:
-        viridis = cm.get_cmap('viridis', len(labels_cluster)).colors
+        cmap = cm.get_cmap('viridis', len(set(labels_cluster))).colors
 
     if dim == 1:
         umap1D = UMAP(n_components=1, init='random', random_state=0)
         proj1D = umap1D.fit_transform(formated_embs).T
 
         data = {"x": proj1D[0],
-                "labels": labels}
+                "labels": labels,
+                "clusters": labels_cluster}
         
         for k in data.keys():
             data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
@@ -142,14 +149,15 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         traces = []
         for i in range(len(data['x'])):
-            if labels_cluster.all() != None:
-                color = colorize(clables=labels_cluster, cmap=viridis, mode="clustered")
+            if data["clusters"].all() != None:
+                color = colorize(clables=data["clusters"][i], cmap=cmap, mode="clustered")
             else:
-                color = colorize(labels=data['labels'], glabels=data_gold['labels'], mode="unclustered")
+                color = colorize(label=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
             trace = go.Scatter(
                 x=[data['x'][i]],
                 mode='markers',
-                marker=dict(size=6, color=color),
+                marker=dict(size=9, color=color),
+                line=dict(width=2, color="DarkSlateGrey"),
                 text=[data['labels'][i]],
                 name=data['labels'][i]
             )
@@ -159,7 +167,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 trace = go.Scatter(
                     x=[data_gold['x'][i]],
                     mode='markers',
-                    marker=dict(size=6, color='gold'),
+                    marker=dict(size=9, color='red'),
+                    line=dict(width=2, color="DarkSlateGrey"),
                     text=[data_gold['labels'][i]],
                     name=data_gold['labels'][i]
                 )
@@ -180,7 +189,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         data = {"x": proj2D[0],
                 "y": proj2D[1],
-                "labels": labels}
+                "labels": labels,
+                "clusters": labels_cluster}
         
         for k in data.keys():
             data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
@@ -196,15 +206,16 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         traces = []
         for i in range(len(data['x'])):
-            if labels_cluster.all() != None:
-                color = colorize(clabel=labels_cluster[i], cmap=viridis, mode="clustered")
+            if data["clusters"] != None:
+                color = colorize(clabel=data["clusters"][i], cmap=cmap, mode="clustered")
             else:
                 color = colorize(labels=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
             trace = go.Scatter(
                 x=[data['x'][i]],
                 y=[data['y'][i]],
                 mode='markers',
-                marker=dict(size=6, color=color),
+                marker=dict(size=9, color=color),
+                line=dict(width=2, color="DarkSlateGrey"),
                 text=[data['labels'][i]],
                 name=data['labels'][i]
             )
@@ -215,7 +226,9 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                     x=[data_gold['x'][i]],
                     y=[data_gold['y'][i]],
                     mode='markers',
-                    marker=dict(size=6, color='gold'),
+                    marker=dict(size=9, color='red'),
+                    marker_symbol="diamond",
+                    line=dict(width=2, color="DarkSlateGrey"),
                     text=[data_gold['labels'][i]],
                     name=data_gold['labels'][i]
                 )
