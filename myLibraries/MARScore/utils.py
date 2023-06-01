@@ -3,6 +3,7 @@ import torch
 from umap import UMAP
 import plotly.graph_objects as go
 import numpy as np
+from matplotlib import cm
 
 
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
@@ -79,7 +80,7 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
         embs = [emb.tolist() for emb in embs]
     return embs
 
-def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
+def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, dim=2):
     """
     Create a visual representation of the vectorized corpus using Plotly express. 
 
@@ -89,17 +90,37 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
     :param4 labels_gold (tensor): Text correponding to each encoded element.
     :param5 dim (int): Number of dimensions wanted for the visualization (only 1 and 2 are available because they are the most usefull).
     """
-    comp_gold = True if embs_gold != None and labels_gold != None else False
+    def colorize(label=None, glabels=[], clabel=None, cmap=[], mode="unclustered"):
+        """
+        Colorize vector's projections depending on the context. 
 
-    #formated_embs = [token.tolist() for token in embs]
-    #formated_embs = np.array(formated_embs)
-    #formated_embs_gold = [token.tolist() for token in embs_gold]
-    #formated_embs_gold = np.array(formated_embs_gold)
+        :param1 mode (string): Equals to <clustered>, <unclustered> to respectively colorize depending on gold's, cluster's belonging.
+
+        :output color (string): CSS text color.  
+        """
+        comp_gold = True if label != None and glabels != [] else False
+        assert label != None or glabels != [] or clabel != None, "ERROR: No labels detected"
+        if mode == "unclustered":
+            if comp_gold:
+                color = "green" if label in glabels else 'red'
+            else:
+                color = "red"
+        elif mode == "clustered":
+            if clabel != None and cmap != []:
+                color = cmap[clabel]
+            else:
+                color = "black"
+        return color
+
+    comp_gold = True if embs_gold != None and labels_gold != None else False
 
     formated_embs = np.array(embs)
     formated_embs_gold = np.array(embs_gold)
 
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
+
+    if labels_cluster.all() != None:
+        viridis = cm.get_cmap('viridis', len(labels_cluster)).colors
 
     if dim == 1:
         umap1D = UMAP(n_components=1, init='random', random_state=0)
@@ -121,10 +142,10 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
 
         traces = []
         for i in range(len(data['x'])):
-            if comp_gold:
-                color = 'green' if data["labels"][i] in data_gold["labels"] else 'red'
+            if labels_cluster.all() != None:
+                color = colorize(clables=labels_cluster, cmap=viridis, mode="clustered")
             else:
-                color = 'red'
+                color = colorize(labels=data['labels'], glabels=data_gold['labels'], mode="unclustered")
             trace = go.Scatter(
                 x=[data['x'][i]],
                 mode='markers',
@@ -168,17 +189,17 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
             token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
             proj2D_gold = umap2D.fit_transform(formated_embs_gold).T
             data_gold = {"x": proj2D_gold[0],
-                        "y": proj2D_gold[1],
-                        "labels": labels_gold}
+                         "y": proj2D_gold[1],
+                         "labels": labels_gold}
             for k in data_gold.keys():
                 data_gold[k] = [data_gold[k][i] for i in range(len(data_gold[k])) if i in token_indexes_gold]
 
         traces = []
         for i in range(len(data['x'])):
-            if comp_gold:
-                color = 'green' if data["labels"][i] in data_gold["labels"] else 'red'
+            if labels_cluster.all() != None:
+                color = colorize(clabel=labels_cluster[i], cmap=viridis, mode="clustered")
             else:
-                color = 'red'
+                color = colorize(labels=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
             trace = go.Scatter(
                 x=[data['x'][i]],
                 y=[data['y'][i]],
