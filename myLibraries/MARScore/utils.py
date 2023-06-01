@@ -4,6 +4,7 @@ from umap import UMAP
 import plotly.graph_objects as go
 import numpy as np
 from matplotlib import cm
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
@@ -80,6 +81,12 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
         embs = [emb.tolist() for emb in embs]
     return embs
 
+def tf(text):
+    vectorizer = TfidfVectorizer(use_idf=False, norm=None, tokenizer=lambda x: x, lowercase=False)
+    tf_values = vectorizer.fit_transform([text]).toarray()[0]
+    tf_dict = {word: tf_values[index] for word, index in vectorizer.vocabulary_.items()}
+    return tf_dict
+
 def cleanVectors(data, labels):
     """
     Removes vectors associated with noisy words such as stop words, punctuation, and BERT separator tokens.
@@ -98,7 +105,7 @@ def cleanVectors(data, labels):
 
     return new
 
-def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, dim=2):
+def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
     """
     Create a visual representation of the vectorized corpus using Plotly express. 
 
@@ -106,7 +113,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
     :param2 labels (tensor): Text correponding to each encoded element.
     :param3 embs_gold (list): List of dynamics embeddings for each word of the gold reference.
     :param4 labels_gold (tensor): Text correponding to each encoded element.
-    :param5 dim (int): Number of dimensions wanted for the visualization (only 1 and 2 are available because they are the most usefull).
+    :param5 tf_values (dict): Dictionnary of Term-Frequency for each token of the text.
+    :param6 dim (int): Number of dimensions wanted for the visualization (only 1 and 2 are available because they are the most usefull).
     """
     def colorize(label=None, glabels=[], clabel=None, cmap=[], mode="unclustered"):
         """
@@ -129,9 +137,25 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
             else:
                 color = "black"
         return color
+    def create_word_dictionary(words):
+        """
+        Transforms list of words to dictionnary of words with value 1 (used to create TF default value).
+
+        :param1 words (list): List of words.
+
+        :output word_dict (dict): Dictionnary of words.
+        """
+        word_dict = {}
+        for word in words:
+            if word not in word_dict:
+                word_dict[word] = 1
+        return word_dict
+    
+    if tf_values == None:
+        tf_values = create_word_dictionary(labels)
 
     comp_gold = True if embs_gold != None and labels_gold != None else False
-
+    
     formated_embs = np.array(embs)
     formated_embs_gold = np.array(embs_gold)
 
@@ -170,7 +194,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 mode='markers',
                 marker=dict(size=9, color=color),
                 line=dict(width=2, color="DarkSlateGrey"),
-                text=[data['labels'][i]],
+                text=["token: "+str(data['labels'][i]),
+                      "tf   : "+str(tf_values[data['labels'][i]])],
                 name=data['labels'][i]
             )
             traces.append(trace)
@@ -181,7 +206,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                     mode='markers',
                     marker=dict(size=9, color='red'),
                     line=dict(width=2, color="DarkSlateGrey"),
-                    text=[data_gold['labels'][i]],
+                    text=["token: "+str(data_gold['labels'][i])],
                     name=data_gold['labels'][i]
                 )
                 traces.append(trace)
@@ -228,7 +253,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 mode='markers',
                 marker=dict(size=9, color=color),
                 line=dict(width=2, color="DarkSlateGrey"),
-                text=[data['labels'][i]],
+                text=["token: "+str(data['labels'][i]),
+                      "tf   : "+str(tf_values[data['labels'][i]])],
                 name=data['labels'][i]
             )
             traces.append(trace)
@@ -241,7 +267,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                     marker=dict(size=9, color='red'),
                     marker_symbol="diamond",
                     line=dict(width=2, color="DarkSlateGrey"),
-                    text=[data_gold['labels'][i]],
+                    text=["token: "+str(data_gold['labels'][i])],
                     name=data_gold['labels'][i]
                 )
                 traces.append(trace)
