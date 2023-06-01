@@ -81,6 +81,14 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
     return embs
 
 def cleanVectors(data, labels):
+    """
+    Removes vectors associated with noisy words such as stop words, punctuation, and BERT separator tokens.
+
+    :param1 data (list): List of words embeddings.
+    :param2 labels (list): List of text token associated with each embedding.
+
+    :output new (list): Cleansed list of words embeddings.
+    """
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
     #new = []
     #for k in range(len(data)):
@@ -247,3 +255,4 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         )
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
+
