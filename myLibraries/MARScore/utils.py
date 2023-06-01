@@ -82,9 +82,13 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
 
 def cleanVectors(data, labels):
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
-    for k in data.keys():
-            data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
-    return data
+    #new = []
+    #for k in range(len(data)):
+        #data[k] = [data[i] for i in range(len(data[k])) if i in token_indexes]
+    #    if i in token_indexes:
+    new = [data[i] for i in range(len(data)) if i in token_indexes]
+
+    return new
 
 def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, dim=2):
     """
