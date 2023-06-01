@@ -55,7 +55,7 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
         output = model(inputs_ids, attention_mask=attention_masks)
     return output, labels
 
-def vectorizeCorpus(model_output, allStates=True):
+def vectorizeCorpus(model_output, allStates=True, tolist=True):
     """
     Transforms an encoded text to word-level vectors using a transformer model.
 
@@ -75,6 +75,8 @@ def vectorizeCorpus(model_output, allStates=True):
         for token in batch:
             emb = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
             embs.append(emb)
+    if tolist:
+        embs = [emb.tolist() for emb in embs]
     return embs
 
 def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
@@ -89,10 +91,14 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, dim=2):
     """
     comp_gold = True if embs_gold != None and labels_gold != None else False
 
-    formated_embs = [token.tolist() for token in embs]
-    formated_embs = np.array(formated_embs)
-    formated_embs_gold = [token.tolist() for token in embs_gold]
-    formated_embs_gold = np.array(formated_embs_gold)
+    #formated_embs = [token.tolist() for token in embs]
+    #formated_embs = np.array(formated_embs)
+    #formated_embs_gold = [token.tolist() for token in embs_gold]
+    #formated_embs_gold = np.array(formated_embs_gold)
+
+    formated_embs = np.array(embs)
+    formated_embs_gold = np.array(embs_gold)
+
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
 
     if dim == 1:
