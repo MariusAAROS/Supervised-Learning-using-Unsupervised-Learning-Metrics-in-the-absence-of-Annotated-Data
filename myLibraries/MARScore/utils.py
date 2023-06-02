@@ -177,7 +177,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         if comp_gold:
             token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
-            proj1D_gold = umap1D.fit_transform(formated_embs_gold).T
+            proj1D_gold = umap1D.transform(formated_embs_gold).T
             data_gold = {"x": proj1D_gold[0],
                         "labels": labels_gold}
             for k in data_gold.keys():
@@ -204,6 +204,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                     x=[data_gold['x'][i]],
                     mode='markers',
                     marker=dict(size=9, color='red'),
+                    marker_symbol="diamond",
                     line=dict(width=2, color="DarkSlateGrey"),
                     text=["token: "+str(data_gold['labels'][i])],
                     name=data_gold['labels'][i]
@@ -233,7 +234,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         if comp_gold:
             token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
-            proj2D_gold = umap2D.fit_transform(formated_embs_gold).T
+            proj2D_gold = umap2D.transform(formated_embs_gold).T
             data_gold = {"x": proj2D_gold[0],
                          "y": proj2D_gold[1],
                          "labels": labels_gold}
