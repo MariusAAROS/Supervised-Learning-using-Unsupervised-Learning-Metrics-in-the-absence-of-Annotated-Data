@@ -185,8 +185,8 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         traces = []
         for i in range(len(data['x'])):
-            if data["clusters"].all() != None:
-                color = colorize(clables=data["clusters"][i], cmap=cmap, mode="clustered")
+            if data["clusters"] != None:
+                color = colorize(clabel=data["clusters"][i], cmap=cmap, mode="clustered")
             else:
                 color = colorize(label=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
             trace = go.Scatter(
@@ -194,8 +194,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 mode='markers',
                 marker=dict(size=9, color=color),
                 line=dict(width=2, color="DarkSlateGrey"),
-                text=["token: "+str(data['labels'][i]),
-                      "tf   : "+str(tf_values[data['labels'][i]])],
+                text=["token: "+str(data['labels'][i])+" || "+"tf   : "+str(tf_values[data['labels'][i]])],
                 name=data['labels'][i]
             )
             traces.append(trace)
@@ -253,8 +252,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 mode='markers',
                 marker=dict(size=9, color=color),
                 line=dict(width=2, color="DarkSlateGrey"),
-                text=["token: "+str(data['labels'][i]),
-                      "tf   : "+str(tf_values[data['labels'][i]])],
+                text=["token: "+str(data['labels'][i]) +" || "+"tf   : "+str(tf_values[data['labels'][i]])],
                 name=data['labels'][i]
             )
             traces.append(trace)
