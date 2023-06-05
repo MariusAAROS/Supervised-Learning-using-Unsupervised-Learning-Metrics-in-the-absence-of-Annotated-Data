@@ -92,7 +92,7 @@ def tf(text):
 
     :output tf_dict (dict): Dictionnary of tokens with their corresponding IDF.
     """
-    vectorizer = TfidfVectorizer(use_idf=False, norm=None, tokenizer=lambda x: x, lowercase=False)
+    vectorizer = TfidfVectorizer(use_idf=False, norm=None, tokenizer=lambda x: x, lowercase=False, token_pattern=None)
     tf_values = vectorizer.fit_transform([text]).toarray()[0]
     tf_dict = {word: tf_values[index] for word, index in vectorizer.vocabulary_.items()}
     return tf_dict
@@ -319,7 +319,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
-def to_ilp_format(labels, clabels, clusters_tf_values, save=True):
+def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -327,6 +327,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True):
     :param2 clabels (list): List of token's cluster index.
     :param3 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
     :param4 save (bool): Save the output to file if set to True.
+    :param5 verbose (bool): Add verbose if set to True.
 
     :output output (string): Text formatted to with respect to ILP's requirements.
     """
@@ -384,6 +385,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True):
         with open(path, "w") as text_file:
             text_file.write(output)
             text_file.close()
+        if verbose:
             print("\nSave successful")
 
     return output
