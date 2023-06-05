@@ -5,6 +5,9 @@ import plotly.graph_objects as go
 import numpy as np
 from matplotlib import cm
 from sklearn.feature_extraction.text import TfidfVectorizer
+from custom_score.utils import cleanString, get_git_root
+import os
+import re
 
 
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
@@ -82,10 +85,35 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
     return embs
 
 def tf(text):
+    """
+    Computes individual TFs of tokens.
+
+    :param1 text (list): List of tokens.
+
+    :output tf_dict (dict): Dictionnary of tokens with their corresponding IDF.
+    """
     vectorizer = TfidfVectorizer(use_idf=False, norm=None, tokenizer=lambda x: x, lowercase=False)
     tf_values = vectorizer.fit_transform([text]).toarray()[0]
     tf_dict = {word: tf_values[index] for word, index in vectorizer.vocabulary_.items()}
     return tf_dict
+
+def clusters_tf(tf_values, labels, clabels):
+    """
+    Computes clusters TFs from tokens individuals TFs.
+
+    :param1 tf_value (dict): Dictionnary of tokens with their corresponding TF value.
+    :param2 labels (list): List of the tokens.
+    :param3 clabels (list): List of the token's clusters.
+
+    :output clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster. 
+    """
+    clusters_tf_values = {}
+    for label, clabel in zip(labels, clabels):
+        if clabel in clusters_tf_values.keys():
+            clusters_tf_values[clabel] += tf_values[label]
+        else:
+            clusters_tf_values[clabel] = tf_values[label]
+    return clusters_tf_values
 
 def cleanAll(embs, labels, mode="all", ignore=["."]):
     """
@@ -118,6 +146,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
     :param2 labels (tensor): Text correponding to each encoded element.
     :param3 embs_gold (list): List of dynamics embeddings for each word of the gold reference.
     :param4 labels_gold (tensor): Text correponding to each encoded element.
+    :param5 labels_cluster (list): List of the token's clusters.
     :param5 tf_values (dict): Dictionnary of Term-Frequency for each token of the text.
     :param6 dim (int): Number of dimensions wanted for the visualization (only 1 and 2 are available because they are the most usefull).
     """
@@ -125,7 +154,11 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         """
         Colorize vector's projections depending on the context. 
 
-        :param1 mode (string): Equals to <clustered>, <unclustered> to respectively colorize depending on gold's, cluster's belonging.
+        :param1 label (string): Single Token.
+        :param2 glabel (list): List of gold tokens.
+        :param3 clabel (int): Cluster's index of the current token.
+        :param4 cmap (color_map): Matplotlib color map.
+        :param5 mode (string): Equals to <clustered>, <unclustered> to respectively colorize depending on gold's, cluster's belonging.
 
         :output color (string): CSS text color.  
         """
@@ -286,3 +319,91 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
+def to_ilp_format(labels, clabels, clusters_tf_values, save=True):
+    """
+    Transforms a text to an ILP model.
+
+    :param1 labels (list): List of text token associated with each embedding.
+    :param2 clabels (list): List of token's cluster index.
+    :param3 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
+    :param4 save (bool): Save the output to file if set to True.
+
+    :output output (string): Text formatted to with respect to ILP's requirements.
+    """
+    #define scoring function
+    output = "Maximize\nscore:"
+    for i, k in enumerate(sorted(clusters_tf_values.keys())):
+        if int(clusters_tf_values[k]) < 0:
+            output += f" - {-int(clusters_tf_values[k])} c{i}"
+        else:
+            output += f" + {int(clusters_tf_values[k])} c{i}"
+
+    #create sentences and sentence dictionnary
+    sentence_index = 0
+    sentences_map = {0: set()}
+    nb_sentences = labels.count(".")
+    for cluster_index, token in zip(clabels, labels):
+        if cluster_index in sentences_map.keys():
+            sentences_map[cluster_index].add(sentence_index)
+        else:
+            sentences_map[cluster_index] = {sentence_index}
+        
+        if token == ".":
+            sentence_index += 1
+            
+    #define constraints
+    output += "\n\nSubject To\n"
+    for i, k in enumerate(sorted(sentences_map.keys())):
+        output += f"index_{i}:"
+        for cluster_index in sorted(sentences_map[k]):
+            output += f" s{cluster_index} +"
+        output = output[:-2] + f" - c{i} >= 0" + "\n"
+        
+    #define sentence length
+    output += "length:"
+    for i in range(nb_sentences):
+        output += f" 1 s{i} +"
+    output = output[:-2] + " <= 2000"
+
+    #declare cluster variables
+    output += "\n\n\nBinary\n"
+    for i in range(len(clusters_tf_values.keys())):
+        output += f"c{i}\n"
+
+    #declare sentences variables
+    for i in range(nb_sentences):
+        output += f"s{i}\n"
+    output = output[:-1]
+
+    #end file
+    output += "\nEnd"
+
+    if save:
+        root = get_git_root()
+        path = os.path.join(root, "myLibraries\MARScore_output\ilp_in.ilp")
+        with open(path, "w") as text_file:
+            text_file.write(output)
+            text_file.close()
+            print("\nSave successful")
+
+    return output
+
+def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol"):
+    """
+    Reads and parses the output value of an ILP model.
+
+    :param1 rel_path (string): Relative path to the desired ILP output file.
+
+    :output result (list): List of sentence selection performed by the ILP model.
+    """
+    root = get_git_root()
+    path = os.path.join(root, rel_path)
+    with open(path, "r") as f:
+        raw = "".join(f.readlines())
+        f.close()
+
+    pattern = r's\d+\s+\*\s+(\d)'
+
+    matches = re.findall(pattern, raw)
+    result = [int(match) for match in matches]
+    return result
