@@ -87,11 +87,11 @@ def tf(text):
     tf_dict = {word: tf_values[index] for word, index in vectorizer.vocabulary_.items()}
     return tf_dict
 
-def cleanVectors(data, labels):
+def cleanVectors(embs, labels):
     """
     Removes vectors associated with noisy words such as stop words, punctuation, and BERT separator tokens.
 
-    :param1 data (list): List of words embeddings.
+    :param1 embs (list): List of words embeddings.
     :param2 labels (list): List of text token associated with each embedding.
 
     :output new (list): Cleansed list of words embeddings.
@@ -101,9 +101,32 @@ def cleanVectors(data, labels):
     #for k in range(len(data)):
         #data[k] = [data[i] for i in range(len(data[k])) if i in token_indexes]
     #    if i in token_indexes:
-    new = [data[i] for i in range(len(data)) if i in token_indexes]
+    new = [embs[i] for i in range(len(embs)) if i in token_indexes]
 
     return new
+
+def cleanAll(embs, labels, mode="all", ignore=["."]):
+    """
+    Removes vectors associated with noisy words such as stop words, punctuation, and BERT separator tokens.
+
+    :param1 embs (list): List of words embeddings.
+    :param2 labels (list): List of text token associated with each embedding.
+
+    :output1 new_embs (list): Cleansed list of words embeddings.
+    :output2 new_labels (list): Cleansed list of tokens.
+    :output3 -1 (int): Error output.
+    """
+    token_indexes = [i for i in range(len(labels)) if (labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2) or labels[i] in ignore]
+    new_embs = [embs[i] for i in range(len(embs)) if i in token_indexes]
+    new_labels = [labels[i] for i in range(len(labels)) if i in token_indexes]
+    if mode == "all":
+        return new_embs, new_labels
+    elif mode == "emb":
+        return new_embs
+    elif mode == "lab":
+        return new_labels
+    else:
+        return -1
 
 def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
     """
