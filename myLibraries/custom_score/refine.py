@@ -188,8 +188,8 @@ class Refiner:
         subset_gold = self.gold[start:stop]
 
         #Static BERTScore computation
-        scoreOut = score(self.model, subset_refined, subset_gold)
-        customScore = [parseScore(curScore) for curScore in scoreOut]
+        customScore = score(self.model, subset_refined, subset_gold)
+        #customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
@@ -198,21 +198,28 @@ class Refiner:
         #BERTScore computation
         with nostd():
             bertscore = bert_score.score(subset_refined, subset_gold, lang="en", verbose=0)
-
         #bartscore
         bart_scorer = BARTScorer(device='cuda:0', checkpoint='facebook/bart-large-cnn')
         bartscore = bart_scorer.score(subset_refined, subset_gold, batch_size=4)
 
         #Data formating
-        custom_R = [round(t, 2) for t in customScore]
+        custom_R = [round(t[0], 2) for t in customScore]
+        custom_P = [round(t[1], 2) for t in customScore]
+        custom_F = [round(t[2], 2) for t in customScore]
         bertscore_R = [round(t.item(), 2) for t in bertscore[1]]
+        bertscore_P = [round(t.item(), 2) for t in bertscore[0]]
+        bertscore_F = [round(t.item(), 2) for t in bertscore[2]]
         bartscore = [round(t, 2) for t in bartscore]
         rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
         rouge2_R = [round(t['rouge2'][0], 2) for t in rougeScore]
         rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
 
-        dfCustom = pd.DataFrame({'CBERT' : custom_R,
-                                 'BERTScore' : bertscore_R,
+        dfCustom = pd.DataFrame({'CBERT-R' : custom_R,
+                                 'CBERT-P' : custom_P,
+                                 'CBERT-F' : custom_F,
+                                 'BERTScore-R' : bertscore_R,
+                                 'BERTScore-P' : bertscore_P,
+                                 'BERTScore-F' : bertscore_F,
                                  'BARTScore' : bartscore,
                                  'R-1' : rouge1_R,
                                  'R-2' : rouge2_R,
@@ -220,12 +227,12 @@ class Refiner:
                                 })
 
         #Correlation estimation
-        pearsonCor_c_r1 = np.round(pearsonr(custom_R, rouge1_R), 2)
-        pearsonCor_c_r2 = np.round(pearsonr(custom_R, rouge2_R), 2)
-        pearsonCor_c_rl = np.round(pearsonr(custom_R, rougeL_R), 2)
-        pearsonCor_bertscore_r1 = np.round(pearsonr(bertscore_R, rouge1_R), 2)
-        pearsonCor_bertscore_r2 = np.round(pearsonr(bertscore_R, rouge2_R), 2)
-        pearsonCor_bertscore_rl = np.round(pearsonr(bertscore_R, rougeL_R), 2)
+        pearsonCor_c_r1 = np.round(pearsonr(custom_F, rouge1_R), 2)
+        pearsonCor_c_r2 = np.round(pearsonr(custom_F, rouge2_R), 2)
+        pearsonCor_c_rl = np.round(pearsonr(custom_F, rougeL_R), 2)
+        pearsonCor_bertscore_r1 = np.round(pearsonr(bertscore_F, rouge1_R), 2)
+        pearsonCor_bertscore_r2 = np.round(pearsonr(bertscore_F, rouge2_R), 2)
+        pearsonCor_bertscore_rl = np.round(pearsonr(bertscore_F, rougeL_R), 2)
         pearsonCor_bartscore_r1 = np.round(pearsonr(bartscore, rouge1_R), 2)
         pearsonCor_bartscore_r2 = np.round(pearsonr(bartscore, rouge2_R), 2)
         pearsonCor_bartscore_rl = np.round(pearsonr(bartscore, rougeL_R), 2)
