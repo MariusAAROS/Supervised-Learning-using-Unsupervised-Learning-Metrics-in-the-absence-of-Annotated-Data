@@ -94,7 +94,7 @@ class Refiner:
             distances = []
             for x in range(len(respaced_sentences)):
                 try:
-                    distance = self.scorer(respaced_sentences[x]*len(respaced_sentences), respaced_sentences)
+                    distance = self.scorer([respaced_sentences[x]]*len(respaced_sentences), respaced_sentences)
                 except:
                     distance = [-1]*len(respaced_sentences)
                 distances.append(distance)
@@ -108,8 +108,10 @@ class Refiner:
                 for curRatio in sorted(self.ratio):
                     curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
                     subCurRefined = [respaced_sentences[i] for i in curIndices]
-                    curSentence = " ".join(subCurRefined)
-                    curScore = self.scorer(indiv.replace(curSentence+".", ""), curSentence) #potentiellement faux 
+                    curSum = ". ".join(subCurRefined)+"."
+                    curIndiv = indiv
+                    #for i in range(len(subCurRefined)): curIndiv = curIndiv.replace(subCurRefined[i]+".", "")
+                    curScore = self.scorer([curIndiv], [curSum])[0]
                     if curScore < self.threshold:
                         try:
                             indices = curBest
