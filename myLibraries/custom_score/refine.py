@@ -14,7 +14,7 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, gold, model, scorer=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, gold, model=None, metric=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
@@ -31,7 +31,7 @@ class Refiner:
         self.gold = gold
         self.processedCorpus = None
         self.model = model
-        self.scorer = scorer
+        self.metric = metric
         self.ratio = ratio
         self.threshold = threshold
         self.ms = maxSpacing
@@ -60,6 +60,7 @@ class Refiner:
         for indiv in self.corpus:
             #preprocess corpus
             clean = cleanString(indiv, self.ms)
+            clean = indiv
             sentences = clean.split(".")
             sentences.pop()
             temp = []
@@ -76,25 +77,22 @@ class Refiner:
 
             #compute ranking
             scores = []
+            formated_refs = []
+            formated_cands = []
             for sentence in respaced_sentences:
-                scoreOut = self.scorer(self.model, [sentence], [indiv.replace(sentence+".", "")])
-                R = parseScore(scoreOut)
-                scores.append(R)
-            
+                formated_refs.append(indiv.replace(sentence+".", ""))
+                formated_cands.append(sentence)
+                #scoreOut = self.scorer(indiv.replace(sentence+".", ""), sentence)
+                #scores.append(scoreOut)
+            scores = self.scorer(formated_refs, formated_cands)
+
             #compute distances
             distances = []
             for x in range(len(respaced_sentences)):
-                distance = []
-                for y in range(len(respaced_sentences)):
-                    if x != y:
-                        try:
-                            scoreOut = self.scorer(self.model, [respaced_sentences[x]], [respaced_sentences[y]])
-                            curDistance = parseScore(scoreOut)
-                        except:
-                            curDistance = -1
-                    else:
-                        curDistance = 1
-                    distance.append(curDistance)
+                try:
+                    distance = self.scorer([respaced_sentences[x]]*len(respaced_sentences), respaced_sentences)
+                except:
+                    distance = [-1]*len(respaced_sentences)
                 distances.append(distance)
             distances = parseDistances(distances)
 
@@ -106,9 +104,10 @@ class Refiner:
                 for curRatio in sorted(self.ratio):
                     curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
                     subCurRefined = [respaced_sentences[i] for i in curIndices]
-                    curSentence = " ".join(subCurRefined)
-                    scoreOut = self.scorer(self.model, [curSentence], [indiv.replace(curSentence+".", "")])
-                    curScore = parseScore(scoreOut)
+                    curSum = ". ".join(subCurRefined)+"."
+                    curIndiv = indiv
+                    #for i in range(len(subCurRefined)): curIndiv = curIndiv.replace(subCurRefined[i]+".", "")
+                    curScore = self.scorer([curIndiv], [curSum])[0]
                     if curScore < self.threshold:
                         try:
                             indices = curBest
@@ -140,6 +139,35 @@ class Refiner:
             stop = datetime.now()
             runtime = stop - start
             self.save(runtime=runtime, new=createFolder)
+
+    def scorer(self, refs, cands, param="F"):
+        param = param.upper()
+        if self.metric.__module__ == "custom_score.score":
+            if self.model == None:
+                self.model = model_load("Word2Vec", True)
+            scores = self.metric(self.model, cands, refs)
+            R, P, F = [], [], []
+            for score in scores:
+                R.append(score[0])
+                P.append(score[1])
+                F.append(score[2])
+            
+        elif self.metric.__module__ == "bert_score.score":
+            with nostd():
+                scores = self.metric(cands, refs, lang="en", verbose=0)
+            P = scores[0].tolist()
+            R = scores[1].tolist()
+            F = scores[2].tolist()
+      
+        if param == "F":
+            output = F
+        elif param == "R":
+            output = R
+        elif param == "P":
+            output = P
+        elif param == "ALL":
+            output = (R, P, F)
+        return output
 
     def assess(self, start=0, stop=None, verbose=True):
         """
