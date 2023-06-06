@@ -38,6 +38,7 @@ class Refiner:
         self.refined = None
         self.printRange = printRange
         self.selectedIndexes = None
+        self.scores = []
 
     def refine(self, checkpoints=False, saveRate=50):
         """
@@ -226,6 +227,14 @@ class Refiner:
                                  'R-L' : rougeL_R
                                 })
 
+        #Score saving
+        if self.metric.__module__ == "custom_score.score":
+            self.scores = custom_F
+        elif self.metric.__module__ == "bert_score.score":
+            self.scores = bertscore_F
+        else:
+            self.scores = -1
+
         #Correlation estimation
         pearsonCor_c_r1 = np.round(pearsonr(custom_F, rouge1_R), 2)
         pearsonCor_c_r2 = np.round(pearsonr(custom_F, rouge2_R), 2)
@@ -325,7 +334,7 @@ class Refiner:
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
 
         for index in self.printRange:
-            printout += f"\nCorpus no.{index+1} : \n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+            printout += f"\nCorpus no.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''}\n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         if i in self.selectedIndexes[index]
                                                         else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
