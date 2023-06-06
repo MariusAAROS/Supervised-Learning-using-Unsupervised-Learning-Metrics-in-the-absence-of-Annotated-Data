@@ -63,7 +63,7 @@ class Refiner:
 
         for indiv in self.corpus:
             #preprocess corpus
-            #clean = cleanString(indiv, self.ms)
+            clean = cleanString(indiv, self.ms)
             clean = indiv
             sentences = clean.split(".")
             sentences.pop()
@@ -328,8 +328,10 @@ class Refiner:
         return printout
     
 
+"""
 w2v = model_load("Word2Vec", True)
 r = Refiner(["I am Marius. I like trains.", "Engineering is good. It is fun."], ["My name is Marius. I think trains are cool.", "I enjoy datascience. It is my studies."], w2v, metric=score)
 r.refine()
 out = r.assess()
 print(r)
+"""
