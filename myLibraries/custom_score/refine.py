@@ -143,6 +143,16 @@ class Refiner:
             self.save(runtime=runtime, new=createFolder)
 
     def scorer(self, refs, cands, param="F", dist=False):
+        """
+        Allows to compute a specific score amongst multiple possibilities.
+
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+        :param2 references (list): List of reference sentences.
+        :param3 candidates (list): List of candidate sentences.
+        :param4 param (str): String equals to <R>, <P>, <F> or <ALL> depending on the desired output metric (respectively Recall, Precision, F1-score, all of them).
+
+        :output output (list): List containing each individual's score. 
+        """
         param = param.upper()
         if not(dist):
             fitness = self.metric
@@ -157,7 +167,7 @@ class Refiner:
                 R.append(score[0])
                 P.append(score[1])
                 F.append(score[2])
-            
+
         elif fitness.__module__ == "bert_score.score":
             with nostd():
                 scores = fitness(cands, refs, lang="en", verbose=0)
