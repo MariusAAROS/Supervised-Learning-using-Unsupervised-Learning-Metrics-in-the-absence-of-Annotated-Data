@@ -13,6 +13,7 @@ import hdbscan
 import pandas as pd
 from scipy.stats import pearsonr
 from BARTScore.bart_score import BARTScorer
+from colorama import Fore, Style
 
 class MARSCore():
     def __init__(self, corpus, gold, model=BertModel.from_pretrained('bert-base-uncased', 
@@ -149,3 +150,29 @@ class MARSCore():
             print(printout)
 
         return {"scores": dfCustom, "correlations": dfCor}
+
+    def __str__(self) -> str:
+        """
+        Summarizes MARScore object to a string.
+
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+
+        :output printout (string): Summarized informations about the MARSCore object.
+        """
+
+        printout = "--------MARScore OBJECT--------\n\n"
+        printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
+        printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
+        printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.summaries]))+1) + "\n"
+
+        """    
+        self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
+    
+        for index in self.printRange:
+            printout += f"\nCorpus no.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''}\n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+                                                        if i in self.selectedIndexes[index]
+                                                        else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+                                                        for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
+        """
+        printout += "\n-------------------------------"
+        return printout
