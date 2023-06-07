@@ -14,7 +14,7 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, gold, model=None, metric=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, gold, model=None, metric=score, dist_metric=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
@@ -32,6 +32,7 @@ class Refiner:
         self.processedCorpus = None
         self.model = model
         self.metric = metric
+        self.dist_metric = dist_metric
         self.ratio = ratio
         self.threshold = threshold
         self.ms = maxSpacing
@@ -91,7 +92,7 @@ class Refiner:
             distances = []
             for x in range(len(respaced_sentences)):
                 try:
-                    distance = self.scorer([respaced_sentences[x]]*len(respaced_sentences), respaced_sentences)
+                    distance = self.scorer([respaced_sentences[x]]*len(respaced_sentences), respaced_sentences, dist=True)
                 except:
                     distance = [-1]*len(respaced_sentences)
                 distances.append(distance)
@@ -141,21 +142,25 @@ class Refiner:
             runtime = stop - start
             self.save(runtime=runtime, new=createFolder)
 
-    def scorer(self, refs, cands, param="F"):
+    def scorer(self, refs, cands, param="F", dist=False):
         param = param.upper()
-        if self.metric.__module__ == "custom_score.score":
+        if not(dist):
+            fitness = self.metric
+        else:
+            fitness = self.dist_metric
+        if fitness.__module__ == "custom_score.score":
             if self.model == None:
                 self.model = model_load("Word2Vec", True)
-            scores = self.metric(self.model, cands, refs)
+            scores = fitness(self.model, cands, refs)
             R, P, F = [], [], []
             for score in scores:
                 R.append(score[0])
                 P.append(score[1])
                 F.append(score[2])
             
-        elif self.metric.__module__ == "bert_score.score":
+        elif fitness.__module__ == "bert_score.score":
             with nostd():
-                scores = self.metric(cands, refs, lang="en", verbose=0)
+                scores = fitness(cands, refs, lang="en", verbose=0)
             P = scores[0].tolist()
             R = scores[1].tolist()
             F = scores[2].tolist()
