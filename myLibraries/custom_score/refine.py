@@ -65,6 +65,7 @@ class Refiner:
             clean = indiv
             sentences = clean.split(".")
             sentences.pop()
+            sentences = [sentence for sentence in sentences if not(sentence.isspace())]
             temp = []
             for sentence in sentences: 
                 if sentence != None and sentence != "":

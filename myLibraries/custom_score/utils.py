@@ -288,6 +288,8 @@ def cleanString(string, maxSpacing=10):
     clean = clean.replace("``", "")
     clean = clean.replace('""', "")
     clean = clean.replace("...", ".")
+    clean = clean.replace("..", ".")
+    clean = clean.replace("_", "")
 
     #remove overspacing
     spacing = "".join([" " for _ in range(maxSpacing)])
