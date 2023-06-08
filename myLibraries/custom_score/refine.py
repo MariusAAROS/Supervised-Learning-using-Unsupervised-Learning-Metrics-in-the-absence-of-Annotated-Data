@@ -6,6 +6,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 from colorama import Fore, Style
 from datetime import datetime
+import plotly_express as px
 
 import sys
 sys.path.append(get_git_root())
@@ -332,6 +333,27 @@ class Refiner:
         with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
             f.write(str(runtime))
 
+    def showDistributions(self, indexes = [0]):
+        """
+        Displays sentence's scores distribution of the selected corpus.
+
+        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+        :param2 indexes (list): List of indexes for which sentences distributions are to be displayed.
+        """
+        for index in indexes:
+            print(f"Corpus n.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''} \n")
+            data = {"sentences": [i for i in range(len(self.sentences_scores[index]))], 
+                    "scores": self.sentences_scores[index]}
+            fig = px.bar(data, x='sentences', y='scores')
+            fig.update_layout(width=int(400), 
+                            height=int(150),
+                            margin=dict(l=5,
+                                        r=5,
+                                        b=5,
+                                        t=5,
+                                        pad=4))
+            fig.show()
+
     def __str__(self) -> str:
         """
         Summarizes Refiner object to a string.
@@ -349,6 +371,8 @@ class Refiner:
         printout += "Threshold           : " + str(self.threshold) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
         
+        printout += "\n------------------------------\n"
+
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
 
         for index in self.printRange:
