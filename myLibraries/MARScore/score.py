@@ -16,9 +16,12 @@ from BARTScore.bart_score import BARTScorer
 from colorama import Fore, Style
 
 class MARSCore():
-    def __init__(self, corpus, gold, model=BertModel.from_pretrained('bert-base-uncased', 
-                                                               output_hidden_states=True), 
-                               tokenizer=BertTokenizer.from_pretrained('bert-base-uncased')) -> None:
+    def __init__(self, 
+                 corpus, 
+                 gold, 
+                 model=BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True), 
+                 tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
+                 printRange = range(1)) -> None:
         """
         Constructor of the MARScore class.
 
@@ -31,6 +34,14 @@ class MARSCore():
         self.summaries = []
         self.model = model
         self.tokenizer = tokenizer
+        self.vectors = []
+        self.labels = []
+        self.clusters_labels = []
+        self.clusters_tfs = []
+        self.processedCorpus = []
+        self.selectedIndexes = []
+        self.scores = []
+        self.printRange = printRange
     
     def compute(self):
         for indiv in self.corpus:
@@ -38,31 +49,39 @@ class MARSCore():
             o, l = tokenizeCorpus(indiv)
             v = vectorizeCorpus(o)
             v, l = cleanAll(v, l)
+            self.vectors.append(v)
+            self.labels.append(l)
 
             #clusterization
             clusterer = hdbscan.HDBSCAN()
             clusterer.fit(v)
             clabels = clusterer.labels_
+            self.clusters_labels.append(clabels)
 
             #TF calculation
             tf_values = tf(l)
             clusters_tf_values = clusters_tf(tf_values, l, clabels)
+            self.clusters_tfs.append(clusters_tf_values)
 
             #ILP computation
-            check = to_ilp_format(l, clabels, clusters_tf_values)
+            _ = to_ilp_format(l, clabels, clusters_tf_values)
             root = get_git_root()
             dirpath = os.path.join(root, "myLibraries\MARScore_output")
             os.system(f'glpsol --tmlim 100 --lp "{os.path.join(dirpath, "ilp_in.ilp")}" -o "{os.path.join(dirpath, "ilp_out.sol")}"')
             selected = readILP()
 
             #summaries construction
-            sentences = indiv.split(".")
+            sentences = [sentence.strip() for sentence in indiv.split(".")]
             sentences.pop()
             sum_sentences = []
+            selected_indexes_temp = []
             for i, value in enumerate(selected):
                 if value == 1:
                     sum_sentences.append(sentences[i]+".")
+                    selected_indexes_temp.append(i)
+            self.selectedIndexes.append(sorted(selected_indexes_temp))
             self.summaries.append(" ".join(sum_sentences))
+            self.processedCorpus.append(sentences)
 
     def assess(self, start=0, stop=None, verbose=True):
         """
@@ -85,7 +104,6 @@ class MARSCore():
         #Static BERTScore computation
         w2v = model_load("Word2Vec", True)
         customScore = score(w2v, subset_summaries, subset_gold)
-        #customScore = [parseScore(curScore) for curScore in scoreOut]
 
         #Rouge-Score computation
         rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
@@ -121,6 +139,8 @@ class MARSCore():
                                  'R-2' : rouge2_R,
                                  'R-L' : rougeL_R
                                 })
+        #score storing
+        self.scores = bertscore_F
 
         #Correlation estimation
         pearsonCor_c_r1 = np.round(pearsonr(custom_F, rouge1_R), 2)
@@ -165,14 +185,15 @@ class MARSCore():
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.summaries]))+1) + "\n"
 
-        """    
+        printout += "\n-------------------------------\n"
+
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
-    
+
         for index in self.printRange:
             printout += f"\nCorpus no.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''}\n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         if i in self.selectedIndexes[index]
                                                         else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
-        """
+        
         printout += "\n-------------------------------"
         return printout
