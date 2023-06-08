@@ -88,6 +88,14 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
         embs = [emb.tolist() for emb in embs]
     return embs
 
+def clusterizeCorpus(embs, clusterizer):
+    if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_":
+        clusterizer.fit(embs)
+        clabels = clusterizer.labels_.astype(int)
+    else:
+        print("\nERROR: Clusterizer not supported yet.\n")
+    return clabels
+
 def tf(text):
     """
     Computes individual TFs of tokens.

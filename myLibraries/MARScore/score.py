@@ -18,9 +18,10 @@ from colorama import Fore, Style
 class MARSCore():
     def __init__(self, 
                  corpus, 
-                 gold, 
+                 gold,
                  model=BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True), 
                  tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
+                 clusterizer=hdbscan.HDBSCAN(),
                  printRange = range(1)) -> None:
         """
         Constructor of the MARScore class.
@@ -34,6 +35,7 @@ class MARSCore():
         self.summaries = []
         self.model = model
         self.tokenizer = tokenizer
+        self.clusterizer = clusterizer
         self.vectors = []
         self.labels = []
         self.clusters_labels = []
@@ -56,9 +58,7 @@ class MARSCore():
             self.labels.append(l)
 
             #clusterization
-            clusterer = hdbscan.HDBSCAN()
-            clusterer.fit(v)
-            clabels = clusterer.labels_
+            clabels = clusterizeCorpus(v, self.clusterizer)
             self.clusters_labels.append(clabels)
 
             #TF calculation
