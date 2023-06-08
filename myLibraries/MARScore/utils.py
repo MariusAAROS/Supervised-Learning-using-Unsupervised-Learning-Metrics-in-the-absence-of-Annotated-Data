@@ -376,7 +376,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False)
     output += "length:"
     for i in range(nb_sentences):
         output += f" 1 s{i} +"
-    output = output[:-2] + " <= 2000"
+    output = output[:-2] + " <= 5"
 
     #declare cluster variables
     output += "\n\n\nBinary\n"
