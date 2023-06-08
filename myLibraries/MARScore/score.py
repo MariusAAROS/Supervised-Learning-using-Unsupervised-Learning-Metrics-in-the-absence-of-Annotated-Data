@@ -44,6 +44,9 @@ class MARSCore():
         self.printRange = printRange
     
     def compute(self):
+        """
+        Creates extractive summaries from the corpus attribute using dynamic embedding, high dimensionnal clustering and MIP/ILP solver.
+        """
         for indiv in self.corpus:
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
