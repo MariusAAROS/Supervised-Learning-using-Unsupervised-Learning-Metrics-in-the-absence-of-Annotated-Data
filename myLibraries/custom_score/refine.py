@@ -40,6 +40,7 @@ class Refiner:
         self.printRange = printRange
         self.selectedIndexes = None
         self.scores = []
+        self.sentences_scores = []
 
     def refine(self, checkpoints=False, saveRate=50):
         """
@@ -88,6 +89,7 @@ class Refiner:
                 #scoreOut = self.scorer(indiv.replace(sentence+".", ""), sentence)
                 #scores.append(scoreOut)
             scores = self.scorer(formated_refs, formated_cands)
+            self.sentences_scores.append(scores)
 
             #compute distances
             distances = []
@@ -350,9 +352,11 @@ class Refiner:
         self.printRange = self.printRange if self.printRange.start >= 0 and self.printRange.stop < len(self.processedCorpus) else range(0, len(self.processedCorpus))
 
         for index in self.printRange:
-            printout += f"\nCorpus no.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''}\n" + str(".\n".join([f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+            printout += f"\nCorpus no.{index+1} : {str(self.scores[index]*100)+'%' if self.scores != [] and self.scores != -1 else ''}\n" + str(".\n".join([f"{Fore.LIGHTMAGENTA_EX}({int(np.round(self.sentences_scores[index][i], 2)*100)}%){Style.RESET_ALL} " +
+                                                                                                                                                            f"{Fore.LIGHTGREEN_EX}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         if i in self.selectedIndexes[index]
-                                                        else f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
+                                                        else f"{Fore.LIGHTMAGENTA_EX}({int(np.round(self.sentences_scores[index][i], 2)*100)}%){Style.RESET_ALL} " +
+                                                             f"{Fore.RED}{self.processedCorpus[index][i]}{Style.RESET_ALL}"
                                                         for i in range(len(self.processedCorpus[index]))])) + "." + "\n"
         printout += "\n------------------------------"
         return printout
