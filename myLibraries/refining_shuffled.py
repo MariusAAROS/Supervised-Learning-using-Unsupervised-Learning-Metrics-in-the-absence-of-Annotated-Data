@@ -6,10 +6,10 @@ from custom_score.score import score
 import bert_score
 
 #params
-size = 6
+size = 500
 dataset_name = "Billsum"
 save = True
-savePace = 2
+savePace = 50
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
