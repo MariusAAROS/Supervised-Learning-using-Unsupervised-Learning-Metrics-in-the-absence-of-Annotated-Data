@@ -299,7 +299,7 @@ def cleanString(string, maxSpacing=10):
     
     return clean
 
-def sentenceSelection(corpus, scores, distances, ratio=2):
+def sentenceSelection(corpus, scores, distances, mmr_lambda=0.5, ratio=2):
     """
     Returns a list of selected indices of sentence that will constituate the new corpus.
 
@@ -326,7 +326,7 @@ def sentenceSelection(corpus, scores, distances, ratio=2):
                 selected_indexes.add(ranking[cur])
                 selectedLength += len(corpus[ranking[cur]])
             else:
-                updated_scores = [randomized_scores[i]*current_distance(i) for i in range(len(randomized_scores))]
+                updated_scores = [mmr_lambda*randomized_scores[i]-(1-mmr_lambda)*current_distance(i) for i in range(len(randomized_scores))]
                 updated_ranking = np.argsort(updated_scores)[::-1]
                 updated_ranking = [index for index in updated_ranking if index not in selected_indexes]
                 selected_indexes.add(updated_ranking[0])

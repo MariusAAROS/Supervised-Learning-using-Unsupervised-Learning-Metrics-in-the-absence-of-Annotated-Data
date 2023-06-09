@@ -15,7 +15,7 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, gold, model=None, metric=score, dist_metric=score, ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, gold, model=None, metric=score, dist_metric=score, mmr_lambda=0.5,  ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
@@ -34,6 +34,7 @@ class Refiner:
         self.model = model
         self.metric = metric
         self.dist_metric = dist_metric
+        self.mmr_lambda = mmr_lambda
         self.ratio = ratio
         self.threshold = threshold
         self.ms = maxSpacing
@@ -105,10 +106,10 @@ class Refiner:
             #selection of best individuals
             indices = None
             if type(self.ratio) == int or type(self.ratio) == float: 
-                indices = sentenceSelection(respaced_sentences, scores, distances, self.ratio)
+                indices = sentenceSelection(respaced_sentences, scores, distances, self.mmr_lambda, self.ratio)
             else:
                 for curRatio in sorted(self.ratio):
-                    curIndices = sentenceSelection(respaced_sentences, scores, distances, curRatio)
+                    curIndices = sentenceSelection(respaced_sentences, scores, distances, self.mmr_lambda, curRatio)
                     subCurRefined = [respaced_sentences[i] for i in curIndices]
                     curSum = ". ".join(subCurRefined)+"."
                     curIndiv = indiv
@@ -367,6 +368,7 @@ class Refiner:
         printout += "Number of Documents : " + str(len(self.corpus)) + "\n"
         printout += "Corpus Avg Size     : " + str(int(np.average([len(x) for x in self.corpus]))+1) + "\n"
         printout += "Refined Avg Size    : " + str(int(np.average([len(x) for x in self.refined]))+1) + "\n"
+        printout += "MMR Lambda          : " + str(self.mmr_lambda) + "\n"
         printout += "Ratio(s)            : " + str(self.ratio) + "\n"
         printout += "Threshold           : " + str(self.threshold) + "\n"
         printout += "Maximum Spacing     : " + str(self.ms) + "\n"
