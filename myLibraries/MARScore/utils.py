@@ -383,10 +383,14 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
         output = output[:-2] + f" - c{i} >= 0" + "\n"
         
     #define sentence length
-    output += "length:"
+    
+    len_template = ""
     for i in range(nb_sentences):
-        output += f" {int(sentences_lens[i])} s{i} +"
-    output = output[:-2] + f" <= {target_len}"
+        len_template += f" {int(sentences_lens[i])} s{i} +"
+    len_template = len_template[:-2]
+    output += "length_max:" + len_template + f" <= {target_len}" + "\n"
+    output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+
 
     #declare cluster variables
     output += "\n\n\nBinary\n"
