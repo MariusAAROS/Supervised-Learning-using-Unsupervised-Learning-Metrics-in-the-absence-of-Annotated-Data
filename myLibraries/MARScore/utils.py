@@ -331,7 +331,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
-def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False):
+def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -351,7 +351,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False)
         else:
             output += f" + {int(clusters_tf_values[k])} c{i}"
 
-    #create sentences and sentence dictionnary
+    #create sentence dictionnary for clusters
     sentence_index = 0
     sentences_map = {0: set()}
     nb_sentences = labels.count(".")
@@ -363,7 +363,17 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False)
         
         if token == ".":
             sentence_index += 1
-            
+    
+    #create sentence dictionnary for length
+    sentence_index = 0
+    sentences_lens = [0]*nb_sentences
+    for token in labels:
+        sentences_lens[sentence_index] += len(token)
+        if token == ".":
+            sentence_index += 1
+    total_len = np.sum(sentences_lens)
+    target_len = int(total_len/ratio)
+
     #define constraints
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):
@@ -375,8 +385,8 @@ def to_ilp_format(labels, clabels, clusters_tf_values, save=True, verbose=False)
     #define sentence length
     output += "length:"
     for i in range(nb_sentences):
-        output += f" 1 s{i} +"
-    output = output[:-2] + " <= 5"
+        output += f" {int(sentences_lens[i])} s{i} +"
+    output = output[:-2] + f" <= {target_len}"
 
     #declare cluster variables
     output += "\n\n\nBinary\n"

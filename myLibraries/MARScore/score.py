@@ -22,13 +22,18 @@ class MARSCore():
                  model=BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True), 
                  tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
                  clusterizer=hdbscan.HDBSCAN(),
+                 ratio=2,
                  printRange = range(1)) -> None:
         """
         Constructor of the MARScore class.
 
         :param1 corpus (list): List of texts to summarize.
-        :param2 model (transformer): Transformer model used compute dynamic embeddings.
-        :param3 tokenizer (transformer) Transformer used to create token from a plain text. 
+        :param2 gold (list): List of gold summaries.
+        :param3 model (transformer): Transformer model used compute dynamic embeddings.
+        :param4 tokenizer (transformer): Transformer used to create token from a plain text. 
+        :param5 clusterize (model): Model used to clusterize the dynamics embeddings.
+        :param6 ratio (float or int): Number determining how much the reference text will be shortened.
+        :param7 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
         """
         self.corpus = corpus
         self.gold = gold
@@ -36,6 +41,7 @@ class MARSCore():
         self.model = model
         self.tokenizer = tokenizer
         self.clusterizer = clusterizer
+        self.ratio = ratio
         self.vectors = []
         self.labels = []
         self.clusters_labels = []
@@ -67,7 +73,7 @@ class MARSCore():
             self.clusters_tfs.append(clusters_tf_values)
 
             #ILP computation
-            _ = to_ilp_format(l, clabels, clusters_tf_values)
+            _ = to_ilp_format(l, clabels, clusters_tf_values, self.ratio)
             root = get_git_root()
             dirpath = os.path.join(root, "myLibraries\MARScore_output")
             os.system(f'glpsol --tmlim 100 --lp "{os.path.join(dirpath, "ilp_in.ilp")}" -o "{os.path.join(dirpath, "ilp_out.sol")}"')
