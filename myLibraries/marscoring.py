@@ -1,19 +1,15 @@
-from custom_score.refine import Refiner
+from MARScore.score import MARSCore
+from MARScore.utils import get_git_root
+import os
 import pandas as pd
-import numpy as np
-from custom_score.utils import model_load
-from custom_score.score import score
-import bert_score
 
 #params
 size = 20
-dataset_name = "Billsum"
-save = True
-savePace = 20
+dataset_name = "Pubmed"
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
-                 "Pubmed": r'D:\COURS\A4\S8 - ESILV\Stage\Work\Datasets\Summary Evaluation\Pubmed\test.json'}
+                 "Pubmed": r'C:\Pro\Stages\A4 - DVRC\Work\Datasets\pubmed\test.json'}
 
 #load dataset
 if dataset_name == "Billsum":
@@ -33,14 +29,14 @@ elif dataset_name == "Pubmed":
     dataset.loc[:,"article_text"] = dataset["article_text"].map(cleaner)
     dataset = dataset.rename(columns={"abstract_text": "summary",
                             "article_text": "text"})
-
+    
 subset = dataset.iloc[:size, :]
 
 #refine
-w2v = model_load("Word2Vec", True)
-r = Refiner(corpus=subset["text"].to_list(), gold=subset["summary"].to_list(), 
-            model=w2v, metric=bert_score.score, dist_metric=score, ratio=3, 
-            maxSpacing=15, printRange=range(0, 3)) #ratio=np.linspace(2, 3, 2)
-r.refine(checkpoints=save, saveRate=savePace)
-if not(save):
-    r.assess()
+ms = MARSCore(subset["text"].to_list(), subset["summary"].to_list())
+ms.compute()
+res = ms.assess()
+scores = res["scores"]
+correlations = res["correlations"]
+scores.to_csv(os.path.join(get_git_root(), r"\myLibraries\MARScore_output\results\scores.csv"))
+correlations.to_csv(os.path.join(get_git_root(), r"\myLibraries\MARScore_output\results\correlations.csv"))
