@@ -45,7 +45,7 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
     for sentence in splited:
         encoded = tokenizer.encode_plus(sentence, 
                                         add_special_tokens=True,
-                                        max_length=input_size+1,
+                                        max_length=model_input_size,
                                         padding="max_length",
                                         return_attention_mask=True,
                                         return_tensors='pt',
@@ -356,7 +356,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
     #create sentence dictionnary for clusters
     sentence_index = 0
     sentences_map = {0: set()}
-    nb_sentences = labels.count(".")
+    nb_sentences = labels.count(".") if labels[-1] == "." else labels.count(".")+1
     for cluster_index, token in zip(clabels, labels):
         if cluster_index in sentences_map.keys():
             sentences_map[cluster_index].add(sentence_index)
