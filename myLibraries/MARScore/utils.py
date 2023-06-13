@@ -36,7 +36,7 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
         :output (list): Array reduced of one dimension.
         """
         return [item for sublist in l for item in sublist]
-    input_size = model_input_size - 1
+    input_size = model_input_size - 15
     corpusWords = corpus.split(" ")
     splited = [" ".join(corpusWords[i:i+input_size]) for i in range(0, len(corpusWords), input_size)]
 
@@ -141,6 +141,8 @@ def cleanAll(embs, labels, mode="all", ignore=["."]):
     token_indexes = [i for i in range(len(labels)) if (labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2) or labels[i] in ignore]
     new_embs = [embs[i] for i in range(len(embs)) if i in token_indexes]
     new_labels = [labels[i] for i in range(len(labels)) if i in token_indexes]
+
+
     if mode == "all":
         return new_embs, new_labels
     elif mode == "emb":
@@ -366,7 +368,7 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
     
     #create sentence dictionnary for length
     sentence_index = 0
-    sentences_lens = [0]*nb_sentences
+    sentences_lens = [0]*(nb_sentences)
     for token in labels:
         sentences_lens[sentence_index] += len(token)
         if token == ".":
