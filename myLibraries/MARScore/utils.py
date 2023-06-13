@@ -390,8 +390,8 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
     for i in range(nb_sentences):
         len_template += f" {int(sentences_lens[i])} s{i} +"
     len_template = len_template[:-2]
-    output += "length_max:" + len_template + f" <= {target_len}" + "\n"
-    output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+    output += "length:" + len_template + f" <= {target_len}" + "\n"
+    #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
 
 
     #declare cluster variables
