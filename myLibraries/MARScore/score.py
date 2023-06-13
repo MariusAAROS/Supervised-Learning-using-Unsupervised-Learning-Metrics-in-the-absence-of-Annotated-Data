@@ -14,6 +14,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 from BARTScore.bart_score import BARTScorer
 from colorama import Fore, Style
+from sklearn.metrics.pairwise import pairwise_distances
 
 class MARSCore():
     def __init__(self, 
@@ -23,17 +24,19 @@ class MARSCore():
                  tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
                  clusterizer=hdbscan.HDBSCAN(),
                  ratio=2,
-                 printRange = range(1)) -> None:
+                 printRange = range(1),
+                 compute_similarity=True) -> None:
         """
         Constructor of the MARScore class.
 
-        :param1 corpus (list): List of texts to summarize.
-        :param2 gold (list): List of gold summaries.
-        :param3 model (transformer): Transformer model used compute dynamic embeddings.
-        :param4 tokenizer (transformer): Transformer used to create token from a plain text. 
-        :param5 clusterize (model): Model used to clusterize the dynamics embeddings.
-        :param6 ratio (float or int): Number determining how much the reference text will be shortened.
-        :param7 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+        :param2 corpus (list): List of texts to summarize.
+        :param3 gold (list): List of gold summaries.
+        :param4 model (transformer): Transformer model used compute dynamic embeddings.
+        :param5 tokenizer (transformer): Transformer used to create token from a plain text. 
+        :param6 clusterizer (model): Model used to clusterize the dynamics embeddings.
+        :param7 ratio (float or int): Number determining how much the reference text will be shortened.
+        :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
         """
         self.corpus = corpus
         self.gold = gold
@@ -46,14 +49,18 @@ class MARSCore():
         self.labels = []
         self.clusters_labels = []
         self.clusters_tfs = []
+        self.similarity_matrices = []
         self.processedCorpus = []
         self.selectedIndexes = []
         self.scores = []
         self.printRange = printRange
+        self.compute_similarity = compute_similarity
     
     def compute(self):
         """
         Creates extractive summaries from the corpus attribute using dynamic embedding, high dimensionnal clustering and MIP/ILP solver.
+
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
         """
         for indiv in self.corpus:
             #creation of embeddings
@@ -64,6 +71,10 @@ class MARSCore():
             self.labels.append(l)
 
             #clusterization
+            if self.compute_similarity:
+                try: distance_metric = self.clusterizer.metric
+                except: distance_metric = "euclidean"
+                self.similarity_matrices.append(pairwise_distances(v, metric=distance_metric))
             clabels = clusterizeCorpus(v, self.clusterizer)
             self.clusters_labels.append(clabels)
 
@@ -71,7 +82,7 @@ class MARSCore():
             tf_values = tf(l)
             clusters_tf_values = clusters_tf(tf_values, l, clabels)
             self.clusters_tfs.append(clusters_tf_values)
-
+            
             #ILP computation
             _ = to_ilp_format(l, clabels, clusters_tf_values, self.ratio)
             root = get_git_root()
@@ -96,7 +107,7 @@ class MARSCore():
         """
         Assesses quality of the refined corpus by computing Static BERTscore and Rouge-Score on the refined version compared to it's initial version.
 
-        :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
         :param2 start (int): Starting index to assess.
         :param3 stop (int): Ending index to assess.
         :param4 verbose (Boolean): When put to True, assess results will be printed.
@@ -186,7 +197,7 @@ class MARSCore():
 
         :param1 self (MARScore): MARScore Object (see __init__ function for more details).
 
-        :output printout (string): Summarized informations about the MARSCore object.
+        :output printout (string): Summarized informations about the MARScore object.
         """
 
         printout = "--------MARScore OBJECT--------\n\n"
