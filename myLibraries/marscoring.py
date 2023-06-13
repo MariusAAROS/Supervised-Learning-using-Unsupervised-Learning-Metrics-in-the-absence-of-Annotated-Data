@@ -3,9 +3,10 @@ from MARScore.utils import get_git_root
 from custom_score.utils import cleanString
 import os
 import pandas as pd
+from hdbscan import HDBSCAN
 
 #params
-size = 20
+size = 2
 dataset_name = "Pubmed"
 
 #url dictionnary
@@ -44,5 +45,5 @@ ms.compute()
 res = ms.assess()
 scores = res["scores"]
 correlations = res["correlations"]
-scores.to_csv(os.path.join(get_git_root(), r"\myLibraries\MARScore_output\results\scores.csv"))
-correlations.to_csv(os.path.join(get_git_root(), r"\myLibraries\MARScore_output\results\correlations.csv"))
+scores.to_csv(get_git_root() + r"\myLibraries\MARScore_output\results\scores.csv")
+correlations.to_csv(get_git_root() + r"\myLibraries\MARScore_output\results\correlations.csv")

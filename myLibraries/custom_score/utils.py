@@ -313,8 +313,8 @@ def sentenceSelection(corpus, scores, distances, mmr_lambda=0.5, ratio=2):
     targetLength = int(totalLength/ratio)
     selected_indexes = []
     
-    #randomized_scores = [np.mean([curScore, uniform(0, 1)]) for curScore in scores]
-    randomized_scores = scores
+    #randomized_scores = [np.mean([curScore, uniform(0, 1)]) for curScore in scores] #this is with randomization 
+    randomized_scores = scores #this is without randomization (see log book section 6.1 to understand this choice).
     ranking = np.argsort(randomized_scores)[::-1]
 
     selectedLength = 0
