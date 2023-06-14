@@ -38,8 +38,8 @@ def cleanDataset(dataset):
 
     :param1 dataset (DataFrame): pandas DataFrame containing at least a <text> and a <summary> column.
     """
-    dataset.loc[:,"text"] = dataset["summary"].replace(regex=r"\[[^\]]*\]", value="")
-    dataset.loc[:,"text"] = dataset["summary"].replace(regex=r"\[[^\]]*\]", value="")
-    dataset.loc[:,"text"] = dataset["summary"].map(cleanString)
-    dataset.loc[:,"text"] = dataset["summary"].map(cleanString)
+    dataset.loc[:,"text"] = dataset["text"].replace(regex=r"\[[^\]]*\]", value="")
+    dataset.loc[:,"summary"] = dataset["summary"].replace(regex=r"\[[^\]]*\]", value="")
+    dataset.loc[:,"text"] = dataset["text"].map(cleanString)
+    dataset.loc[:,"summary"] = dataset["summary"].map(cleanString)
    
