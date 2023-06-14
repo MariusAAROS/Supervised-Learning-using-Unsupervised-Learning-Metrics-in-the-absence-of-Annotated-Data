@@ -304,7 +304,6 @@ class Refiner:
         :param1 self (Refiner): Refiner Object (see __init__ function for more details).
         :param2 new (bool): Indicates if a new folder should be created. If false, output is append to the most recent ouput folder.
         """
-
         #evaluation
         start = 0
         stop = len(self.refined)

@@ -15,6 +15,8 @@ from scipy.stats import pearsonr
 from BARTScore.bart_score import BARTScorer
 from colorama import Fore, Style
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.preprocessing import MinMaxScaler
+from datetime import datetime
 
 class MARSCore():
     def __init__(self, 
@@ -56,12 +58,17 @@ class MARSCore():
         self.printRange = printRange
         self.compute_similarity = compute_similarity
     
-    def compute(self):
+    def compute(self, checkpoints=False, saveRate=50):
         """
         Creates extractive summaries from the corpus attribute using dynamic embedding, high dimensionnal clustering and MIP/ILP solver.
 
         :param1 self (MARScore): MARScore Object (see __init__ function for more details).
         """
+        if checkpoints:
+            iter = 0
+            start = datetime.now()
+            createFolder = True
+
         for indiv in self.corpus:
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
@@ -74,7 +81,10 @@ class MARSCore():
             if self.compute_similarity:
                 try: distance_metric = self.clusterizer.metric
                 except: distance_metric = "euclidean"
-                self.similarity_matrices.append(pairwise_distances(v, metric=distance_metric))
+                distances = pairwise_distances(v, metric=distance_metric)
+                scaler = MinMaxScaler()
+                normalized_distances = scaler.fit_transform(distances)
+                self.similarity_matrices.append(normalized_distances)
             clabels = clusterizeCorpus(v, self.clusterizer)
             self.clusters_labels.append(clabels)
 
@@ -102,6 +112,20 @@ class MARSCore():
             self.selectedIndexes.append(sorted(selected_indexes_temp))
             self.summaries.append(" ".join(sum_sentences))
             self.processedCorpus.append(sentences)
+
+            #checkpoint verification
+            if checkpoints:
+                if iter % saveRate == 0 and iter != 0:
+                    stop = datetime.now()
+                    partial_runtime = stop - start
+                    self.save(runtime=partial_runtime, new=createFolder)
+                    createFolder = False
+                iter += 1
+                
+        if checkpoints:
+            stop = datetime.now()
+            runtime = stop - start
+            self.save(runtime=runtime, new=createFolder)
 
     def assess(self, start=0, stop=None, verbose=True):
         """
@@ -190,6 +214,42 @@ class MARSCore():
             print(printout)
 
         return {"scores": dfCustom, "correlations": dfCor}
+
+    def save(self, runtime=None, new=True):
+            """
+            Saves Refiner output to a local folder.
+
+            :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+            :param2 new (bool): Indicates if a new folder should be created. If false, output is append to the most recent ouput folder.
+            """
+            #evaluation
+            start = 0
+            stop = len(self.summaries)
+            assessement = self.assess(start=start, stop=stop)
+
+            #mainDf = self.to_dataframe()
+            scoreDf = assessement["scores"]
+            corDf = assessement["correlations"]
+
+            #write output
+            main_folder_path = os.path.join(get_git_root(), "myLibraries\MARScore_output\results")
+            countfile_name = r"count.txt"
+            if new:
+                count = updateFileCount(os.path.join(main_folder_path, countfile_name))
+            else:
+                count = readFileCount(os.path.join(main_folder_path, countfile_name))
+
+            current_path = os.path.join(main_folder_path, f"experimentation_{count}")
+            try:
+                os.mkdir(current_path)
+            except FileExistsError:
+                pass
+
+            #mainDf.to_csv(os.path.join(current_path, "main.csv"))
+            scoreDf.to_csv(os.path.join(current_path, "scores.csv"))
+            corDf.to_csv(os.path.join(current_path, "correlations.csv"))
+            with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
+                f.write(str(runtime))
 
     def __str__(self) -> str:
         """

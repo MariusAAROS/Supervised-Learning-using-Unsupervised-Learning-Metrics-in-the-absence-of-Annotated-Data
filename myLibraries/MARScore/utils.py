@@ -460,3 +460,30 @@ def nostd():
     yield
     sys.stdout = save_stdout
     sys.stderr = save_stderr
+
+def updateFileCount(path):
+    """
+    :param1 path (string): Path to the file counting the number of experimentation output I already generated.
+
+    :output updated (int): New number of output file created after the current experimentation.
+    """
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            value = int(f.read())
+        updated = value + 1
+    else:
+        updated = 1
+    with open(path, "w") as f:
+        f.write(str(updated))    
+    return updated
+
+def readFileCount(path):
+    """
+    :param1 path (string): Path to the file counting the number of experimentation output I already generated.
+
+    :output updated (int): New number of output file created after the current experimentation.
+    """
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            value = int(f.read())
+    return value

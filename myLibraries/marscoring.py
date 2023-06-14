@@ -6,8 +6,10 @@ import pandas as pd
 from hdbscan import HDBSCAN
 
 #params
-size = 500
+size = 4
 dataset_name = "Pubmed"
+savePace = 2
+save = True
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
@@ -41,9 +43,14 @@ subset = dataset.iloc[:size, :]
 
 #refine
 ms = MARSCore(subset["text"].to_list(), subset["summary"].to_list())
-ms.compute()
+ms.compute(checkpoints=save, saveRate=savePace)
+if not(save):
+    _=ms.assess()
+
+"""
 res = ms.assess()
 scores = res["scores"]
 correlations = res["correlations"]
 scores.to_csv(get_git_root() + r"\myLibraries\MARScore_output\results\scores.csv")
 correlations.to_csv(get_git_root() + r"\myLibraries\MARScore_output\results\correlations.csv")
+"""
