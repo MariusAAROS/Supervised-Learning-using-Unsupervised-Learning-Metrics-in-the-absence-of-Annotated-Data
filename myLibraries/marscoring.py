@@ -6,7 +6,7 @@ import pandas as pd
 from hdbscan import HDBSCAN
 
 #params
-size = 2
+size = 20
 dataset_name = "Pubmed"
 
 #url dictionnary

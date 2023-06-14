@@ -273,6 +273,8 @@ def computeMetricsWithIdf(refToCand, candToRef, referencesWords, candidatesWords
 
 def cleanString(string, maxSpacing=10):
     """
+    Removes noisy and useless characters from a given string.
+
     :param1 string (string): Initial corpus
     :param2 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
 
