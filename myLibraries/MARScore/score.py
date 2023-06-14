@@ -232,7 +232,7 @@ class MARSCore():
             corDf = assessement["correlations"]
 
             #write output
-            main_folder_path = os.path.join(get_git_root(), "myLibraries\MARScore_output\results")
+            main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\results")
             countfile_name = r"count.txt"
             if new:
                 count = updateFileCount(os.path.join(main_folder_path, countfile_name))
