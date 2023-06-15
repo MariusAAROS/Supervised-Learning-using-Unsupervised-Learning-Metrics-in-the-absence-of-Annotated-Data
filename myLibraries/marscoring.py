@@ -42,7 +42,7 @@ elif dataset_name == "Pubmed":
 subset = dataset.iloc[:size, :]
 
 #refine
-ms = MARSCore(subset["text"].to_list(), subset["summary"].to_list())
+ms = MARSCore(subset["text"].to_list(), subset["summary"].to_list(), low_memory=True)
 ms.compute(checkpoints=save, saveRate=savePace)
 if not(save):
     _=ms.assess()

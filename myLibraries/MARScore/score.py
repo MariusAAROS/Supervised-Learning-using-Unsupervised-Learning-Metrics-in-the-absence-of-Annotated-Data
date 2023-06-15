@@ -27,7 +27,7 @@ class MARSCore():
                  clusterizer=hdbscan.HDBSCAN(),
                  ratio=2,
                  printRange = range(1),
-                 compute_similarity=True) -> None:
+                 low_memory=False) -> None:
         """
         Constructor of the MARScore class.
 
@@ -39,6 +39,7 @@ class MARSCore():
         :param6 clusterizer (model): Model used to clusterize the dynamics embeddings.
         :param7 ratio (float or int): Number determining how much the reference text will be shortened.
         :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
+        :param9 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization. 
         """
         self.corpus = corpus
         self.gold = gold
@@ -56,7 +57,7 @@ class MARSCore():
         self.selectedIndexes = []
         self.scores = []
         self.printRange = printRange
-        self.compute_similarity = compute_similarity
+        self.low_memory = low_memory
     
     def compute(self, checkpoints=False, saveRate=50):
         """
@@ -69,6 +70,9 @@ class MARSCore():
             start = datetime.now()
             createFolder = True
 
+        if not(self.low_memory):
+            scaler = MinMaxScaler()
+
         for indiv in self.corpus:
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
@@ -78,21 +82,22 @@ class MARSCore():
             self.labels.append(l)
 
             #clusterization
-            if self.compute_similarity:
+            if not(self.low_memory):
                 try: distance_metric = self.clusterizer.metric
                 except: distance_metric = "euclidean"
                 distances = pairwise_distances(v, metric=distance_metric)
-                scaler = MinMaxScaler()
                 normalized_distances = scaler.fit_transform(distances)
                 normalized_distances = 0.5 * (normalized_distances + normalized_distances.T)
                 self.similarity_matrices.append(normalized_distances)
             clabels = clusterizeCorpus(v, self.clusterizer)
-            self.clusters_labels.append(clabels)
+            if not(self.low_memory):
+                self.clusters_labels.append(clabels)
 
             #TF calculation
             tf_values = tf(l)
             clusters_tf_values = clusters_tf(tf_values, l, clabels)
-            self.clusters_tfs.append(clusters_tf_values)
+            if not(self.low_memory):
+                self.clusters_tfs.append(clusters_tf_values)
             
             #ILP computation
             _ = to_ilp_format(l, clabels, clusters_tf_values, self.ratio)
@@ -110,9 +115,10 @@ class MARSCore():
                 if value == 1:
                     sum_sentences.append(sentences[i]+".")
                     selected_indexes_temp.append(i)
-            self.selectedIndexes.append(sorted(selected_indexes_temp))
             self.summaries.append(" ".join(sum_sentences))
-            self.processedCorpus.append(sentences)
+            if not(self.low_memory):
+                self.selectedIndexes.append(sorted(selected_indexes_temp))
+                self.processedCorpus.append(sentences)
 
             #checkpoint verification
             if checkpoints:
