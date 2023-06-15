@@ -84,6 +84,7 @@ class MARSCore():
                 distances = pairwise_distances(v, metric=distance_metric)
                 scaler = MinMaxScaler()
                 normalized_distances = scaler.fit_transform(distances)
+                normalized_distances = 0.5 * (normalized_distances + normalized_distances.T)
                 self.similarity_matrices.append(normalized_distances)
             clabels = clusterizeCorpus(v, self.clusterizer)
             self.clusters_labels.append(clabels)
