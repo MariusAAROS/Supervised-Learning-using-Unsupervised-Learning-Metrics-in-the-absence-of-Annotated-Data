@@ -15,7 +15,7 @@ from BARTScore.bart_score import BARTScorer
 
 class Refiner:
 
-    def __init__(self, corpus, gold, model=None, metric=score, dist_metric=score, mmr_lambda=0.5,  ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1)):
+    def __init__(self, corpus, gold, model=None, metric=score, dist_metric=score, mmr_lambda=0.5,  ratio=2, threshold=0.70, maxSpacing=10, printRange=range(0, 1), expe_params=None):
         """
         Constructor of the Refiner class. Aims at reducing the size and noise of a given independant list of documents.
         
@@ -27,6 +27,7 @@ class Refiner:
         :param6 threshold (float): Number between 0 and 1 indicating the lowest acceptable quality when tuning the length of the summary.
         :param7 maxSpacing (int): Maximal number of adjacent space to be found and suppressed in the corpus.
         :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed. 
+        :param9 expe_params (dict): Differents parameters usefull for experimentation purpose
         """
         self.corpus = corpus
         self.gold = gold
@@ -43,6 +44,7 @@ class Refiner:
         self.selectedIndexes = None
         self.scores = []
         self.sentences_scores = []
+        self.expe_params = expe_params
 
     def refine(self, checkpoints=False, saveRate=50):
         """
@@ -314,7 +316,13 @@ class Refiner:
         corDf = assessement["correlations"]
 
         #write output
-        main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output")
+        if self.expe_params == None:
+            main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output")
+        elif "shuffled" in self.expe_params.keys():
+            if self.expe_params["shuffled"]:
+                main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output\shuffled")
+            else:
+                main_folder_path = os.path.join(get_git_root(), r"myLibraries\refining_output\regular")
         countfile_name = r"count.txt"
         if new:
             count = updateFileCount(os.path.join(main_folder_path, countfile_name))

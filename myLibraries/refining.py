@@ -6,10 +6,11 @@ from custom_score.score import score
 import bert_score
 
 #params
-size = 20
+size = 4
 dataset_name = "Billsum"
 save = True
-savePace = 20
+savePace = 2
+params = {"shuffled":False}
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
@@ -40,7 +41,7 @@ subset = dataset.iloc[:size, :]
 w2v = model_load("Word2Vec", True)
 r = Refiner(corpus=subset["text"].to_list(), gold=subset["summary"].to_list(), 
             model=w2v, metric=bert_score.score, dist_metric=score, ratio=3, 
-            maxSpacing=15, printRange=range(0, 3)) #ratio=np.linspace(2, 3, 2)
+            maxSpacing=15, printRange=range(0, 3), expe_params=params) #ratio=np.linspace(2, 3, 2)
 r.refine(checkpoints=save, saveRate=savePace)
 if not(save):
     r.assess()
