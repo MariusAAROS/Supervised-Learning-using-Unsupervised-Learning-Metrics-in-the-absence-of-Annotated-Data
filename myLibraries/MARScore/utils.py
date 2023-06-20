@@ -333,15 +333,16 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
-def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose=False):
+def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
-    :param1 labels (list): List of text token associated with each embedding.
-    :param2 clabels (list): List of token's cluster index.
-    :param3 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
-    :param4 save (bool): Save the output to file if set to True.
-    :param5 verbose (bool): Add verbose if set to True.
+    :param1 path (string): Absolute path where ILP output should be save. 
+    :param2 labels (list): List of text token associated with each embedding.
+    :param3 clabels (list): List of token's cluster index.
+    :param4 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
+    :param5 save (bool): Save the output to file if set to True.
+    :param6 verbose (bool): Add verbose if set to True.
 
     :output output (string): Text formatted to with respect to ILP's requirements.
     """
@@ -408,8 +409,6 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
     output += "\nEnd"
 
     if save:
-        root = get_git_root()
-        path = os.path.join(root, "myLibraries\MARScore_output\ilp_in.ilp")
         with open(path, "w") as text_file:
             text_file.write(output)
             text_file.close()
@@ -418,16 +417,18 @@ def to_ilp_format(labels, clabels, clusters_tf_values, ratio, save=True, verbose
 
     return output
 
-def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol"):
+def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
     """
     Reads and parses the output value of an ILP model.
 
     :param1 rel_path (string): Relative path to the desired ILP output file.
+    :param2 path (string): Absolute path to replace relative path. 
 
     :output result (list): List of sentence selection performed by the ILP model.
     """
-    root = get_git_root()
-    path = os.path.join(root, rel_path)
+    if path == None:
+        root = get_git_root()
+        path = os.path.join(root, rel_path)
     with open(path, "r") as f:
         raw = "".join(f.readlines())
         f.close()

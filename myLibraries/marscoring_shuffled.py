@@ -5,16 +5,12 @@ import os
 import pandas as pd
 from hdbscan import HDBSCAN
 
-import sys
-sys.path.append(r"C:\Pro\Stages\A4 - DVRC\Work\Supervised-Learning-using-Unsupervised-Learning-Metrics-in-the-absence-of-Annotated-Data\myLibraries")
-from datasets_loaders.loaders import load_billsum
-
 #params
 size = 4
 dataset_name = "Pubmed"
 savePace = 2
 save = True
-params = {"shuffled": False}
+params = {"shuffled": True}
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
@@ -22,13 +18,10 @@ datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYr
 
 #load dataset
 if dataset_name == "Billsum":
-    """
     dataset_url=datasets_list[dataset_name]
     dataset_url='https://drive.google.com/uc?export=download&id=' + dataset_url.split('/')[-2]
     dataset = pd.read_json(dataset_url, lines=True)
     dataset = dataset.loc[:, ["text", "summary"]]
-    """
-    dataset = load_billsum()
 
 elif dataset_name == "Pubmed":
     dataset_url=datasets_list[dataset_name]
@@ -46,7 +39,8 @@ elif dataset_name == "Pubmed":
     dataset.loc[:,"article_text"] = dataset["article_text"].map(format_dot)
     dataset = dataset.rename(columns={"abstract_text": "summary",
                             "article_text": "text"})
-    
+
+dataset["summary"] = dataset["summary"].sample(frac=1).values
 subset = dataset.iloc[:size, :]
 
 #refine

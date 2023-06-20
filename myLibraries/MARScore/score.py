@@ -27,7 +27,8 @@ class MARSCore():
                  clusterizer=hdbscan.HDBSCAN(),
                  ratio=2,
                  printRange = range(1),
-                 low_memory=False) -> None:
+                 low_memory=False,
+                 expe_params=None) -> None:
         """
         Constructor of the MARScore class.
 
@@ -39,7 +40,8 @@ class MARSCore():
         :param6 clusterizer (model): Model used to clusterize the dynamics embeddings.
         :param7 ratio (float or int): Number determining how much the reference text will be shortened.
         :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
-        :param9 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization. 
+        :param9 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
+        :param10 expe_params (dict): Differents parameters usefull for experimentation purpose
         """
         self.corpus = corpus
         self.gold = gold
@@ -58,6 +60,7 @@ class MARSCore():
         self.scores = []
         self.printRange = printRange
         self.low_memory = low_memory
+        self.expe_params = expe_params 
     
     def compute(self, checkpoints=False, saveRate=50):
         """
@@ -100,11 +103,35 @@ class MARSCore():
                 self.clusters_tfs.append(clusters_tf_values)
             
             #ILP computation
-            _ = to_ilp_format(l, clabels, clusters_tf_values, self.ratio)
             root = get_git_root()
             dirpath = os.path.join(root, "myLibraries\MARScore_output")
-            os.system(f'glpsol --tmlim 100 --lp "{os.path.join(dirpath, "ilp_in.ilp")}" -o "{os.path.join(dirpath, "ilp_out.sol")}"')
-            selected = readILP()
+            if self.expe_params == None:
+                save_path_in = os.path.join(dirpath, "ilp_in.ilp")
+                save_path_out = os.path.join(dirpath, "ilp_out.sol")
+            elif "shuffled" in self.expe_params.keys():
+                if self.expe_params["shuffled"]:
+                    save_path_in = os.path.join(dirpath, "ilp_in_shuffled.ilp")
+                    save_path_out = os.path.join(dirpath, "ilp_out_shuffled.sol")
+                else:
+                    save_path_in = os.path.join(dirpath, "ilp_in_regular.ilp")
+                    save_path_out = os.path.join(dirpath, "ilp_out_regular.sol")
+
+            _ = to_ilp_format(save_path_in, l, clabels, clusters_tf_values, self.ratio)
+            
+            os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
+            """
+            if self.expe_params == None:
+                save_path = os.path.join(dirpath, "ilp_in.ilp")
+                os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out.sol")}"')
+            elif "shuffled" in self.expe_params.keys():
+                if self.expe_params["shuffled"]:
+                    save_path = os.path.join(dirpath, "ilp_in_shuffled.ilp")
+                    os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out_shuffled.sol")}"')
+                else:
+                    save_path = os.path.join(dirpath, "ilp_in_regular.ilp")
+                    os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out_regular.sol")}"')
+            """
+            selected = readILP(path=save_path_out)
 
             #summaries construction
             sentences = [sentence.strip() for sentence in indiv.split(".")]
@@ -239,7 +266,13 @@ class MARSCore():
             corDf = assessement["correlations"]
 
             #write output
-            main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\results")
+            if self.expe_params == None:
+                main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\results")
+            elif "shuffled" in self.expe_params.keys():
+                if self.expe_params["shuffled"]:
+                    main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\shuffled")
+                else:
+                    main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\regular")
             countfile_name = r"count.txt"
             if new:
                 count = updateFileCount(os.path.join(main_folder_path, countfile_name))
