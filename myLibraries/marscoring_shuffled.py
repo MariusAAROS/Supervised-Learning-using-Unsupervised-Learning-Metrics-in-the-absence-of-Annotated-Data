@@ -5,6 +5,10 @@ import os
 import pandas as pd
 from hdbscan import HDBSCAN
 
+import sys
+sys.path.append(os.path.join(get_git_root(), "\myLibraries"))
+from datasets_loaders.loaders import load_billsum
+
 #params
 size = 4
 dataset_name = "Pubmed"
@@ -14,14 +18,11 @@ params = {"shuffled": True}
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
-                 "Pubmed": r'C:\Pro\Stages\A4 - DVRC\Work\Datasets\pubmed\test.json'}
+                 "Pubmed": r'D:\COURS\A4\S8 - ESILV\Stage\Work\Datasets\Summary Evaluation\Pubmed\test.json'}
 
 #load dataset
 if dataset_name == "Billsum":
-    dataset_url=datasets_list[dataset_name]
-    dataset_url='https://drive.google.com/uc?export=download&id=' + dataset_url.split('/')[-2]
-    dataset = pd.read_json(dataset_url, lines=True)
-    dataset = dataset.loc[:, ["text", "summary"]]
+    dataset = load_billsum()
 
 elif dataset_name == "Pubmed":
     dataset_url=datasets_list[dataset_name]
