@@ -6,10 +6,10 @@ from custom_score.score import score
 import bert_score
 
 #params
-size = 4
+size = 500
 dataset_name = "Billsum"
 save = True
-savePace = 2
+savePace = 50
 params = {"shuffled": True}
 
 #url dictionnary
