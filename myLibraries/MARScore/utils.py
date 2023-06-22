@@ -39,29 +39,23 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
     input_size = model_input_size - 15
     corpusWords = corpus.split(" ")
     splited = [" ".join(corpusWords[i:i+input_size]) for i in range(0, len(corpusWords), input_size)]
+   
+    b_encoded = tokenizer.batch_encode_plus(splited,
+                                      add_special_tokens=True,
+                                      max_length=model_input_size,
+                                      padding="max_length",
+                                      return_attention_mask=True,
+                                      return_tensors='pt',
+                                      truncation=True)
 
-    input_ids = []
-    attention_masks = []
-    for sentence in splited:
-        encoded = tokenizer.encode_plus(sentence, 
-                                        add_special_tokens=True,
-                                        max_length=model_input_size,
-                                        padding="max_length",
-                                        return_attention_mask=True,
-                                        return_tensors='pt',
-                                        truncation=True)
-        input_ids.append(encoded["input_ids"])
-        attention_masks.append(encoded["attention_mask"])
-
-    inputs_ids = torch.cat(input_ids, dim=0)
-    attention_masks = torch.cat(attention_masks, dim=0)
-    
-    temp = flatten([batch.tolist() for batch in input_ids])
+    input_ids = b_encoded["input_ids"]
+    attention_masks = b_encoded["attention_mask"]
+    temp = flatten([batch for batch in b_encoded["input_ids"].tolist()])
     labels = np.array(temp)
-    labels = labels.reshape((labels.shape[0]*labels.shape[1]))
     labels = tokenizer.convert_ids_to_tokens(labels)
+
     with torch.no_grad():
-        output = model(inputs_ids, attention_mask=attention_masks)
+        output = model(input_ids, attention_mask=attention_masks)
     return output, labels
 
 def vectorizeCorpus(model_output, allStates=True, tolist=True):
