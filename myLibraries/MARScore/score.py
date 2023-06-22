@@ -54,6 +54,7 @@ class MARSCore():
         self.labels = []
         self.clusters_labels = []
         self.clusters_tfs = []
+        self.tokens_tfs = []
         self.similarity_matrices = []
         self.processedCorpus = []
         self.selectedIndexes = []
@@ -103,6 +104,7 @@ class MARSCore():
             tf_values = tf(l)
             clusters_tf_values = clusters_tf(tf_values, l, clabels)
             if not(self.low_memory):
+                self.tokens_tfs.append(tf_values)
                 self.clusters_tfs.append(clusters_tf_values)
             
             #ILP computation
@@ -251,6 +253,15 @@ class MARSCore():
             print(printout)
 
         return {"scores": dfCustom, "correlations": dfCor}
+
+    def visualize(self, indiv=0, dim=2):
+        if not(self.low_memory):
+            o_gold, l_gold = tokenizeCorpus(self.gold[indiv])
+            v_gold = vectorizeCorpus(o_gold)
+            v_gold, l_gold = cleanAll(v_gold, l_gold) 
+            visualizeCorpus(self.vectors[indiv], self.labels[indiv], v_gold, l_gold, self.clusters_labels[indiv], self.tokens_tfs[indiv], dim)
+        else:
+            print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
 
     def save(self, runtime=None, new=True):
             """
