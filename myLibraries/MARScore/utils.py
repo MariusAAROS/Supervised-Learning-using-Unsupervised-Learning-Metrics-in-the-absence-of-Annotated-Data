@@ -17,7 +17,8 @@ from contextlib import contextmanager
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
                                                            output_hidden_states=True), 
                            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased'), 
-                           model_input_size=512):
+                           model_input_size=512,
+                           padding_id=0):
     """
     Tokenize a text in order to create a dynamic embedding.
 
@@ -25,35 +26,38 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
     :param2 model (transformer): Model used to create the embedding.
     :param3 tokenizer (transformer): Tokenizer used to encode text.
     :param4 model_input_size (int): Maximum receivable input size for the transformer model.
+    :param5 padding_id (int): Number representing the padding token for the transfomer model in use.
 
     :output1 output (dict): Dictionnary containing the transformer model's weigths.
     :output2 labels (tensor): Text correponding to each encoded element (usefull for visualization). 
     """
-    def flatten(l):
-        """
-        Flattens an array. Copied from stack overflow: https://stackoverflow.com/questions/952914/how-do-i-make-a-flat-list-out-of-a-list-of-lists.
-
-        :output (list): Array reduced of one dimension.
-        """
-        return [item for sublist in l for item in sublist]
+    
     input_size = model_input_size - 15
     corpusWords = corpus.split(" ")
     splited = [" ".join(corpusWords[i:i+input_size]) for i in range(0, len(corpusWords), input_size)]
    
     b_encoded = tokenizer.batch_encode_plus(splited,
                                       add_special_tokens=True,
-                                      max_length=model_input_size,
-                                      padding="max_length",
+                                      max_length=None,
+                                      padding=True,
                                       return_attention_mask=True,
                                       return_tensors='pt',
-                                      truncation=True)
+                                      truncation=False)
 
     input_ids = b_encoded["input_ids"]
     attention_masks = b_encoded["attention_mask"]
-    temp = flatten([batch for batch in b_encoded["input_ids"].tolist()])
-    labels = np.array(temp)
-    labels = tokenizer.convert_ids_to_tokens(labels)
 
+    input_ids = torch.flatten(input_ids)
+    input_ids = input_ids[input_ids != padding_id]
+    attention_masks = attention_masks[attention_masks != 0]
+    padding_length = model_input_size - (input_ids.size(0) % model_input_size)
+    padding_tensor = torch.full((padding_length,), padding_id)
+    input_ids = torch.cat((input_ids, padding_tensor), dim=0)
+    attention_masks = torch.cat((attention_masks, padding_tensor), dim=0)
+    labels = tokenizer.convert_ids_to_tokens(input_ids)
+    input_ids = input_ids.reshape((-1, model_input_size))
+    attention_masks = attention_masks.reshape((-1, model_input_size))
+    
     with torch.no_grad():
         output = model(input_ids, attention_mask=attention_masks)
     return output, labels
