@@ -67,6 +67,8 @@ class MARSCore():
         Creates extractive summaries from the corpus attribute using dynamic embedding, high dimensionnal clustering and MIP/ILP solver.
 
         :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+        :param2 checkpoints (bool): Indicates whether the refining should save partial outputs along computation to prevent from losing data in the context of a crash.
+        :param3 saveRate (int): Only applicable id safe equals True. Specify the number of consicutive iterations after which a checkpoint should be created. 
         """
         if checkpoints:
             iter = 0
@@ -81,8 +83,9 @@ class MARSCore():
             o, l = tokenizeCorpus(indiv)
             v = vectorizeCorpus(o)
             v, l = cleanAll(v, l)
-            self.vectors.append(v)
-            self.labels.append(l)
+            if not(self.low_memory):
+                self.vectors.append(v)
+                self.labels.append(l)
 
             #clusterization
             if not(self.low_memory):
