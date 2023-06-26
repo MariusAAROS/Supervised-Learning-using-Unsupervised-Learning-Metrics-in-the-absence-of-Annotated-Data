@@ -361,9 +361,9 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
             sentences_map[cluster_index].add(sentence_index)
         else:
             sentences_map[cluster_index] = {sentence_index}
-        
         if token == ".":
             sentence_index += 1
+    sentences_map.pop(-1)
     
     #create sentence dictionnary for length
     sentence_index = 0
@@ -384,14 +384,12 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
         output = output[:-2] + f" - c{i} >= 0" + "\n"
         
     #define sentence length
-    
     len_template = ""
     for i in range(nb_sentences):
         len_template += f" {int(sentences_lens[i])} s{i} +"
     len_template = len_template[:-2]
     output += "length:" + len_template + f" <= {target_len}" + "\n"
     #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
-
 
     #declare cluster variables
     output += "\n\n\nBinary\n"
