@@ -17,6 +17,8 @@ from colorama import Fore, Style
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
+from matplotlib import pyplot as plt
+import numpy as np
 
 class MARSCore():
     def __init__(self, 
@@ -262,6 +264,19 @@ class MARSCore():
             visualizeCorpus(self.vectors[indiv], self.labels[indiv], v_gold, l_gold, self.clusters_labels[indiv], self.tokens_tfs[indiv], dim)
         else:
             print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
+
+    def cluster_distribution(self, indiv=0):
+        if not(self.low_memory):
+            output = "" 
+            n_clusters = len(set(self.clusters_labels[indiv]))
+            for token, c_label in zip(self.labels[indiv], self.clusters_labels[indiv]):
+                color = c_label % n_clusters + 1  # Generate a color code (1 to clusters) based on the label
+                colored_word = getattr(Fore, list(Fore.__dict__.keys())[color]) + token + Fore.RESET
+                output += colored_word + ' '
+            return output.replace(" ##", "").replace(".", ".\n").strip()
+        else:
+            print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
+            return -1
 
     def save(self, runtime=None, new=True):
             """
