@@ -257,6 +257,13 @@ class MARSCore():
         return {"scores": dfCustom, "correlations": dfCor}
 
     def visualize(self, indiv=0, dim=2):
+        """
+        Generates a plotly graph in 1 or 2 dimensions of the clusterized tokens using UMAP.
+
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+        :param2 indiv (int): Document index for which representation is desired.
+        :param3 dim (int): Target number of dimensions for the UMAP reduction. 
+        """
         if not(self.low_memory):
             o_gold, l_gold = tokenizeCorpus(self.gold[indiv])
             v_gold = vectorizeCorpus(o_gold)
@@ -266,6 +273,12 @@ class MARSCore():
             print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
 
     def cluster_distribution(self, indiv=0):
+        """
+        Creates a formated string with different colorization depending on the words' clusters.
+
+        :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+        :param2 indiv (int): Document index for which representation is desired.        
+        """
         if not(self.low_memory):
             output = "" 
             n_clusters = len(set(self.clusters_labels[indiv]))
@@ -273,7 +286,10 @@ class MARSCore():
                 color = c_label % n_clusters + 1  # Generate a color code (1 to clusters) based on the label
                 colored_word = getattr(Fore, list(Fore.__dict__.keys())[color]) + token + Fore.RESET
                 output += colored_word + ' '
-            return output.replace(" ##", "").replace(".", ".\n").strip()
+            output = output.replace(" ##", "")
+            output = output.replace(".", ".\n")
+            output = output.strip()
+            return output
         else:
             print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
             return -1
