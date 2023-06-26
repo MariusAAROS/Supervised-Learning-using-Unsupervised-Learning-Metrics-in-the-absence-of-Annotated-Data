@@ -12,6 +12,7 @@ import io
 import sys
 import git
 from contextlib import contextmanager
+import random
 
 
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
