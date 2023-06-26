@@ -355,16 +355,28 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
 
     #create sentence dictionnary for clusters
     sentence_index = 0
-    sentences_map = {0: set()}
+    sentences_map = {0: []}
     nb_sentences = labels.count(".") if labels[-1] == "." else labels.count(".")+1
     for cluster_index, token in zip(clabels, labels):
         if cluster_index in sentences_map.keys():
-            sentences_map[cluster_index].add(sentence_index)
+            sentences_map[cluster_index].append(sentence_index)
         else:
-            sentences_map[cluster_index] = {sentence_index}
+            sentences_map[cluster_index] = [sentence_index]
         if token == ".":
             sentence_index += 1
     sentences_map.pop(-1)
+
+    #create sentence count dictionnary for clusters
+    sentences_map_count = {}
+    for cluster_index in sentences_map.keys():
+        sentences_map_count[cluster_index] = {}
+        for sentence_index in sentences_map[cluster_index]:
+            sentences_map_count[cluster_index][sentence_index] = list(sentences_map[cluster_index]).count(sentence_index)
+
+    #transform sentence_map to set
+    for k in sentences_map.keys():
+        sentences_map[k] = set(sentences_map[k])
+
     
     #create sentence dictionnary for length
     sentence_index = 0
@@ -380,8 +392,8 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):
         output += f"index_{i}:"
-        for cluster_index in sorted(sentences_map[k]):
-            output += f" s{cluster_index} +"
+        for sentence_index in sorted(sentences_map[k]):
+            output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
         output = output[:-2] + f" - c{i} >= 0" + "\n"
         
     #define sentence length

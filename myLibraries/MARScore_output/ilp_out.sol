@@ -10,10 +10,10 @@ Objective:  score = 60894 (MAXimum)
      1 index_0                     1             0               
      2 index_1                     2             0               
      3 index_2                     2             0               
-     4 index_3                     1             0               
+     4 index_3                     2             0               
      5 index_4                     0             0               
      6 index_5                     0             0               
-     7 index_6                     0             0               
+     7 index_6                     1             0               
      8 index_7                     2             0               
      9 index_8                     1             0               
     10 index_9                     1             0               
@@ -24,10 +24,10 @@ Objective:  score = 60894 (MAXimum)
     15 index_14                    0             0               
     16 index_15                    0             0               
     17 index_16                    1             0               
-    18 index_17                    0             0               
+    18 index_17                    2             0               
     19 index_18                    1             0               
-    20 index_19                    1             0               
-    21 index_20                    0             0               
+    20 index_19                    2             0               
+    21 index_20                    1             0               
     22 index_21                    0             0               
     23 index_22                    1             0               
     24 index_23                    1             0               
@@ -43,27 +43,27 @@ Objective:  score = 60894 (MAXimum)
     34 index_33                    1             0               
     35 index_34                    2             0               
     36 index_35                    0             0               
-    37 index_36                    0             0               
-    38 index_37                    0             0               
+    37 index_36                    2             0               
+    38 index_37                    2             0               
     39 index_38                    1             0               
-    40 index_39                    0             0               
+    40 index_39                    4             0               
     41 index_40                    0             0               
-    42 index_41                    0             0               
+    42 index_41                    4             0               
     43 index_42                    2             0               
     44 index_43                    2             0               
-    45 index_44                    1             0               
+    45 index_44                    2             0               
     46 index_45                    2             0               
-    47 index_46                    1             0               
+    47 index_46                    2             0               
     48 index_47                    0             0               
-    49 index_48                    1             0               
-    50 index_49                    0             0               
+    49 index_48                    7             0               
+    50 index_49                   20             0               
     51 index_50                    1             0               
     52 index_51                    0             0               
     53 index_52                    1             0               
     54 index_53                    3             0               
-    55 index_54                    2             0               
-    56 index_55                    2             0               
-    57 index_56                    1             0               
+    55 index_54                    3             0               
+    56 index_55                    3             0               
+    57 index_56                    2             0               
     58 index_57                    0             0               
     59 index_58                    0             0               
     60 index_59                    1             0               
@@ -72,24 +72,24 @@ Objective:  score = 60894 (MAXimum)
     63 index_62                    0             0               
     64 index_63                    2             0               
     65 index_64                    0             0               
-    66 index_65                    3             0               
+    66 index_65                    5             0               
     67 index_66                    1             0               
-    68 index_67                   10             0               
+    68 index_67                   13             0               
     69 index_68                    4             0               
-    70 index_69                    0             0               
+    70 index_69                    2             0               
     71 index_70                    0             0               
-    72 index_71                    0             0               
+    72 index_71                    4             0               
     73 index_72                    0             0               
-    74 index_73                    5             0               
+    74 index_73                    9             0               
     75 index_74                    1             0               
-    76 index_75                    0             0               
+    76 index_75                    2             0               
     77 index_76                    0             0               
     78 index_77                    0             0               
     79 index_78                   10             0               
     80 index_79                    1             0               
-    81 index_80                    0             0               
-    82 index_81                    0             0               
-    83 index_82                    0             0               
+    81 index_80                    2             0               
+    82 index_81                    2             0               
+    83 index_82                    1             0               
     84 length                   3002                        7125 
 
    No. Column name       Activity     Lower bound   Upper bound
