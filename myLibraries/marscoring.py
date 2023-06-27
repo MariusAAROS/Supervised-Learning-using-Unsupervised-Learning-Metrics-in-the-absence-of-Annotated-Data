@@ -10,9 +10,9 @@ sys.path.append(os.path.join(get_git_root(), "\myLibraries"))
 from datasets_loaders.loaders import load_billsum
 
 #params
-size = 500
-dataset_name = "Pubmed"
-savePace = 50
+size = 4
+dataset_name = "Billsum"
+savePace = 2
 save = True
 params = {"shuffled": False}
 

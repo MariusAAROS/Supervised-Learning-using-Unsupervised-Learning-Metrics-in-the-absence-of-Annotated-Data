@@ -63,7 +63,8 @@ class MARSCore():
         self.scores = []
         self.printRange = printRange
         self.low_memory = low_memory
-        self.expe_params = expe_params 
+        self.expe_params = expe_params
+        self.written_summaries = 0
     
     def compute(self, checkpoints=False, saveRate=50):
         """
@@ -294,7 +295,7 @@ class MARSCore():
             print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
             return -1
 
-    def save(self, runtime=None, new=True):
+    def save(self, runtime=None, new=True, pace=50):
             """
             Saves Refiner output to a local folder.
 
@@ -310,7 +311,7 @@ class MARSCore():
             scoreDf = assessement["scores"]
             corDf = assessement["correlations"]
 
-            #write output
+            #write statistics
             if self.expe_params == None:
                 main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\results")
             elif "shuffled" in self.expe_params.keys():
@@ -335,6 +336,23 @@ class MARSCore():
             corDf.to_csv(os.path.join(current_path, "correlations.csv"))
             with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
                 f.write(str(runtime))
+            
+            #write summaries
+            try:
+                os.mkdir(os.path.join(current_path, f"summaries"))
+            except FileExistsError:
+                pass
+            
+            sum_path = os.path.join(current_path, f"summaries")
+            pos = len(self.summaries)-self.written_summaries
+
+            for i, summary in enumerate(self.summaries[len(self.summaries)-pos:]):
+                if new:
+                    arg = "w"
+                else:
+                    arg = "a"
+                with open(os.path.join(sum_path, f"{i+self.written_summaries}.txt"), arg) as f:
+                    f.write(summary)
 
     def __str__(self) -> str:
         """
