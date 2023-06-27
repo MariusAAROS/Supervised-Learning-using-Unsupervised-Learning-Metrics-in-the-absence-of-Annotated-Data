@@ -332,7 +332,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
-def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, verbose=False):
+def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -379,14 +379,18 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
 
     
     #create sentence dictionnary for length
-    sentence_index = 0
-    sentences_lens = [0]*(nb_sentences)
-    for token in labels:
-        sentences_lens[sentence_index] += len(token)
-        if token == ".":
-            sentence_index += 1
-    total_len = np.sum(sentences_lens)
-    target_len = int(total_len/ratio)
+    if precision_level == "c":
+        sentence_index = 0
+        sentences_lens = [0]*(nb_sentences)
+        for token in labels:
+            sentences_lens[sentence_index] += len(token)
+            if token == ".":
+                sentence_index += 1
+        total_len = np.sum(sentences_lens)
+        target_len = int(total_len/ratio)
+    elif precision_level == "s":
+        total_len = nb_sentences
+        target_len = int(total_len/ratio)
 
     #define constraints
     output += "\n\nSubject To\n"
@@ -398,11 +402,17 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, save=True, v
         
     #define sentence length
     len_template = ""
-    for i in range(nb_sentences):
-        len_template += f" {int(sentences_lens[i])} s{i} +"
-    len_template = len_template[:-2]
-    output += "length:" + len_template + f" <= {target_len}" + "\n"
-    #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+    if precision_level == "c":
+        for i in range(nb_sentences):
+            len_template += f" {int(sentences_lens[i])} s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
+        #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+    elif precision_level == "s":
+        for i in range(nb_sentences):
+            len_template += f" s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
 
     #declare cluster variables
     output += "\n\n\nBinary\n"

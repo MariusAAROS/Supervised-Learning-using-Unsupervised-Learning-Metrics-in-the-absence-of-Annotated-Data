@@ -1,3 +1,3 @@
 ,pearson_CBERT_R-1,pearson_CBERT_R-2,pearson_CBERT_R-L,pearson_BERT_R-1,pearson_BERT_R-2,pearson_BERT_R-l,pearson_BART_R-1,pearson_BART_R-2,pearson_BART_R-l
-Pearson score,0.18,0.47,0.21,0.47,0.6,0.52,0.28,0.64,0.44
-p-value,0.08,0.0,0.04,0.0,0.0,0.0,0.01,0.0,0.0
+Pearson score,0.21,0.49,0.22,0.4,0.56,0.46,0.25,0.62,0.42
+p-value,0.01,0.0,0.01,0.0,0.0,0.0,0.0,0.0,0.0
