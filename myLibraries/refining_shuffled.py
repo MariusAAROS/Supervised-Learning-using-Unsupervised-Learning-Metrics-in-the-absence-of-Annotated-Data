@@ -7,7 +7,7 @@ import bert_score
 
 #params
 size = 500
-dataset_name = "Billsum"
+dataset_name = "Pubmed"
 save = True
 savePace = 50
 params = {"shuffled": True}
