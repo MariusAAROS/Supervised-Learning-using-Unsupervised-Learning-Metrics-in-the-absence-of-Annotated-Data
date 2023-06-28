@@ -449,13 +449,13 @@ def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
         root = get_git_root()
         path = os.path.join(root, rel_path)
     with open(path, "r") as f:
-        raw = "".join(f.readlines())
+        lines = f.readlines()
         f.close()
+    
+    sentences_lines = [line for line in lines if re.search(r"s\d", line)]
 
-    pattern = r's\d+\s+\*\s+(\d)'
-
-    matches = re.findall(pattern, raw)
-    result = [int(match) for match in matches]
+    sorted_lines = sorted(sentences_lines, key=lambda line: int(line.split()[1][1:]))
+    result = [int(sorted_line.split()[3]) for sorted_line in sorted_lines]
     return result
 
 def get_git_root():
