@@ -130,18 +130,6 @@ class MARSCore():
             _ = to_ilp_format(save_path_in, l, clabels, clusters_tf_values, self.ratio, self.precision_level)
             
             os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
-            """
-            if self.expe_params == None:
-                save_path = os.path.join(dirpath, "ilp_in.ilp")
-                os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out.sol")}"')
-            elif "shuffled" in self.expe_params.keys():
-                if self.expe_params["shuffled"]:
-                    save_path = os.path.join(dirpath, "ilp_in_shuffled.ilp")
-                    os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out_shuffled.sol")}"')
-                else:
-                    save_path = os.path.join(dirpath, "ilp_in_regular.ilp")
-                    os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{os.path.join(dirpath, "ilp_out_regular.sol")}"')
-            """
             selected = readILP(path=save_path_out)
 
             #summaries construction

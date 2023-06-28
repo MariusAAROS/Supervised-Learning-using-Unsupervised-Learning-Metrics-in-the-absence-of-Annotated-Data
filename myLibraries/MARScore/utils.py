@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 from matplotlib import cm
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import MinMaxScaler
 from custom_score.utils import cleanString, get_git_root
 import os
 import re
@@ -345,14 +346,20 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
 
     :output output (string): Text formatted to with respect to ILP's requirements.
     """
-    #define scoring function
-    output = "Maximize\nscore:"
-    for i, k in enumerate(sorted(clusters_tf_values.keys())):
-        if int(clusters_tf_values[k]) < 0:
-            output += f" - {-int(clusters_tf_values[k])} c{i}"
-        else:
-            output += f" + {int(clusters_tf_values[k])} c{i}"
+    def scale_dict(d):
+        """
+        MinMax scales values of a dictionnary.
 
+        :param1 d (dict): Dictionnary to scale.
+
+        :output norm_d (dict): Dictionnary with normalized values.
+        """
+        values = d.values()
+        min_ = min(values)
+        max_ = max(values)
+        norm_d = {key: ((v - min_ ) / (max_ - min_) )  for (key, v) in d.items()}
+        return norm_d
+    
     #create sentence dictionnary for clusters
     sentence_index = 0
     sentences_map = {0: []}
@@ -379,18 +386,33 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
 
     
     #create sentence dictionnary for length
+    sentence_index = 0
+    sentences_lens = [0]*(nb_sentences)
+    for token in labels:
+        sentences_lens[sentence_index] += len(token)
+        if token == ".":
+            sentence_index += 1
     if precision_level == "c":
-        sentence_index = 0
-        sentences_lens = [0]*(nb_sentences)
-        for token in labels:
-            sentences_lens[sentence_index] += len(token)
-            if token == ".":
-                sentence_index += 1
         total_len = np.sum(sentences_lens)
         target_len = int(total_len/ratio)
     elif precision_level == "s":
         total_len = nb_sentences
         target_len = int(total_len/ratio)
+
+    #define scoring function
+    clusters_tf_values.pop(-1)
+    #norm_clusters_tf_values = scale_dict(clusters_tf_values)
+    output = "Maximize\nscore:"
+    for i, k in enumerate(sorted(clusters_tf_values.keys())):
+        if int(clusters_tf_values[k]) < 0:
+            output += f" - {-int(clusters_tf_values[k])} c{i}"
+        else:
+            output += f" + {int(clusters_tf_values[k])} c{i}"
+
+    scaler = MinMaxScaler()
+    norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
+    for i, length in enumerate(norm_sentences_lens):
+        output += f" - {round(length, 3)} s{i}"
 
     #define constraints
     output += "\n\nSubject To\n"
@@ -449,13 +471,13 @@ def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
         root = get_git_root()
         path = os.path.join(root, rel_path)
     with open(path, "r") as f:
-        raw = "".join(f.readlines())
+        lines = f.readlines()
         f.close()
+    
+    sentences_lines = [line for line in lines if re.search(r"s\d", line)]
 
-    pattern = r's\d+\s+\*\s+(\d)'
-
-    matches = re.findall(pattern, raw)
-    result = [int(match) for match in matches]
+    sorted_lines = sorted(sentences_lines, key=lambda line: int(line.split()[1][1:]))
+    result = [int(sorted_line.split()[3]) for sorted_line in sorted_lines]
     return result
 
 def get_git_root():
