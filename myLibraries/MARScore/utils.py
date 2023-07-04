@@ -89,7 +89,7 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
     return embs
 
 def clusterizeCorpus(embs, clusterizer):
-    if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_":
+    if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_" or clusterizer.__module__ == "sklearn.cluster._birch":
         clusterizer.fit(embs)
         clabels = clusterizer.labels_.astype(int)
     else:
@@ -371,7 +371,10 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             sentences_map[cluster_index] = [sentence_index]
         if token == ".":
             sentence_index += 1
-    sentences_map.pop(-1)
+    try:
+        sentences_map.pop(-1)
+    except KeyError:
+        pass
 
     #create sentence count dictionnary for clusters
     sentences_map_count = {}
@@ -400,7 +403,10 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
         target_len = int(total_len/ratio)
 
     #define scoring function
-    clusters_tf_values.pop(-1)
+    try:
+        clusters_tf_values.pop(-1)
+    except KeyError:
+        pass
     #norm_clusters_tf_values = scale_dict(clusters_tf_values)
     output = "Maximize\nscore:"
     for i, k in enumerate(sorted(clusters_tf_values.keys())):
@@ -408,12 +414,11 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             output += f" - {-int(clusters_tf_values[k])} c{i}"
         else:
             output += f" + {int(clusters_tf_values[k])} c{i}"
-
     scaler = MinMaxScaler()
     norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
     for i, length in enumerate(norm_sentences_lens):
         output += f" - {round(length, 3)} s{i}"
-
+        
     #define constraints
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):
