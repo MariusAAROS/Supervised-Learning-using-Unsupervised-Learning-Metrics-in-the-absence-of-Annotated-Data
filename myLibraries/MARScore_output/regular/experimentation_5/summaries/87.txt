@@ -1,0 +1,1 @@
+SECTION 1. ; and (3) by adding at the end the following new subsection: (f) SafetyCritical Devices or Circuits. Time on duty shall include all work where there is a potential to interact or otherwise come into contact with safetycritical devices or circuits.
