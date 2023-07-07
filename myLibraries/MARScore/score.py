@@ -31,7 +31,8 @@ class MARSCore():
                  printRange = range(1),
                  low_memory=False,
                  precision_level="c",
-                 expe_params=None) -> None:
+                 expe_params=None,
+                 extraction_method="concat_l4") -> None:
         """
         Constructor of the MARScore class.
 
@@ -44,8 +45,9 @@ class MARSCore():
         :param7 ratio (float or int): Number determining how much the reference text will be shortened.
         :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
         :param9 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
-        :param10 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}
-        :param11 expe_params (dict): Differents parameters usefull for experimentation purpose
+        :param10 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
+        :param11 expe_params (dict): Differents parameters usefull for experimentation purpose.
+        :param12 extraction_method (str): Method of extraction for BERT embeddings.
         """
         self.corpus = corpus
         self.gold = gold
@@ -53,6 +55,7 @@ class MARSCore():
         self.model = model
         self.tokenizer = tokenizer
         self.clusterizer = clusterizer
+        self.extraction_method = extraction_method
         self.ratio = ratio
         self.vectors = []
         self.labels = []
@@ -88,7 +91,7 @@ class MARSCore():
         for indiv in self.corpus:
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
-            v = vectorizeCorpus(o)
+            v = vectorizeCorpus(o, method=self.extraction_method)
             v, l = cleanAll(v, l)
             if not(self.low_memory):
                 self.vectors.append(v)
@@ -258,7 +261,7 @@ class MARSCore():
         """
         if not(self.low_memory):
             o_gold, l_gold = tokenizeCorpus(self.gold[indiv])
-            v_gold = vectorizeCorpus(o_gold)
+            v_gold = vectorizeCorpus(o_gold, method=self.extraction_method)
             v_gold, l_gold = cleanAll(v_gold, l_gold) 
             visualizeCorpus(self.vectors[indiv], self.labels[indiv], v_gold, l_gold, self.clusters_labels[indiv], self.tokens_tfs[indiv], dim)
         else:

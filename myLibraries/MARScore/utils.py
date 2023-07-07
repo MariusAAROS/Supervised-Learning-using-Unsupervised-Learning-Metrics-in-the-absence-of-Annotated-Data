@@ -64,15 +64,43 @@ def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased',
         output = model(input_ids, attention_mask=attention_masks)
     return output, labels
 
-def vectorizeCorpus(model_output, allStates=True, tolist=True):
+def vectorizeCorpus(model_output, allStates=True, tolist=True, method="concat_l4"):
     """
     Transforms an encoded text to word-level vectors using a transformer model.
 
     :param1 model_output (dict): Dictionnary containing the transformer model's weigths.
     :param2 allStates (bool): Defines if all of the transformer's hidden states shall be used or only the last hidden state.
-
+    :param3 tolist (bool): If True, embeddings are converted from tensor to list before return.
+    :param4 method (str): Defines the method of extraction for the word embeddings. Available method from best to worst {"concat_l4": "concatenate last hidden 4 layers", 
+                                                                                                                         "sum_l4": "sum last 4 hidden layers", 
+                                                                                                                         "secondToLast": "take second to last hidden layer",
+                                                                                                                         "sum_all": "sum all hidden layers",
+                                                                                                                         "last": "take last hidden layer",
+                                                                                                                         "first": "take first hidden layer"}
     :output embs (list): List of dynamics embeddings for each word of the initial corpus.
     """
+    def switch_method(method, token):
+        """
+        Helper function to select embedding extraction method.
+
+        :param1 method (str): Switch parameter for method selection.
+        :param2 token (Tensor): BERT layers.
+        """
+        if method == "concat_l4":
+            return torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+        elif method == "sum_l4":
+            return torch.sum(token[-4:], dim=0)
+        elif method == "secondToLast":
+            return token[-2]
+        elif method == "sum_all":
+            return torch.sum(token, dim=0)
+        elif method == "last":
+            return token[-1]
+        elif method =="first":
+            return token[0]
+        else:
+            raise ValueError("Invalid embedding extraction method")
+        
     if allStates==True:
         hidden_states = model_output.hidden_states
     else:
@@ -82,7 +110,7 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True):
     embs = []
     for batch in token_embeddings:
         for token in batch:
-            emb = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+            emb = switch_method(method, token)
             embs.append(emb)
     if tolist:
         embs = [emb.tolist() for emb in embs]
@@ -414,13 +442,10 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             output += f" - {-int(clusters_tf_values[k])} c{i}"
         else:
             output += f" + {int(clusters_tf_values[k])} c{i}"
-
-    """
     scaler = MinMaxScaler()
     norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
     for i, length in enumerate(norm_sentences_lens):
         output += f" - {round(length, 3)} s{i}"
-    """
          
     #define constraints
     output += "\n\nSubject To\n"
@@ -428,8 +453,9 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
         output += f"index_{i}:"
         for sentence_index in sorted(sentences_map[k]):
             output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
-        output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
-        
+        #output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
+        output = output[:-2] + f" - c{i} >= 0" + "\n"
+
     #define sentence length
     len_template = ""
     if precision_level == "c":
