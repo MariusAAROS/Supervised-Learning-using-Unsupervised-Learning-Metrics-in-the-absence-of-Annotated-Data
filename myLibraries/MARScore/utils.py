@@ -414,18 +414,21 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             output += f" - {-int(clusters_tf_values[k])} c{i}"
         else:
             output += f" + {int(clusters_tf_values[k])} c{i}"
+
+    """
     scaler = MinMaxScaler()
     norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
     for i, length in enumerate(norm_sentences_lens):
         output += f" - {round(length, 3)} s{i}"
-        
+    """
+         
     #define constraints
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):
         output += f"index_{i}:"
         for sentence_index in sorted(sentences_map[k]):
             output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
-        output = output[:-2] + f" - c{i} >= 0" + "\n"
+        output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
         
     #define sentence length
     len_template = ""
