@@ -256,6 +256,47 @@ class MARSCore():
 
         return {"scores": dfCustom, "correlations": dfCor}
 
+    def light_assess(self, start=0, stop=None, verbose=True):
+            """
+            Assesses quality of the refined corpus by computing Static BERTscore and Rouge-Score on the refined version compared to it's initial version.
+
+            :param1 self (MARScore): MARScore Object (see __init__ function for more details).
+            :param2 start (int): Starting index to assess.
+            :param3 stop (int): Ending index to assess.
+            :param4 verbose (Boolean): When put to True, assess results will be printed.
+
+            :output (dict): Dictionnary containing both the scores of Static BERTScore, BERTScore, BARTScore and Rouge as well as their correlation.
+            """
+            assert self.summaries != None, "refined corpus doesn't exists"
+            
+            if stop == None:
+                stop = len(self.summaries)
+            subset_summaries = self.summaries[start:stop]
+            subset_gold = self.gold[start:stop]
+
+            #Rouge-Score computation
+            rougeScorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+            rougeScore = [rougeScorer.score(c, r) for c, r in zip(subset_gold, subset_summaries)]
+
+            #Data formating
+            rouge1_R = [round(t['rouge1'][0], 2) for t in rougeScore]
+            rouge2_R = [round(t['rouge2'][0], 2) for t in rougeScore]
+            rougeL_R = [round(t['rougeL'][0], 2) for t in rougeScore]
+
+            dfCustom = pd.DataFrame({'R-1' : rouge1_R,
+                                     'R-2' : rouge2_R,
+                                     'R-L' : rougeL_R
+                                    })
+            #score storing
+            self.scores = rouge2_R
+
+            if verbose:
+                printout = "Scores: \n"
+                printout += dfCustom.to_string() + "\n\n"
+                print(printout)
+
+            return {"scores": dfCustom}
+
     def visualize(self, indiv=0, dim=2):
         """
         Generates a plotly graph in 1 or 2 dimensions of the clusterized tokens using UMAP.
