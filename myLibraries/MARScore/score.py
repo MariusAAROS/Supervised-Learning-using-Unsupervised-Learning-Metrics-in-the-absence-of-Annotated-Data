@@ -29,6 +29,7 @@ class MARSCore():
                  clusterizer=hdbscan.HDBSCAN(),
                  dim_reductor=UMAP(n_components=2, init='random', random_state=0),
                  ratio=2,
+                 n_allowed_elements=None,
                  printRange = range(1),
                  low_memory=False,
                  precision_level="c",
@@ -45,11 +46,12 @@ class MARSCore():
         :param6 clusterizer (model): Model used to clusterize the dynamics embeddings.
         :param7 dim_reductor (model): Dimension reduction algorithm (UMAP as default).
         :param8 ratio (float or int): Number determining how much the reference text will be shortened.
-        :param9 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
-        :param10 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
-        :param11 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
-        :param12 expe_params (dict): Differents parameters usefull for experimentation purpose.
-        :param13 extraction_method (str): Method of extraction for BERT embeddings.
+        :param9 n_allowed_elements (int): Number of characters/sentences (depending on precision_level parameter) allowed in the summary. Overrides ratio parameter.
+        :param10 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
+        :param11 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
+        :param12 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
+        :param13 expe_params (dict): Differents parameters usefull for experimentation purpose.
+        :param14 extraction_method (str): Method of extraction for BERT embeddings.
         """
         self.corpus = corpus
         self.gold = gold
@@ -60,6 +62,7 @@ class MARSCore():
         self.dim_reductor = dim_reductor
         self.extraction_method = extraction_method
         self.ratio = ratio
+        self.n_allowed_elements = n_allowed_elements
         self.vectors = []
         self.reduced_vectors = []
         self.labels = []
@@ -135,7 +138,7 @@ class MARSCore():
                     save_path_in = os.path.join(dirpath, "ilp_in_regular.ilp")
                     save_path_out = os.path.join(dirpath, "ilp_out_regular.sol")
 
-            _ = to_ilp_format(save_path_in, l, clabels, clusters_tf_values, self.ratio, self.precision_level)
+            _ = to_ilp_format(save_path_in, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements)
             
             os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
             selected = readILP(path=save_path_out)
@@ -337,9 +340,9 @@ class MARSCore():
 
     def save(self, runtime=None, new=True, pace=50):
             """
-            Saves Refiner output to a local folder.
+            Saves MARScore output to a local folder.
 
-            :param1 self (Refiner): Refiner Object (see __init__ function for more details).
+            :param1 self (MARScore): Refiner Object (see __init__ function for more details).
             :param2 new (bool): Indicates if a new folder should be created. If false, output is append to the most recent ouput folder.
             """
             #evaluation

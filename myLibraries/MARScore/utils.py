@@ -387,7 +387,7 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
-def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, save=True, verbose=False):
+def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -451,10 +451,12 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             sentence_index += 1
     if precision_level == "c":
         total_len = np.sum(sentences_lens)
-        target_len = int(total_len/ratio)
     elif precision_level == "s":
         total_len = nb_sentences
+    if n_allowed_elements == None:
         target_len = int(total_len/ratio)
+    else:
+        target_len = int(n_allowed_elements)
 
     #define scoring function
     try:
