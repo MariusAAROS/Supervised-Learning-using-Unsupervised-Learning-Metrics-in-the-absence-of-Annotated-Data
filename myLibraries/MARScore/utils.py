@@ -3,7 +3,6 @@ import torch
 from umap import UMAP
 import plotly.graph_objects as go
 import numpy as np
-from matplotlib import cm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from custom_score.utils import cleanString, get_git_root
@@ -13,6 +12,7 @@ import io
 import sys
 import git
 from contextlib import contextmanager
+from matplotlib import colormaps
 import random
 
 
@@ -116,13 +116,24 @@ def vectorizeCorpus(model_output, allStates=True, tolist=True, method="concat_l4
         embs = [emb.tolist() for emb in embs]
     return embs
 
-def clusterizeCorpus(embs, clusterizer):
+def clusterizeCorpus(reductor, embs, clusterizer):
+    """"
+    Clusterizes high dimensionnal vectors by reducing them first.
+
+    :param1 reductor (model): Usually a UMAP instance.
+    :param2 embs (list): High dimensionnal vectors.
+    :param3 clusterizer (model): Clusterizer model, usually HDBScan or MinCut.
+
+    :output1 proj (list): List of vectors with reduced dimensions. 
+    :output2 clabels (list): List of clusters labels for each vector.
+    """
     if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_" or clusterizer.__module__ == "sklearn.cluster._birch":
-        clusterizer.fit(embs)
+        proj = reductor.fit_transform(embs)
+        clusterizer.fit(proj)
         clabels = clusterizer.labels_.astype(int)
     else:
         print("\nERROR: Clusterizer not supported yet.\n")
-    return clabels
+    return proj, clabels
 
 def tf(text):
     """
@@ -180,10 +191,11 @@ def cleanAll(embs, labels, mode="all", ignore=["."]):
     else:
         return -1
 
-def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
+def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
     """
     Create a visual representation of the vectorized corpus using Plotly express. 
 
+    :param1 reductor (model): Dimension reduction algorithm (UMAP as default).
     :param1 embs (list): List of dynamics embeddings for each word of the initial corpus.
     :param2 labels (tensor): Text correponding to each encoded element.
     :param3 embs_gold (list): List of dynamics embeddings for each word of the gold reference.
@@ -242,11 +254,14 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
     token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
 
     if labels_cluster.all() != None:
-        cmap = cm.get_cmap('viridis', len(set(labels_cluster))).colors
+        cmap = colormaps["viridis"].colors
 
     if dim == 1:
-        umap1D = UMAP(n_components=1, init='random', random_state=0)
-        proj1D = umap1D.fit_transform(formated_embs).T
+        if len(embs[0]) != 1:
+            umap1D = UMAP(n_components=1, init='random', random_state=0)
+            proj1D = umap1D.fit_transform(formated_embs).T
+        else:
+            proj1D = np.transpose(embs)
 
         data = {"x": proj1D[0],
                 "labels": labels,
@@ -257,7 +272,11 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         if comp_gold:
             token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
-            proj1D_gold = umap1D.transform(formated_embs_gold).T
+            if len(embs[0]) != 1:
+                formated_embs_gold = reductor.transform(formated_embs_gold)
+                proj1D_gold = umap1D.transform(formated_embs_gold).T
+            else:
+                proj1D_gold = reductor.transform(formated_embs_gold).T
             data_gold = {"x": proj1D_gold[0],
                         "labels": labels_gold}
             for k in data_gold.keys():
@@ -301,8 +320,11 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
         fig.show()
 
     elif dim == 2:
-        umap2D = UMAP(n_components=2, init='random', random_state=0)
-        proj2D = umap2D.fit_transform(formated_embs).T
+        if len(embs[0]) != 2:
+            umap2D = UMAP(n_components=2, init='random', random_state=0)
+            proj2D = umap2D.fit_transform(formated_embs).T
+        else:
+            proj2D = np.transpose(embs)
 
         data = {"x": proj2D[0],
                 "y": proj2D[1],
@@ -314,7 +336,11 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
 
         if comp_gold:
             token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
-            proj2D_gold = umap2D.transform(formated_embs_gold).T
+            if len(embs[0]) != 2:
+                formated_embs_gold = reductor.transform(formated_embs_gold)
+                proj2D_gold = umap2D.transform(formated_embs_gold).T
+            else:
+                proj2D_gold = reductor.transform(formated_embs_gold).T
             data_gold = {"x": proj2D_gold[0],
                          "y": proj2D_gold[1],
                          "labels": labels_gold}
@@ -333,7 +359,7 @@ def visualizeCorpus(embs, labels, embs_gold=None, labels_gold=None, labels_clust
                 mode='markers',
                 marker=dict(size=9, color=color),
                 line=dict(width=2, color="DarkSlateGrey"),
-                text=["token: "+str(data['labels'][i]) +" || "+"tf   : "+str(tf_values[data['labels'][i]])],
+                text=["token: "+str(data['labels'][i]) +" || "+"tf   : "+str(tf_values[data['labels'][i]])+" || cluster: "+str(data["clusters"][i])],
                 name=data['labels'][i]
             )
             traces.append(trace)
