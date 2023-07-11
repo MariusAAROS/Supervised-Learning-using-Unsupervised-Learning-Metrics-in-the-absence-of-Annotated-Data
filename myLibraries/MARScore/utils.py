@@ -127,7 +127,7 @@ def clusterizeCorpus(reductor, embs, clusterizer):
     :output1 proj (list): List of vectors with reduced dimensions. 
     :output2 clabels (list): List of clusters labels for each vector.
     """
-    if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_" or clusterizer.__module__ == "sklearn.cluster._birch":
+    if clusterizer.__module__ == "hdbscan.hdbscan_" or ".".join(clusterizer.__module__.split(".")[:2]) == "sklearn.cluster":
         proj = reductor.fit_transform(embs)
         clusterizer.fit(proj)
         clabels = clusterizer.labels_.astype(int)
