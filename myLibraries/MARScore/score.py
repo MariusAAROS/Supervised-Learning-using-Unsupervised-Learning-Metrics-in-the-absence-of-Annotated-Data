@@ -18,7 +18,213 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
 from matplotlib import pyplot as plt
+from matplotlib import colormaps
 import numpy as np
+
+def clusterizeCorpusProto(reductor, embs, clusterizer):
+    if clusterizer.__module__ == "sklearn.cluster._spectral" or clusterizer.__module__ == "hdbscan.hdbscan_" or clusterizer.__module__ == "sklearn.cluster._birch":
+        proj2D = reductor.fit_transform(embs)
+        clusterizer.fit(proj2D)
+        clabels = clusterizer.labels_.astype(int)
+    else:
+        print("\nERROR: Clusterizer not supported yet.\n")
+    return proj2D, clabels
+
+def visualizeCorpusProto(reductor, embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
+    """
+    Create a visual representation of the vectorized corpus using Plotly express. 
+
+    :param1 reductor (model): Dimension reduction algorithm (UMAP as default).
+    :param1 embs (list): List of dynamics embeddings for each word of the initial corpus.
+    :param2 labels (tensor): Text correponding to each encoded element.
+    :param3 embs_gold (list): List of dynamics embeddings for each word of the gold reference.
+    :param4 labels_gold (tensor): Text correponding to each encoded element.
+    :param5 labels_cluster (list): List of the token's clusters.
+    :param5 tf_values (dict): Dictionnary of Term-Frequency for each token of the text.
+    :param6 dim (int): Number of dimensions wanted for the visualization (only 1 and 2 are available because they are the most usefull).
+    """
+    def colorize(label=None, glabels=[], clabel=None, cmap=[], mode="unclustered"):
+        """
+        Colorize vector's projections depending on the context. 
+
+        :param1 label (string): Single Token.
+        :param2 glabel (list): List of gold tokens.
+        :param3 clabel (int): Cluster's index of the current token.
+        :param4 cmap (color_map): Matplotlib color map.
+        :param5 mode (string): Equals to <clustered>, <unclustered> to respectively colorize depending on gold's, cluster's belonging.
+
+        :output color (string): CSS text color.  
+        """
+        comp_gold = True if label != None and glabels != [] else False
+        assert label != None or glabels != [] or clabel != None, "ERROR: No labels detected"
+        if mode == "unclustered":
+            if comp_gold:
+                color = "green" if label in glabels else 'red'
+            else:
+                color = "red"
+        elif mode == "clustered":
+            if clabel != None and cmap != []:
+                color = cmap[clabel]
+            else:
+                color = "black"
+        return color
+    def create_word_dictionary(words):
+        """
+        Transforms list of words to dictionnary of words with value 1 (used to create TF default value).
+
+        :param1 words (list): List of words.
+
+        :output word_dict (dict): Dictionnary of words.
+        """
+        word_dict = {}
+        for word in words:
+            if word not in word_dict:
+                word_dict[word] = 1
+        return word_dict
+    
+    if tf_values == None:
+        tf_values = create_word_dictionary(labels)
+
+    comp_gold = True if embs_gold != None and labels_gold != None else False
+    
+    formated_embs = np.array(embs)
+    formated_embs_gold = np.array(embs_gold)
+
+    token_indexes = [i for i in range(len(labels)) if labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2]
+
+    if labels_cluster.all() != None:
+        cmap = colormaps["viridis"].colors
+
+    if dim == 1:
+        if len(embs[0]) != 1:
+            umap1D = UMAP(n_components=1, init='random', random_state=0)
+            proj1D = umap1D.fit_transform(formated_embs).T
+        else:
+            proj1D = np.transpose(embs)
+
+        data = {"x": proj1D[0],
+                "labels": labels,
+                "clusters": labels_cluster}
+        
+        for k in data.keys():
+            data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
+
+        if comp_gold:
+            token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
+            if len(embs[0]) != 1:
+                formated_embs_gold = reductor.transform(formated_embs_gold)
+                proj1D_gold = umap1D.transform(formated_embs_gold).T
+            else:
+                proj1D_gold = reductor.transform(formated_embs_gold).T
+            data_gold = {"x": proj1D_gold[0],
+                        "labels": labels_gold}
+            for k in data_gold.keys():
+                data_gold[k] = [data_gold[k][i] for i in range(len(data_gold[k])) if i in token_indexes_gold]
+
+        traces = []
+        for i in range(len(data['x'])):
+            if data["clusters"] != None:
+                color = colorize(clabel=data["clusters"][i], cmap=cmap, mode="clustered")
+            else:
+                color = colorize(label=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
+            trace = go.Scatter(
+                x=[data['x'][i]],
+                mode='markers',
+                marker=dict(size=9, color=color),
+                line=dict(width=2, color="DarkSlateGrey"),
+                text=["token: "+str(data['labels'][i])+" || "+"tf   : "+str(tf_values[data['labels'][i]])],
+                name=data['labels'][i]
+            )
+            traces.append(trace)
+        if comp_gold:
+            for i in range(len(data_gold['x'])):
+                trace = go.Scatter(
+                    x=[data_gold['x'][i]],
+                    mode='markers',
+                    marker=dict(size=9, color='red'),
+                    marker_symbol="diamond",
+                    line=dict(width=2, color="DarkSlateGrey"),
+                    text=["token: "+str(data_gold['labels'][i])],
+                    name=data_gold['labels'][i]
+                )
+                traces.append(trace)
+
+        layout = go.Layout(
+            title='1D Scatter Plot',
+            scene=dict(
+                xaxis=dict(title='X')
+            )
+        )
+        fig = go.Figure(data=traces, layout=layout)
+        fig.show()
+
+    elif dim == 2:
+        if len(embs[0]) != 2:
+            umap2D = UMAP(n_components=2, init='random', random_state=0)
+            proj2D = umap2D.fit_transform(formated_embs).T
+        else:
+            proj2D = np.transpose(embs)
+
+        data = {"x": proj2D[0],
+                "y": proj2D[1],
+                "labels": labels,
+                "clusters": labels_cluster}
+        
+        for k in data.keys():
+            data[k] = [data[k][i] for i in range(len(data[k])) if i in token_indexes]
+
+        if comp_gold:
+            token_indexes_gold = [i for i in range(len(labels_gold)) if labels_gold[i] != "[PAD]" and labels_gold[i] != "[CLS]" and labels_gold[i] != "[SEP]" and len(labels_gold[i])>2]
+            if len(embs[0]) != 2:
+                formated_embs_gold = reductor.transform(formated_embs_gold)
+                proj2D_gold = umap2D.transform(formated_embs_gold).T
+            else:
+                proj2D_gold = reductor.transform(formated_embs_gold).T
+            data_gold = {"x": proj2D_gold[0],
+                         "y": proj2D_gold[1],
+                         "labels": labels_gold}
+            for k in data_gold.keys():
+                data_gold[k] = [data_gold[k][i] for i in range(len(data_gold[k])) if i in token_indexes_gold]
+
+        traces = []
+        for i in range(len(data['x'])):
+            if data["clusters"] != None:
+                color = colorize(clabel=data["clusters"][i], cmap=cmap, mode="clustered")
+            else:
+                color = colorize(labels=data['labels'][i], glabels=data_gold['labels'], mode="unclustered")
+            trace = go.Scatter(
+                x=[data['x'][i]],
+                y=[data['y'][i]],
+                mode='markers',
+                marker=dict(size=9, color=color),
+                line=dict(width=2, color="DarkSlateGrey"),
+                text=["token: "+str(data['labels'][i]) +" || "+"tf   : "+str(tf_values[data['labels'][i]])+" || cluster: "+str(data["clusters"][i])],
+                name=data['labels'][i]
+            )
+            traces.append(trace)
+        if comp_gold:
+            for i in range(len(data_gold['x'])):
+                trace = go.Scatter(
+                    x=[data_gold['x'][i]],
+                    y=[data_gold['y'][i]],
+                    mode='markers',
+                    marker=dict(size=9, color='red'),
+                    marker_symbol="diamond",
+                    line=dict(width=2, color="DarkSlateGrey"),
+                    text=["token: "+str(data_gold['labels'][i])],
+                    name=data_gold['labels'][i]
+                )
+                traces.append(trace)
+
+        layout = go.Layout(
+            title='2D Scatter Plot',
+            scene=dict(
+                xaxis=dict(title='X'),
+                yaxis=dict(title='Y')
+            )
+        )
+        fig = go.Figure(data=traces, layout=layout)
+        fig.show()
 
 class MARSCore():
     def __init__(self, 
@@ -27,6 +233,7 @@ class MARSCore():
                  model=BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True), 
                  tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
                  clusterizer=hdbscan.HDBSCAN(),
+                 dim_reductor=UMAP(n_components=2, init='random', random_state=0),
                  ratio=2,
                  printRange = range(1),
                  low_memory=False,
@@ -42,12 +249,13 @@ class MARSCore():
         :param4 model (transformer): Transformer model used compute dynamic embeddings.
         :param5 tokenizer (transformer): Transformer used to create token from a plain text. 
         :param6 clusterizer (model): Model used to clusterize the dynamics embeddings.
-        :param7 ratio (float or int): Number determining how much the reference text will be shortened.
-        :param8 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
-        :param9 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
-        :param10 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
-        :param11 expe_params (dict): Differents parameters usefull for experimentation purpose.
-        :param12 extraction_method (str): Method of extraction for BERT embeddings.
+        :param7 dim_reductor (model): Dimension reduction algorithm (UMAP as default).
+        :param8 ratio (float or int): Number determining how much the reference text will be shortened.
+        :param9 printRange (range): Range of corpus that should be displayed when the Refiner object in printed.
+        :param10 low_memory (bool): If set to True, stores many informations about computation allowing to compute class printing and visualization.
+        :param11 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
+        :param12 expe_params (dict): Differents parameters usefull for experimentation purpose.
+        :param13 extraction_method (str): Method of extraction for BERT embeddings.
         """
         self.corpus = corpus
         self.gold = gold
@@ -55,9 +263,11 @@ class MARSCore():
         self.model = model
         self.tokenizer = tokenizer
         self.clusterizer = clusterizer
+        self.dim_reductor = dim_reductor
         self.extraction_method = extraction_method
         self.ratio = ratio
         self.vectors = []
+        self.reduced_vectors = []
         self.labels = []
         self.clusters_labels = []
         self.clusters_tfs = []
@@ -105,8 +315,9 @@ class MARSCore():
                 normalized_distances = scaler.fit_transform(distances)
                 normalized_distances = 0.5 * (normalized_distances + normalized_distances.T)
                 self.similarity_matrices.append(normalized_distances)
-            clabels = clusterizeCorpus(v, self.clusterizer)
+            reduced_v, clabels = clusterizeCorpusProto(self.dim_reductor, v, self.clusterizer)
             if not(self.low_memory):
+                self.reduced_vectors.append(reduced_v)
                 self.clusters_labels.append(clabels)
 
             #TF calculation
@@ -263,7 +474,7 @@ class MARSCore():
             o_gold, l_gold = tokenizeCorpus(self.gold[indiv])
             v_gold = vectorizeCorpus(o_gold, method=self.extraction_method)
             v_gold, l_gold = cleanAll(v_gold, l_gold) 
-            visualizeCorpus(self.vectors[indiv], self.labels[indiv], v_gold, l_gold, self.clusters_labels[indiv], self.tokens_tfs[indiv], dim)
+            visualizeCorpusProto(self.dim_reductor, self.reduced_vectors[indiv], self.labels[indiv], v_gold, l_gold, self.clusters_labels[indiv], self.tokens_tfs[indiv], dim)
         else:
             print(f"\n{Fore.RED}Low memory mode activated: very likely that required attributes were not stored during computation{Style.RESET_ALL}\n\n")
 
