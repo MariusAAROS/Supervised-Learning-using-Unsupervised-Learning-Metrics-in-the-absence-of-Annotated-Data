@@ -438,8 +438,13 @@ def optimized_score(tokens_dict, clusters_tfs):
     scores = {}
     for k, v in tokens_dict.items():
         try:
-            max_dist = biggerDistance(v["embs"])
-            scores[k] = clusters_tfs[k]/(max_dist*len(v["tokens"])) if max_dist > 0 else 0
+            if v["embs"].shape[0] == 1:
+                scores[k] = 0
+            elif v["embs"].shape[0] == 2:
+                scores[k] = euclideanDistance(v["embs"][0], v["embs"][1])
+            else:
+                max_dist = biggerDistance(v["embs"])
+                scores[k] = clusters_tfs[k]/(max_dist*len(v["tokens"])) if max_dist > 0 else 0
         except QhullError:
             print("Unfeasable convex hull")
             scores[k] = 0
