@@ -389,17 +389,42 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
         fig.show()
 
 def euclideanDistance(p, q):
+    """
+    Calculates Euclidean distance between 2 n-dimensional points.
+
+    :param1 p (list): N dimensional point.
+    :param2 q (list): N dimensional point.
+
+    :output: Euclidean distance between the points.
+    """
     p = np.array(p)
     q = np.array(q)
     return np.linalg.norm(p - q)
 
 def crossProduct(p, q, r):
+    """
+    Calculates the cross product of two 3D vectors.
+
+    :param p (list): Starting point of the first vector.
+    :param q (list): Ending point of the first vector.
+    :param r (list): Another point through which the second vector passes.
+
+    :output: The cross product vector of the two input vectors.
+    """
+
     pq = np.array(q) - np.array(p)
     pr = np.array(r) - np.array(p)
     return np.cross(pq, pr)
     
 def rotatingCaliper(points, convex_hull):
-   
+    """
+    Computes rotation calipers algorithm to a list of points. 
+
+    :param1 points (list): list of N dimensional points. 
+    :param2 convex_hull (ConvexHull): Convex hull calculated from the points.
+
+    output res (float): Greatest point-to-point distance within the group of points.
+    """
     # Takes O(n)
     hull = [points[i] for i in range(len(points)) if i in convex_hull.vertices]
     n = len(hull)
@@ -430,11 +455,26 @@ def rotatingCaliper(points, convex_hull):
     return res
 
 def biggerDistance(points):
+    """
+    Returns the bigger point-to-point distance in a list of points.
+
+    :param1 points (list): List of N-dimensional points.
+    
+    :output: Greatest in-group distance.
+    """
     points = np.array(points)
     convex_hull = ConvexHull(points)
     return rotatingCaliper(points, convex_hull)
 
 def optimized_score(tokens_dict, clusters_tfs):
+    """
+    Relevancy score calculated for each cluster of the corpus.
+
+    :param1 token_dicts (dict): Dictionnary containing embeddings and associated tokens for each cluster.
+    :param2 clusters-tfs (dict): Dictionnary of clutster's tf values.
+
+    :output scores (dict): Dictionnary of scores for each cluster.
+    """
     scores = {}
     for k, v in tokens_dict.items():
         try:
@@ -612,6 +652,15 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
         return norm_d
     
     def tokens_per_cluster(tokens, clabels, embs):
+        """
+        Groups embeddings and tokens by cluster.
+
+        :param1 tokens (list): List of text tokens associated with each embedding.
+        :param2 clabels (list): List of token's cluster index.
+        :param3 embs (list): List of embedding vectors for each token.
+
+        :output d (dict): Dictionnary containing embeddings and associated tokens for each cluster.
+        """
         d = {}
         for token, clabel, emb in zip(tokens, clabels, embs):
             if clabel in d.keys():
