@@ -3,7 +3,7 @@ Rows:       638
 Columns:    771 (771 integer, 771 binary)
 Non-zeros:  2647
 Status:     INTEGER OPTIMAL
-Objective:  score = 39240.596 (MAXimum)
+Objective:  score = 9089.506 (MAXimum)
 
    No.   Row name        Activity     Lower bound   Upper bound
 ------ ------------    ------------- ------------- -------------
@@ -66,7 +66,7 @@ Objective:  score = 39240.596 (MAXimum)
     57 index_56                    0             0               
     58 index_57                    0             0               
     59 index_58                    0             0               
-    60 index_59                   13             0               
+    60 index_59                    9             0               
     61 index_60                    0             0               
     62 index_61                    0             0               
     63 index_62                    0             0               
@@ -103,7 +103,7 @@ Objective:  score = 39240.596 (MAXimum)
     94 index_93                    0             0               
     95 index_94                    0             0               
     96 index_95                    0             0               
-    97 index_96                    0             0               
+    97 index_96                    2             0               
     98 index_97                    0             0               
     99 index_98                    0             0               
    100 index_99                    0             0               
@@ -124,7 +124,7 @@ Objective:  score = 39240.596 (MAXimum)
    115 index_114                   0             0               
    116 index_115                   0             0               
    117 index_116                   0             0               
-   118 index_117                   0             0               
+   118 index_117                   1             0               
    119 index_118                   0             0               
    120 index_119                   0             0               
    121 index_120                   0             0               
@@ -137,7 +137,7 @@ Objective:  score = 39240.596 (MAXimum)
    128 index_127                   0             0               
    129 index_128                   0             0               
    130 index_129                   0             0               
-   131 index_130                   0             0               
+   131 index_130                   1             0               
    132 index_131                   0             0               
    133 index_132                   0             0               
    134 index_133                   0             0               
@@ -148,31 +148,31 @@ Objective:  score = 39240.596 (MAXimum)
    139 index_138                   0             0               
    140 index_139                   0             0               
    141 index_140                   0             0               
-   142 index_141                   0             0               
-   143 index_142                   0             0               
-   144 index_143                   0             0               
-   145 index_144                   0             0               
+   142 index_141                   1             0               
+   143 index_142                   1             0               
+   144 index_143                   1             0               
+   145 index_144                   1             0               
    146 index_145                   1             0               
-   147 index_146                   0             0               
-   148 index_147                   0             0               
-   149 index_148                   0             0               
-   150 index_149                   0             0               
-   151 index_150                   0             0               
-   152 index_151                   0             0               
-   153 index_152                   0             0               
-   154 index_153                   2             0               
-   155 index_154                   0             0               
-   156 index_155                   0             0               
-   157 index_156                   0             0               
+   147 index_146                   1             0               
+   148 index_147                   1             0               
+   149 index_148                   1             0               
+   150 index_149                   1             0               
+   151 index_150                   1             0               
+   152 index_151                   1             0               
+   153 index_152                   1             0               
+   154 index_153                   1             0               
+   155 index_154                   1             0               
+   156 index_155                   1             0               
+   157 index_156                   1             0               
    158 index_157                   0             0               
    159 index_158                   0             0               
    160 index_159                   0             0               
    161 index_160                   0             0               
-   162 index_161                   2             0               
+   162 index_161                   7             0               
    163 index_162                   0             0               
    164 index_163                   0             0               
    165 index_164                   0             0               
-   166 index_165                   4             0               
+   166 index_165                   3             0               
    167 index_166                   0             0               
    168 index_167                   0             0               
    169 index_168                   0             0               
@@ -186,7 +186,7 @@ Objective:  score = 39240.596 (MAXimum)
    177 index_176                   0             0               
    178 index_177                   0             0               
    179 index_178                   0             0               
-   180 index_179                   1             0               
+   180 index_179                   0             0               
    181 index_180                   0             0               
    182 index_181                   0             0               
    183 index_182                   0             0               
@@ -198,9 +198,9 @@ Objective:  score = 39240.596 (MAXimum)
    189 index_188                   0             0               
    190 index_189                   0             0               
    191 index_190                   1             0               
-   192 index_191                   0             0               
+   192 index_191                   9             0               
    193 index_192                   0             0               
-   194 index_193                   1             0               
+   194 index_193                   0             0               
    195 index_194                   0             0               
    196 index_195                   0             0               
    197 index_196                   0             0               
@@ -210,7 +210,7 @@ Objective:  score = 39240.596 (MAXimum)
    201 index_200                   0             0               
    202 index_201                   0             0               
    203 index_202                   0             0               
-   204 index_203                   0             0               
+   204 index_203                   1             0               
    205 index_204                   0             0               
    206 index_205                   0             0               
    207 index_206                   0             0               
@@ -222,16 +222,16 @@ Objective:  score = 39240.596 (MAXimum)
    213 index_212                   0             0               
    214 index_213                   0             0               
    215 index_214                   0             0               
-   216 index_215                   2             0               
+   216 index_215                   0             0               
    217 index_216                   0             0               
    218 index_217                   0             0               
    219 index_218                   0             0               
-   220 index_219                   0             0               
-   221 index_220                   0             0               
-   222 index_221                   0             0               
-   223 index_222                   9             0               
+   220 index_219                   1             0               
+   221 index_220                   1             0               
+   222 index_221                   1             0               
+   223 index_222                   1             0               
    224 index_223                   1             0               
-   225 index_224                   0             0               
+   225 index_224                   1             0               
    226 index_225                   0             0               
    227 index_226                   0             0               
    228 index_227                   0             0               
@@ -253,10 +253,10 @@ Objective:  score = 39240.596 (MAXimum)
    244 index_243                   0             0               
    245 index_244                   0             0               
    246 index_245                   0             0               
-   247 index_246                   6             0               
+   247 index_246                   5             0               
    248 index_247                   0             0               
    249 index_248                   0             0               
-   250 index_249                   2             0               
+   250 index_249                   3             0               
    251 index_250                   0             0               
    252 index_251                   0             0               
    253 index_252                   0             0               
@@ -266,7 +266,7 @@ Objective:  score = 39240.596 (MAXimum)
    257 index_256                   0             0               
    258 index_257                   0             0               
    259 index_258                   0             0               
-   260 index_259                   2             0               
+   260 index_259                   0             0               
    261 index_260                   0             0               
    262 index_261                   0             0               
    263 index_262                   0             0               
@@ -279,7 +279,7 @@ Objective:  score = 39240.596 (MAXimum)
    270 index_269                   0             0               
    271 index_270                   0             0               
    272 index_271                   0             0               
-   273 index_272                   0             0               
+   273 index_272                   1             0               
    274 index_273                   0             0               
    275 index_274                   0             0               
    276 index_275                   0             0               
@@ -295,7 +295,7 @@ Objective:  score = 39240.596 (MAXimum)
    286 index_285                   0             0               
    287 index_286                   0             0               
    288 index_287                   0             0               
-   289 index_288                   6             0               
+   289 index_288                   4             0               
    290 index_289                   0             0               
    291 index_290                   0             0               
    292 index_291                   0             0               
@@ -304,7 +304,7 @@ Objective:  score = 39240.596 (MAXimum)
    295 index_294                   0             0               
    296 index_295                   0             0               
    297 index_296                   0             0               
-   298 index_297                   1             0               
+   298 index_297                   0             0               
    299 index_298                   0             0               
    300 index_299                   0             0               
    301 index_300                   0             0               
@@ -318,7 +318,7 @@ Objective:  score = 39240.596 (MAXimum)
    309 index_308                   0             0               
    310 index_309                   0             0               
    311 index_310                   0             0               
-   312 index_311                   3             0               
+   312 index_311                   0             0               
    313 index_312                   0             0               
    314 index_313                   0             0               
    315 index_314                   0             0               
@@ -333,9 +333,9 @@ Objective:  score = 39240.596 (MAXimum)
    324 index_323                   0             0               
    325 index_324                   0             0               
    326 index_325                   0             0               
-   327 index_326                   0             0               
-   328 index_327                   0             0               
-   329 index_328                   0             0               
+   327 index_326                   1             0               
+   328 index_327                   1             0               
+   329 index_328                   1             0               
    330 index_329                   0             0               
    331 index_330                   0             0               
    332 index_331                   0             0               
@@ -343,7 +343,7 @@ Objective:  score = 39240.596 (MAXimum)
    334 index_333                   0             0               
    335 index_334                   0             0               
    336 index_335                   0             0               
-   337 index_336                   1             0               
+   337 index_336                   2             0               
    338 index_337                   0             0               
    339 index_338                   0             0               
    340 index_339                   0             0               
@@ -395,31 +395,31 @@ Objective:  score = 39240.596 (MAXimum)
    386 index_385                   0             0               
    387 index_386                   0             0               
    388 index_387                   0             0               
-   389 index_388                   4             0               
+   389 index_388                   2             0               
    390 index_389                   0             0               
    391 index_390                   0             0               
-   392 index_391                   0             0               
-   393 index_392                   0             0               
-   394 index_393                   2             0               
+   392 index_391                   1             0               
+   393 index_392                   1             0               
+   394 index_393                   3             0               
    395 index_394                   0             0               
-   396 index_395                   0             0               
-   397 index_396                   0             0               
-   398 index_397                   0             0               
+   396 index_395                   1             0               
+   397 index_396                   2             0               
+   398 index_397                   1             0               
    399 index_398                   0             0               
-   400 index_399                   0             0               
+   400 index_399                   1             0               
    401 index_400                   0             0               
    402 index_401                   0             0               
    403 index_402                   0             0               
-   404 index_403                   0             0               
+   404 index_403                   1             0               
    405 index_404                   0             0               
-   406 index_405                   0             0               
+   406 index_405                   2             0               
    407 index_406                   0             0               
    408 index_407                   0             0               
-   409 index_408                   1             0               
+   409 index_408                   0             0               
    410 index_409                   0             0               
    411 index_410                   0             0               
    412 index_411                   0             0               
-   413 index_412                   1             0               
+   413 index_412                   0             0               
    414 index_413                   0             0               
    415 index_414                   0             0               
    416 index_415                   0             0               
@@ -442,8 +442,8 @@ Objective:  score = 39240.596 (MAXimum)
    433 index_432                   0             0               
    434 index_433                   0             0               
    435 index_434                   0             0               
-   436 index_435                   0             0               
-   437 index_436                   0             0               
+   436 index_435                   1             0               
+   437 index_436                   1             0               
    438 index_437                   0             0               
    439 index_438                   0             0               
    440 index_439                   0             0               
@@ -455,13 +455,13 @@ Objective:  score = 39240.596 (MAXimum)
    446 index_445                   1             0               
    447 index_446                   0             0               
    448 index_447                   0             0               
-   449 index_448                   2             0               
+   449 index_448                   1             0               
    450 index_449                   0             0               
    451 index_450                   0             0               
    452 index_451                   0             0               
-   453 index_452                   6             0               
+   453 index_452                   2             0               
    454 index_453                   0             0               
-   455 index_454                   0             0               
+   455 index_454                   1             0               
    456 index_455                   0             0               
    457 index_456                   0             0               
    458 index_457                   0             0               
@@ -474,14 +474,14 @@ Objective:  score = 39240.596 (MAXimum)
    465 index_464                   0             0               
    466 index_465                   0             0               
    467 index_466                   0             0               
-   468 index_467                   2             0               
+   468 index_467                   1             0               
    469 index_468                   0             0               
    470 index_469                   0             0               
    471 index_470                   0             0               
    472 index_471                   0             0               
    473 index_472                   0             0               
    474 index_473                   0             0               
-   475 index_474                   0             0               
+   475 index_474                   3             0               
    476 index_475                   0             0               
    477 index_476                   0             0               
    478 index_477                   0             0               
@@ -490,8 +490,8 @@ Objective:  score = 39240.596 (MAXimum)
    481 index_480                   0             0               
    482 index_481                   0             0               
    483 index_482                   0             0               
-   484 index_483                   0             0               
-   485 index_484                   0             0               
+   484 index_483                   2             0               
+   485 index_484                   1             0               
    486 index_485                   0             0               
    487 index_486                   0             0               
    488 index_487                   0             0               
@@ -532,7 +532,7 @@ Objective:  score = 39240.596 (MAXimum)
    523 index_522                   0             0               
    524 index_523                   0             0               
    525 index_524                   0             0               
-   526 index_525                   1             0               
+   526 index_525                   0             0               
    527 index_526                   1             0               
    528 index_527                   0             0               
    529 index_528                   0             0               
@@ -546,30 +546,30 @@ Objective:  score = 39240.596 (MAXimum)
    537 index_536                   0             0               
    538 index_537                   0             0               
    539 index_538                   0             0               
-   540 index_539                   0             0               
-   541 index_540                   0             0               
-   542 index_541                   0             0               
-   543 index_542                   0             0               
-   544 index_543                   0             0               
-   545 index_544                   0             0               
-   546 index_545                   0             0               
-   547 index_546                   0             0               
-   548 index_547                   0             0               
-   549 index_548                   0             0               
-   550 index_549                   0             0               
-   551 index_550                   0             0               
-   552 index_551                   0             0               
-   553 index_552                   0             0               
-   554 index_553                   0             0               
-   555 index_554                   0             0               
-   556 index_555                   0             0               
+   540 index_539                   1             0               
+   541 index_540                   1             0               
+   542 index_541                   1             0               
+   543 index_542                   1             0               
+   544 index_543                   1             0               
+   545 index_544                   1             0               
+   546 index_545                   1             0               
+   547 index_546                   1             0               
+   548 index_547                   1             0               
+   549 index_548                   1             0               
+   550 index_549                   1             0               
+   551 index_550                   1             0               
+   552 index_551                   2             0               
+   553 index_552                   1             0               
+   554 index_553                   1             0               
+   555 index_554                   1             0               
+   556 index_555                   1             0               
    557 index_556                   0             0               
    558 index_557                   0             0               
    559 index_558                   0             0               
    560 index_559                   0             0               
    561 index_560                   0             0               
    562 index_561                   0             0               
-   563 index_562                  16             0               
+   563 index_562                   7             0               
    564 index_563                   0             0               
    565 index_564                   0             0               
    566 index_565                   0             0               
@@ -612,7 +612,7 @@ Objective:  score = 39240.596 (MAXimum)
    603 index_602                   0             0               
    604 index_603                   0             0               
    605 index_604                   0             0               
-   606 index_605                   2             0               
+   606 index_605                   1             0               
    607 index_606                   0             0               
    608 index_607                   0             0               
    609 index_608                   0             0               
@@ -630,15 +630,15 @@ Objective:  score = 39240.596 (MAXimum)
    621 index_620                   0             0               
    622 index_621                   0             0               
    623 index_622                   0             0               
-   624 index_623                   0             0               
+   624 index_623                   1             0               
    625 index_624                   0             0               
    626 index_625                   0             0               
-   627 index_626                   1             0               
-   628 index_627                   5             0               
+   627 index_626                   0             0               
+   628 index_627                   3             0               
    629 index_628                   0             0               
    630 index_629                   0             0               
-   631 index_630                   3             0               
-   632 index_631                   4             0               
+   631 index_630                   2             0               
+   632 index_631                   0             0               
    633 index_632                   0             0               
    634 index_633                   0             0               
    635 index_634                   0             0               
@@ -701,7 +701,7 @@ Objective:  score = 39240.596 (MAXimum)
     51 c50          *              0             0             1 
     52 c51          *              0             0             1 
     53 c52          *              0             0             1 
-    54 c53          *              0             0             1 
+    54 c53          *              1             0             1 
     55 c54          *              0             0             1 
     56 c55          *              0             0             1 
     57 c56          *              0             0             1 
@@ -716,7 +716,7 @@ Objective:  score = 39240.596 (MAXimum)
     66 c65          *              0             0             1 
     67 c66          *              0             0             1 
     68 c67          *              0             0             1 
-    69 c68          *              1             0             1 
+    69 c68          *              0             0             1 
     70 c69          *              0             0             1 
     71 c70          *              0             0             1 
     72 c71          *              0             0             1 
@@ -740,11 +740,11 @@ Objective:  score = 39240.596 (MAXimum)
     90 c89          *              0             0             1 
     91 c90          *              0             0             1 
     92 c91          *              0             0             1 
-    93 c92          *              1             0             1 
+    93 c92          *              0             0             1 
     94 c93          *              0             0             1 
     95 c94          *              0             0             1 
     96 c95          *              0             0             1 
-    97 c96          *              1             0             1 
+    97 c96          *              0             0             1 
     98 c97          *              0             0             1 
     99 c98          *              0             0             1 
    100 c99          *              0             0             1 
@@ -766,7 +766,7 @@ Objective:  score = 39240.596 (MAXimum)
    116 c115         *              0             0             1 
    117 c116         *              0             0             1 
    118 c117         *              0             0             1 
-   119 c118         *              1             0             1 
+   119 c118         *              0             0             1 
    120 c119         *              0             0             1 
    121 c120         *              0             0             1 
    122 c121         *              0             0             1 
@@ -774,51 +774,51 @@ Objective:  score = 39240.596 (MAXimum)
    124 c123         *              0             0             1 
    125 c124         *              0             0             1 
    126 c125         *              0             0             1 
-   127 c126         *              1             0             1 
-   128 c127         *              1             0             1 
-   129 c128         *              1             0             1 
-   130 c129         *              1             0             1 
-   131 c130         *              1             0             1 
-   132 c131         *              1             0             1 
-   133 c132         *              1             0             1 
-   134 c133         *              1             0             1 
-   135 c134         *              1             0             1 
-   136 c135         *              1             0             1 
-   137 c136         *              1             0             1 
-   138 c137         *              1             0             1 
-   139 c138         *              1             0             1 
-   140 c139         *              1             0             1 
-   141 c140         *              1             0             1 
-   142 c141         *              1             0             1 
-   143 c142         *              1             0             1 
-   144 c143         *              1             0             1 
-   145 c144         *              1             0             1 
+   127 c126         *              0             0             1 
+   128 c127         *              0             0             1 
+   129 c128         *              0             0             1 
+   130 c129         *              0             0             1 
+   131 c130         *              0             0             1 
+   132 c131         *              0             0             1 
+   133 c132         *              0             0             1 
+   134 c133         *              0             0             1 
+   135 c134         *              0             0             1 
+   136 c135         *              0             0             1 
+   137 c136         *              0             0             1 
+   138 c137         *              0             0             1 
+   139 c138         *              0             0             1 
+   140 c139         *              0             0             1 
+   141 c140         *              0             0             1 
+   142 c141         *              0             0             1 
+   143 c142         *              0             0             1 
+   144 c143         *              0             0             1 
+   145 c144         *              0             0             1 
    146 c145         *              1             0             1 
-   147 c146         *              1             0             1 
-   148 c147         *              1             0             1 
-   149 c148         *              1             0             1 
-   150 c149         *              1             0             1 
-   151 c150         *              1             0             1 
-   152 c151         *              1             0             1 
-   153 c152         *              1             0             1 
+   147 c146         *              0             0             1 
+   148 c147         *              0             0             1 
+   149 c148         *              0             0             1 
+   150 c149         *              0             0             1 
+   151 c150         *              0             0             1 
+   152 c151         *              0             0             1 
+   153 c152         *              0             0             1 
    154 c153         *              1             0             1 
-   155 c154         *              1             0             1 
-   156 c155         *              1             0             1 
-   157 c156         *              1             0             1 
+   155 c154         *              0             0             1 
+   156 c155         *              0             0             1 
+   157 c156         *              0             0             1 
    158 c157         *              0             0             1 
-   159 c158         *              1             0             1 
-   160 c159         *              1             0             1 
-   161 c160         *              1             0             1 
-   162 c161         *              1             0             1 
-   163 c162         *              1             0             1 
-   164 c163         *              1             0             1 
-   165 c164         *              1             0             1 
-   166 c165         *              1             0             1 
-   167 c166         *              1             0             1 
-   168 c167         *              1             0             1 
-   169 c168         *              1             0             1 
-   170 c169         *              1             0             1 
-   171 c170         *              1             0             1 
+   159 c158         *              0             0             1 
+   160 c159         *              0             0             1 
+   161 c160         *              0             0             1 
+   162 c161         *              0             0             1 
+   163 c162         *              0             0             1 
+   164 c163         *              0             0             1 
+   165 c164         *              0             0             1 
+   166 c165         *              0             0             1 
+   167 c166         *              0             0             1 
+   168 c167         *              0             0             1 
+   169 c168         *              0             0             1 
+   170 c169         *              0             0             1 
+   171 c170         *              0             0             1 
    172 c171         *              0             0             1 
    173 c172         *              0             0             1 
    174 c173         *              0             0             1 
@@ -841,17 +841,17 @@ Objective:  score = 39240.596 (MAXimum)
    191 c190         *              1             0             1 
    192 c191         *              1             0             1 
    193 c192         *              0             0             1 
-   194 c193         *              1             0             1 
+   194 c193         *              0             0             1 
    195 c194         *              0             0             1 
    196 c195         *              0             0             1 
    197 c196         *              0             0             1 
-   198 c197         *              1             0             1 
+   198 c197         *              0             0             1 
    199 c198         *              0             0             1 
    200 c199         *              0             0             1 
    201 c200         *              0             0             1 
    202 c201         *              0             0             1 
    203 c202         *              0             0             1 
-   204 c203         *              0             0             1 
+   204 c203         *              1             0             1 
    205 c204         *              0             0             1 
    206 c205         *              0             0             1 
    207 c206         *              1             0             1 
@@ -862,11 +862,11 @@ Objective:  score = 39240.596 (MAXimum)
    212 c211         *              0             0             1 
    213 c212         *              0             0             1 
    214 c213         *              0             0             1 
-   215 c214         *              1             0             1 
-   216 c215         *              1             0             1 
-   217 c216         *              1             0             1 
-   218 c217         *              1             0             1 
-   219 c218         *              1             0             1 
+   215 c214         *              0             0             1 
+   216 c215         *              0             0             1 
+   217 c216         *              0             0             1 
+   218 c217         *              0             0             1 
+   219 c218         *              0             0             1 
    220 c219         *              1             0             1 
    221 c220         *              0             0             1 
    222 c221         *              0             0             1 
@@ -874,7 +874,7 @@ Objective:  score = 39240.596 (MAXimum)
    224 c223         *              1             0             1 
    225 c224         *              0             0             1 
    226 c225         *              0             0             1 
-   227 c226         *              1             0             1 
+   227 c226         *              0             0             1 
    228 c227         *              0             0             1 
    229 c228         *              1             0             1 
    230 c229         *              0             0             1 
@@ -887,14 +887,14 @@ Objective:  score = 39240.596 (MAXimum)
    237 c236         *              0             0             1 
    238 c237         *              0             0             1 
    239 c238         *              0             0             1 
-   240 c239         *              1             0             1 
+   240 c239         *              0             0             1 
    241 c240         *              0             0             1 
    242 c241         *              0             0             1 
    243 c242         *              0             0             1 
    244 c243         *              0             0             1 
    245 c244         *              0             0             1 
    246 c245         *              0             0             1 
-   247 c246         *              1             0             1 
+   247 c246         *              0             0             1 
    248 c247         *              1             0             1 
    249 c248         *              0             0             1 
    250 c249         *              1             0             1 
@@ -903,7 +903,7 @@ Objective:  score = 39240.596 (MAXimum)
    253 c252         *              1             0             1 
    254 c253         *              0             0             1 
    255 c254         *              0             0             1 
-   256 c255         *              0             0             1 
+   256 c255         *              1             0             1 
    257 c256         *              0             0             1 
    258 c257         *              0             0             1 
    259 c258         *              0             0             1 
@@ -912,35 +912,35 @@ Objective:  score = 39240.596 (MAXimum)
    262 c261         *              0             0             1 
    263 c262         *              0             0             1 
    264 c263         *              0             0             1 
-   265 c264         *              1             0             1 
-   266 c265         *              1             0             1 
+   265 c264         *              0             0             1 
+   266 c265         *              0             0             1 
    267 c266         *              0             0             1 
    268 c267         *              0             0             1 
    269 c268         *              0             0             1 
    270 c269         *              0             0             1 
    271 c270         *              0             0             1 
-   272 c271         *              1             0             1 
-   273 c272         *              1             0             1 
-   274 c273         *              1             0             1 
-   275 c274         *              1             0             1 
+   272 c271         *              0             0             1 
+   273 c272         *              0             0             1 
+   274 c273         *              0             0             1 
+   275 c274         *              0             0             1 
    276 c275         *              0             0             1 
    277 c276         *              0             0             1 
-   278 c277         *              1             0             1 
+   278 c277         *              0             0             1 
    279 c278         *              0             0             1 
    280 c279         *              1             0             1 
-   281 c280         *              1             0             1 
+   281 c280         *              0             0             1 
    282 c281         *              0             0             1 
    283 c282         *              1             0             1 
    284 c283         *              0             0             1 
    285 c284         *              0             0             1 
    286 c285         *              0             0             1 
    287 c286         *              0             0             1 
-   288 c287         *              0             0             1 
+   288 c287         *              1             0             1 
    289 c288         *              1             0             1 
    290 c289         *              0             0             1 
    291 c290         *              0             0             1 
-   292 c291         *              1             0             1 
-   293 c292         *              0             0             1 
+   292 c291         *              0             0             1 
+   293 c292         *              1             0             1 
    294 c293         *              0             0             1 
    295 c294         *              0             0             1 
    296 c295         *              0             0             1 
@@ -969,14 +969,14 @@ Objective:  score = 39240.596 (MAXimum)
    319 c318         *              0             0             1 
    320 c319         *              0             0             1 
    321 c320         *              0             0             1 
-   322 c321         *              1             0             1 
+   322 c321         *              0             0             1 
    323 c322         *              0             0             1 
    324 c323         *              0             0             1 
    325 c324         *              0             0             1 
    326 c325         *              0             0             1 
-   327 c326         *              1             0             1 
-   328 c327         *              1             0             1 
-   329 c328         *              1             0             1 
+   327 c326         *              0             0             1 
+   328 c327         *              0             0             1 
+   329 c328         *              0             0             1 
    330 c329         *              0             0             1 
    331 c330         *              0             0             1 
    332 c331         *              0             0             1 
@@ -984,7 +984,7 @@ Objective:  score = 39240.596 (MAXimum)
    334 c333         *              0             0             1 
    335 c334         *              0             0             1 
    336 c335         *              0             0             1 
-   337 c336         *              1             0             1 
+   337 c336         *              0             0             1 
    338 c337         *              0             0             1 
    339 c338         *              0             0             1 
    340 c339         *              0             0             1 
@@ -1030,7 +1030,7 @@ Objective:  score = 39240.596 (MAXimum)
    380 c379         *              0             0             1 
    381 c380         *              0             0             1 
    382 c381         *              0             0             1 
-   383 c382         *              1             0             1 
+   383 c382         *              0             0             1 
    384 c383         *              0             0             1 
    385 c384         *              0             0             1 
    386 c385         *              0             0             1 
@@ -1041,11 +1041,11 @@ Objective:  score = 39240.596 (MAXimum)
    391 c390         *              0             0             1 
    392 c391         *              0             0             1 
    393 c392         *              0             0             1 
-   394 c393         *              1             0             1 
-   395 c394         *              0             0             1 
+   394 c393         *              0             0             1 
+   395 c394         *              1             0             1 
    396 c395         *              0             0             1 
-   397 c396         *              1             0             1 
-   398 c397         *              1             0             1 
+   397 c396         *              0             0             1 
+   398 c397         *              0             0             1 
    399 c398         *              1             0             1 
    400 c399         *              0             0             1 
    401 c400         *              0             0             1 
@@ -1053,7 +1053,7 @@ Objective:  score = 39240.596 (MAXimum)
    403 c402         *              0             0             1 
    404 c403         *              0             0             1 
    405 c404         *              0             0             1 
-   406 c405         *              0             0             1 
+   406 c405         *              1             0             1 
    407 c406         *              0             0             1 
    408 c407         *              1             0             1 
    409 c408         *              1             0             1 
@@ -1080,27 +1080,27 @@ Objective:  score = 39240.596 (MAXimum)
    430 c429         *              0             0             1 
    431 c430         *              0             0             1 
    432 c431         *              0             0             1 
-   433 c432         *              1             0             1 
+   433 c432         *              0             0             1 
    434 c433         *              0             0             1 
    435 c434         *              0             0             1 
-   436 c435         *              0             0             1 
+   436 c435         *              1             0             1 
    437 c436         *              1             0             1 
    438 c437         *              0             0             1 
    439 c438         *              0             0             1 
    440 c439         *              0             0             1 
    441 c440         *              0             0             1 
-   442 c441         *              1             0             1 
+   442 c441         *              0             0             1 
    443 c442         *              0             0             1 
    444 c443         *              0             0             1 
    445 c444         *              0             0             1 
-   446 c445         *              1             0             1 
-   447 c446         *              0             0             1 
+   446 c445         *              0             0             1 
+   447 c446         *              1             0             1 
    448 c447         *              0             0             1 
    449 c448         *              1             0             1 
    450 c449         *              0             0             1 
    451 c450         *              0             0             1 
    452 c451         *              0             0             1 
-   453 c452         *              1             0             1 
+   453 c452         *              0             0             1 
    454 c453         *              0             0             1 
    455 c454         *              0             0             1 
    456 c455         *              0             0             1 
@@ -1115,7 +1115,7 @@ Objective:  score = 39240.596 (MAXimum)
    465 c464         *              0             0             1 
    466 c465         *              0             0             1 
    467 c466         *              0             0             1 
-   468 c467         *              1             0             1 
+   468 c467         *              0             0             1 
    469 c468         *              0             0             1 
    470 c469         *              0             0             1 
    471 c470         *              0             0             1 
@@ -1123,7 +1123,7 @@ Objective:  score = 39240.596 (MAXimum)
    473 c472         *              0             0             1 
    474 c473         *              0             0             1 
    475 c474         *              0             0             1 
-   476 c475         *              0             0             1 
+   476 c475         *              1             0             1 
    477 c476         *              0             0             1 
    478 c477         *              0             0             1 
    479 c478         *              0             0             1 
@@ -1147,13 +1147,13 @@ Objective:  score = 39240.596 (MAXimum)
    497 c496         *              0             0             1 
    498 c497         *              0             0             1 
    499 c498         *              0             0             1 
-   500 c499         *              1             0             1 
-   501 c500         *              1             0             1 
+   500 c499         *              0             0             1 
+   501 c500         *              0             0             1 
    502 c501         *              0             0             1 
    503 c502         *              0             0             1 
    504 c503         *              0             0             1 
    505 c504         *              0             0             1 
-   506 c505         *              1             0             1 
+   506 c505         *              0             0             1 
    507 c506         *              0             0             1 
    508 c507         *              0             0             1 
    509 c508         *              0             0             1 
@@ -1173,13 +1173,13 @@ Objective:  score = 39240.596 (MAXimum)
    523 c522         *              0             0             1 
    524 c523         *              0             0             1 
    525 c524         *              0             0             1 
-   526 c525         *              1             0             1 
-   527 c526         *              1             0             1 
+   526 c525         *              0             0             1 
+   527 c526         *              0             0             1 
    528 c527         *              0             0             1 
    529 c528         *              0             0             1 
    530 c529         *              0             0             1 
    531 c530         *              0             0             1 
-   532 c531         *              1             0             1 
+   532 c531         *              0             0             1 
    533 c532         *              0             0             1 
    534 c533         *              0             0             1 
    535 c534         *              0             0             1 
@@ -1202,8 +1202,8 @@ Objective:  score = 39240.596 (MAXimum)
    552 c551         *              0             0             1 
    553 c552         *              0             0             1 
    554 c553         *              0             0             1 
-   555 c554         *              0             0             1 
-   556 c555         *              0             0             1 
+   555 c554         *              1             0             1 
+   556 c555         *              1             0             1 
    557 c556         *              0             0             1 
    558 c557         *              0             0             1 
    559 c558         *              0             0             1 
@@ -1263,26 +1263,26 @@ Objective:  score = 39240.596 (MAXimum)
    613 c612         *              0             0             1 
    614 c613         *              0             0             1 
    615 c614         *              0             0             1 
-   616 c615         *              1             0             1 
+   616 c615         *              0             0             1 
    617 c616         *              0             0             1 
    618 c617         *              0             0             1 
    619 c618         *              0             0             1 
    620 c619         *              0             0             1 
    621 c620         *              0             0             1 
-   622 c621         *              0             0             1 
+   622 c621         *              1             0             1 
    623 c622         *              0             0             1 
-   624 c623         *              1             0             1 
+   624 c623         *              0             0             1 
    625 c624         *              0             0             1 
    626 c625         *              0             0             1 
-   627 c626         *              1             0             1 
+   627 c626         *              0             0             1 
    628 c627         *              1             0             1 
-   629 c628         *              1             0             1 
-   630 c629         *              1             0             1 
-   631 c630         *              1             0             1 
+   629 c628         *              0             0             1 
+   630 c629         *              0             0             1 
+   631 c630         *              0             0             1 
    632 c631         *              1             0             1 
-   633 c632         *              1             0             1 
-   634 c633         *              1             0             1 
-   635 c634         *              1             0             1 
+   633 c632         *              0             0             1 
+   634 c633         *              0             0             1 
+   635 c634         *              0             0             1 
    636 c635         *              0             0             1 
    637 c636         *              0             0             1 
    638 s0           *              0             0             1 
@@ -1296,10 +1296,10 @@ Objective:  score = 39240.596 (MAXimum)
    646 s8           *              0             0             1 
    647 s9           *              0             0             1 
    648 s10          *              0             0             1 
-   649 s11          *              1             0             1 
+   649 s11          *              0             0             1 
    650 s12          *              1             0             1 
    651 s13          *              0             0             1 
-   652 s14          *              1             0             1 
+   652 s14          *              0             0             1 
    653 s15          *              0             0             1 
    654 s16          *              0             0             1 
    655 s17          *              0             0             1 
@@ -1321,9 +1321,9 @@ Objective:  score = 39240.596 (MAXimum)
    671 s33          *              0             0             1 
    672 s34          *              0             0             1 
    673 s35          *              0             0             1 
-   674 s36          *              1             0             1 
+   674 s36          *              0             0             1 
    675 s37          *              0             0             1 
-   676 s38          *              0             0             1 
+   676 s38          *              1             0             1 
    677 s39          *              0             0             1 
    678 s40          *              0             0             1 
    679 s41          *              0             0             1 
@@ -1341,7 +1341,7 @@ Objective:  score = 39240.596 (MAXimum)
    691 s53          *              0             0             1 
    692 s54          *              0             0             1 
    693 s55          *              0             0             1 
-   694 s56          *              0             0             1 
+   694 s56          *              1             0             1 
    695 s57          *              0             0             1 
    696 s58          *              0             0             1 
    697 s59          *              0             0             1 
@@ -1353,7 +1353,7 @@ Objective:  score = 39240.596 (MAXimum)
    703 s65          *              0             0             1 
    704 s66          *              0             0             1 
    705 s67          *              0             0             1 
-   706 s68          *              1             0             1 
+   706 s68          *              0             0             1 
    707 s69          *              0             0             1 
    708 s70          *              0             0             1 
    709 s71          *              0             0             1 
@@ -1390,7 +1390,7 @@ Objective:  score = 39240.596 (MAXimum)
    740 s102         *              0             0             1 
    741 s103         *              0             0             1 
    742 s104         *              0             0             1 
-   743 s105         *              0             0             1 
+   743 s105         *              1             0             1 
    744 s106         *              0             0             1 
    745 s107         *              0             0             1 
    746 s108         *              0             0             1 
@@ -1402,13 +1402,13 @@ Objective:  score = 39240.596 (MAXimum)
    752 s114         *              0             0             1 
    753 s115         *              0             0             1 
    754 s116         *              0             0             1 
-   755 s117         *              0             0             1 
+   755 s117         *              1             0             1 
    756 s118         *              0             0             1 
    757 s119         *              0             0             1 
    758 s120         *              0             0             1 
    759 s121         *              0             0             1 
    760 s122         *              0             0             1 
-   761 s123         *              0             0             1 
+   761 s123         *              1             0             1 
    762 s124         *              0             0             1 
    763 s125         *              0             0             1 
    764 s126         *              0             0             1 
@@ -1417,7 +1417,7 @@ Objective:  score = 39240.596 (MAXimum)
    767 s129         *              0             0             1 
    768 s130         *              0             0             1 
    769 s131         *              0             0             1 
-   770 s132         *              1             0             1 
+   770 s132         *              0             0             1 
    771 s133         *              0             0             1 
 
 Integer feasibility conditions:

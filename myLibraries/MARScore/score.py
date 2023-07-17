@@ -138,7 +138,7 @@ class MARSCore():
                     save_path_in = os.path.join(dirpath, "ilp_in_regular.ilp")
                     save_path_out = os.path.join(dirpath, "ilp_out_regular.sol")
 
-            _ = to_ilp_format(save_path_in, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements)
+            _ = to_ilp_format_V2(save_path_in, reduced_v, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements)
             
             os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
             selected = readILP(path=save_path_out)

@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from custom_score.utils import cleanString, get_git_root
+from scipy.spatial import ConvexHull, QhullError
 import os
 import re
 import io
@@ -387,6 +388,63 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
         fig = go.Figure(data=traces, layout=layout)
         fig.show()
 
+def euclideanDistance(p, q):
+    p = np.array(p)
+    q = np.array(q)
+    return np.linalg.norm(p - q)
+
+def crossProduct(p, q, r):
+    pq = np.array(q) - np.array(p)
+    pr = np.array(r) - np.array(p)
+    return np.cross(pq, pr)
+    
+def rotatingCaliper(points, convex_hull):
+   
+    # Takes O(n)
+    hull = [points[i] for i in range(len(points)) if i in convex_hull.vertices]
+    n = len(hull)
+ 
+    # Base Cases
+    if n == 1:
+        return 0
+    if n == 2:
+        return euclideanDistance(hull[0], hull[1])
+    k = 1
+ 
+    # Find the farthest vertex
+    # from hull[0] and hull[n-1]
+    while crossProduct(hull[n - 1], hull[0], hull[(k + 1) % n]) > crossProduct(hull[n - 1], hull[0], hull[k]):
+        k += 1
+ 
+    res = 0
+ 
+    # Check points from 0 to k
+    for i in range(k + 1):
+        j = (i + 1) % n
+        while crossProduct(hull[i], hull[(i + 1) % n], hull[(j + 1) % n]) > crossProduct(hull[i], hull[(i + 1) % n], hull[j]):
+            # Update res
+            res = max(res, euclideanDistance(hull[i], hull[(j + 1) % n]))
+            j = (j + 1) % n
+ 
+    # Return the result distance
+    return res
+
+def biggerDistance(points):
+    points = np.array(points)
+    convex_hull = ConvexHull(points)
+    return rotatingCaliper(points, convex_hull)
+
+def optimized_score(tokens_dict, clusters_tfs):
+    scores = {}
+    for k, v in tokens_dict.items():
+        try:
+            max_dist = biggerDistance(v["embs"])
+            scores[k] = clusters_tfs[k]/(max_dist*len(v["tokens"])) if max_dist > 0 else 0
+        except QhullError:
+            print("Unfeasable convex hull")
+            scores[k] = 0
+    return scores
+
 def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
@@ -470,6 +528,158 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
             output += f" - {-int(clusters_tf_values[k])} c{i}"
         else:
             output += f" + {int(clusters_tf_values[k])} c{i}"
+    scaler = MinMaxScaler()
+    norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
+    for i, length in enumerate(norm_sentences_lens):
+        output += f" - {round(length, 3)} s{i}"
+         
+    #define constraints
+    output += "\n\nSubject To\n"
+    for i, k in enumerate(sorted(sentences_map.keys())):
+        output += f"index_{i}:"
+        for sentence_index in sorted(sentences_map[k]):
+            output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
+        #output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
+        output = output[:-2] + f" - c{i} >= 0" + "\n"
+
+    #define sentence length
+    len_template = ""
+    if precision_level == "c":
+        for i in range(nb_sentences):
+            len_template += f" {int(sentences_lens[i])} s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
+        #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+    elif precision_level == "s":
+        for i in range(nb_sentences):
+            len_template += f" s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
+
+    #declare cluster variables
+    output += "\n\n\nBinary\n"
+    for i in range(len(clusters_tf_values.keys())):
+        output += f"c{i}\n"
+
+    #declare sentences variables
+    for i in range(nb_sentences):
+        output += f"s{i}\n"
+    output = output[:-1]
+
+    #end file
+    output += "\nEnd"
+
+    if save:
+        with open(path, "w") as text_file:
+            text_file.write(output)
+            text_file.close()
+        if verbose:
+            print("\nSave successful")
+
+    return output
+
+def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
+    """
+    Transforms a text to an ILP model.
+
+    :param1 path (string): Absolute path where ILP output should be save. 
+    :param2 embs (list): List of embedding vectors for each token.
+    :param3 labels (list): List of text token associated with each embedding.
+    :param4 clabels (list): List of token's cluster index.
+    :param5 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
+    :param6 save (bool): Save the output to file if set to True.
+    :param7 verbose (bool): Add verbose if set to True.
+
+    :output output (string): Text formatted to with respect to ILP's requirements.
+    """
+    def scale_dict(d):
+        """
+        MinMax scales values of a dictionnary.
+
+        :param1 d (dict): Dictionnary to scale.
+
+        :output norm_d (dict): Dictionnary with normalized values.
+        """
+        values = d.values()
+        min_ = min(values)
+        max_ = max(values)
+        norm_d = {key: ((v - min_ ) / (max_ - min_) )  for (key, v) in d.items()}
+        return norm_d
+    
+    def tokens_per_cluster(tokens, clabels, embs):
+        d = {}
+        for token, clabel, emb in zip(tokens, clabels, embs):
+            if clabel in d.keys():
+                d[clabel]["tokens"].append(token)
+                d[clabel]["embs"].append(emb)
+            else:
+                d[clabel] = {"tokens": [token], "embs": [emb]}
+        for k, v in d.items():
+            d[k]["embs"] = np.array(v["embs"])
+        return d
+
+    #create sentence dictionnary for clusters
+    sentence_index = 0
+    sentences_map = {0: []}
+    nb_sentences = labels.count(".") if labels[-1] == "." else labels.count(".")+1
+    for cluster_index, token in zip(clabels, labels):
+        if cluster_index in sentences_map.keys():
+            sentences_map[cluster_index].append(sentence_index)
+        else:
+            sentences_map[cluster_index] = [sentence_index]
+        if token == ".":
+            sentence_index += 1
+    try:
+        sentences_map.pop(-1)
+    except KeyError:
+        pass
+
+    #create sentence count dictionnary for clusters
+    sentences_map_count = {}
+    for cluster_index in sentences_map.keys():
+        sentences_map_count[cluster_index] = {}
+        for sentence_index in sentences_map[cluster_index]:
+            sentences_map_count[cluster_index][sentence_index] = list(sentences_map[cluster_index]).count(sentence_index)
+
+    #transform sentence_map to set
+    for k in sentences_map.keys():
+        sentences_map[k] = set(sentences_map[k])
+
+    #create sentence dictionnary for length
+    sentence_index = 0
+    sentences_lens = [0]*(nb_sentences)
+    for token in labels:
+        sentences_lens[sentence_index] += len(token)
+        if token == ".":
+            sentence_index += 1
+    if precision_level == "c":
+        total_len = np.sum(sentences_lens)
+    elif precision_level == "s":
+        total_len = nb_sentences
+    if n_allowed_elements == None:
+        target_len = int(total_len/ratio)
+    else:
+        target_len = int(n_allowed_elements)
+
+    #compute clusters fitness coefficients
+    d_tokens = tokens_per_cluster(labels, clabels, embs)
+    sfc = optimized_score(d_tokens, clusters_tf_values)
+
+    #define scoring function
+    try:
+        clusters_tf_values.pop(-1)
+        d_tokens.pop(-1)
+        sfc.pop(-1)
+    except KeyError:
+        pass
+    output = "Maximize\nscore:"
+    #--Relevancy
+    for i, k in enumerate(sorted(sfc.keys())):
+        if int(sfc[k]) < 0:
+            output += f" - {-int(sfc[k])} c{i}"
+        else:
+            output += f" + {int(sfc[k])} c{i}"
+    #--Redundancy
     scaler = MinMaxScaler()
     norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
     for i, length in enumerate(norm_sentences_lens):
