@@ -497,6 +497,47 @@ def relevancy_score(tokens_dict, clusters_tfs):
             scores[k] = 0
     return scores
 
+def redundancy_score(d_tokens):
+    """
+    Evaluates redundancy in clusters. 
+
+    :param1 d_tokens (dict): Dictionnary containing embeddings and associated tokens for each cluster.
+
+    :output (list): Redundancy matrix for a group of clusters.
+    """
+
+    def smallest_intercluster_distance(embs1, embs2):
+        """
+        Determines the smallest inter-cluster distance between two clusters. 
+
+        :param1 embs1 (list): List of embeddings for cluster 1.
+        :param2 embs2 (list): List of embeddings for cluster 2.
+
+        :output (float): Smallest inter-cluster distance.
+        """
+        distance_matrix = []
+        for emb1 in embs1:
+            temp = []
+            for emb2 in embs2:
+                temp.append(np.linalg.norm(emb2 - emb1))
+            distance_matrix.append(temp)
+        distance_matrix = np.array(distance_matrix)
+        return distance_matrix.min()
+
+    try:
+        d_tokens.pop(-1)
+    except KeyError:
+        pass
+    k = sorted(d_tokens.keys())
+    l = len(k)
+    m = [[0 for j in range(l)] for i in range(l)]
+    for i in range(l):
+        for j in range(i, l):
+            m[i][j] = smallest_intercluster_distance(d_tokens[k[i]]["embs"], d_tokens[k[j]]["embs"])
+    m = np.triu(m)
+    m = m + m.T - np.diag(np.diag(m))
+    return m
+
 def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
@@ -630,7 +671,7 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
 
     return output
 
-def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
+def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, lambda_param=0.5, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -725,27 +766,33 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     #compute clusters fitness coefficients
     d_tokens = tokens_per_cluster(labels, clabels, embs)
     rel = relevancy_score(d_tokens, clusters_tf_values)
-
+    red = np.median(redundancy_score(d_tokens), axis=0)
     #define scoring function
     try:
         clusters_tf_values.pop(-1)
-        d_tokens.pop(-1)
-        rel.pop(-1)
     except KeyError:
+        pass
+    try:
+        d_tokens.pop(-1)
+    except:
+        pass
+    try:
+        rel.pop(-1)
+    except:
         pass
     output = "Maximize\nscore:"
     #--Relevancy
     for i, k in enumerate(sorted(rel.keys())):
         if int(rel[k]) < 0:
-            output += f" - {-int(rel[k])} c{i}"
+            output += f" - {-lambda_param*int(rel[k])} c{i}"
         else:
-            output += f" + {int(rel[k])} c{i}"
+            output += f" + {lambda_param*int(rel[k])} c{i}"
     #--Redundancy
-    scaler = MinMaxScaler()
-    norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
-    for i, length in enumerate(norm_sentences_lens):
-        output += f" - {round(length, 3)} s{i}"
-         
+    """
+    for i, r_val in enumerate(red):
+        output += f" - {(1-lambda_param)*round(r_val, 3)} c{i}"
+    """
+    
     #define constraints
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):
