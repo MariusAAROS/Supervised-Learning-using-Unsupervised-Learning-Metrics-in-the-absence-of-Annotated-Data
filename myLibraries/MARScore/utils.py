@@ -383,9 +383,16 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
             scene=dict(
                 xaxis=dict(title='X'),
                 yaxis=dict(title='Y')
-            )
+            ),
+            autosize=False,
+            width=1000,
+            height=1000
         )
         fig = go.Figure(data=traces, layout=layout)
+        fig.update_yaxes(
+            scaleanchor="x",
+            scaleratio=1,
+        )
         fig.show()
 
 def euclideanDistance(p, q):
