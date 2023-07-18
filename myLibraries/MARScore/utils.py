@@ -473,7 +473,7 @@ def biggerDistance(points):
     convex_hull = ConvexHull(points)
     return rotatingCaliper(points, convex_hull)
 
-def optimized_score(tokens_dict, clusters_tfs):
+def relevancy_score(tokens_dict, clusters_tfs):
     """
     Relevancy score calculated for each cluster of the corpus.
 
@@ -724,22 +724,22 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
 
     #compute clusters fitness coefficients
     d_tokens = tokens_per_cluster(labels, clabels, embs)
-    sfc = optimized_score(d_tokens, clusters_tf_values)
+    rel = relevancy_score(d_tokens, clusters_tf_values)
 
     #define scoring function
     try:
         clusters_tf_values.pop(-1)
         d_tokens.pop(-1)
-        sfc.pop(-1)
+        rel.pop(-1)
     except KeyError:
         pass
     output = "Maximize\nscore:"
     #--Relevancy
-    for i, k in enumerate(sorted(sfc.keys())):
-        if int(sfc[k]) < 0:
-            output += f" - {-int(sfc[k])} c{i}"
+    for i, k in enumerate(sorted(rel.keys())):
+        if int(rel[k]) < 0:
+            output += f" - {-int(rel[k])} c{i}"
         else:
-            output += f" + {int(sfc[k])} c{i}"
+            output += f" + {int(rel[k])} c{i}"
     #--Redundancy
     scaler = MinMaxScaler()
     norm_sentences_lens = list(scaler.fit_transform(np.array(sentences_lens).reshape(-1, 1)).reshape(-1))
