@@ -671,7 +671,7 @@ def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_le
 
     return output
 
-def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, lambda_param=0.5, save=True, verbose=False):
+def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, lambda_param, save=True, verbose=False):
     """
     Transforms a text to an ILP model.
 
@@ -792,7 +792,7 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     for i, r_val in enumerate(red):
         output += f" - {(1-lambda_param)*round(r_val, 3)} c{i}"
     """
-    
+
     #define constraints
     output += "\n\nSubject To\n"
     for i, k in enumerate(sorted(sentences_map.keys())):

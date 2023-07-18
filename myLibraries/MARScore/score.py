@@ -34,7 +34,8 @@ class MARSCore():
                  low_memory=False,
                  precision_level="c",
                  expe_params=None,
-                 extraction_method="concat_l4") -> None:
+                 extraction_method="concat_l4",
+                 lambda_param=0.5) -> None:
         """
         Constructor of the MARScore class.
 
@@ -52,6 +53,7 @@ class MARSCore():
         :param12 precision_level (string): Defines the method used to calculate the limit length of the output summary {c: character level, s: sentence level}.
         :param13 expe_params (dict): Differents parameters usefull for experimentation purpose.
         :param14 extraction_method (str): Method of extraction for BERT embeddings.
+        :param15 lambda_param (float): Value between 0 and 1 allowing to tune between relevancy and redundancy in the solver (closer to 1 is higher relevancy interest, closer to 0 means higher redundancy interest).
         """
         self.corpus = corpus
         self.gold = gold
@@ -78,6 +80,7 @@ class MARSCore():
         self.precision_level = precision_level
         self.expe_params = expe_params
         self.written_summaries = 0
+        self.lambda_param = lambda_param
     
     def compute(self, checkpoints=False, saveRate=50):
         """
@@ -138,7 +141,7 @@ class MARSCore():
                     save_path_in = os.path.join(dirpath, "ilp_in_regular.ilp")
                     save_path_out = os.path.join(dirpath, "ilp_out_regular.sol")
 
-            _ = to_ilp_format_V2(save_path_in, reduced_v, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements)
+            _ = to_ilp_format_V2(save_path_in, reduced_v, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements, self.lambda_param)
             
             os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
             selected = readILP(path=save_path_out)
