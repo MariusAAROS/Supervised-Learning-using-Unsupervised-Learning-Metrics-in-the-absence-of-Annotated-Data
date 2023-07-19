@@ -3,7 +3,7 @@ Rows:       167
 Columns:    300 (300 integer, 300 binary)
 Non-zeros:  1851
 Status:     INTEGER OPTIMAL
-Objective:  score = 15159 (MAXimum)
+Objective:  score = 15171.311 (MAXimum)
 
    No.   Row name        Activity     Lower bound   Upper bound
 ------ ------------    ------------- ------------- -------------
@@ -162,7 +162,7 @@ Objective:  score = 15159 (MAXimum)
    153 index_152                   0             0               
    154 index_153                   0             0               
    155 index_154                   0             0               
-   156 index_155                   9             0               
+   156 index_155                  10             0               
    157 index_156                   0             0               
    158 index_157                   0             0               
    159 index_158                   2             0               
@@ -332,7 +332,7 @@ Objective:  score = 15159 (MAXimum)
    153 c152         *              1             0             1 
    154 c153         *              0             0             1 
    155 c154         *              0             0             1 
-   156 c155         *              1             0             1 
+   156 c155         *              0             0             1 
    157 c156         *              0             0             1 
    158 c157         *              0             0             1 
    159 c158         *              1             0             1 

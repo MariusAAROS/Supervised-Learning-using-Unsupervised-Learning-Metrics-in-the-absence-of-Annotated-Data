@@ -536,7 +536,7 @@ def redundancy_score(d_tokens):
             m[i][j] = smallest_intercluster_distance(d_tokens[k[i]]["embs"], d_tokens[k[j]]["embs"])
     m = np.triu(m)
     m = m + m.T - np.diag(np.diag(m))
-    return m
+    return np.reciprocal(m)
 
 def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
@@ -767,6 +767,7 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     d_tokens = tokens_per_cluster(labels, clabels, embs)
     rel = relevancy_score(d_tokens, clusters_tf_values)
     red = np.median(redundancy_score(d_tokens), axis=0)
+    sfc = [round((lambda_param*rel[i]) - ((1-lambda_param)*red[i]), 3) for i in range(len(red))]
     #define scoring function
     try:
         clusters_tf_values.pop(-1)
@@ -781,17 +782,12 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     except:
         pass
     output = "Maximize\nscore:"
-    #--Relevancy
-    for i, k in enumerate(sorted(rel.keys())):
-        if int(rel[k]) < 0:
-            output += f" - {-lambda_param*int(rel[k])} c{i}"
+    
+    for i in range(len(sfc)):
+        if sfc[i] < 0:
+            output += f" - {-sfc[i]} c{i}"
         else:
-            output += f" + {lambda_param*int(rel[k])} c{i}"
-    #--Redundancy
-    """
-    for i, r_val in enumerate(red):
-        output += f" - {(1-lambda_param)*round(r_val, 3)} c{i}"
-    """
+            output += f" + {sfc[i]} c{i}"
 
     #define constraints
     output += "\n\nSubject To\n"
@@ -801,7 +797,7 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
             output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
         #output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
         output = output[:-2] + f" - c{i} >= 0" + "\n"
-
+        
     #define sentence length
     len_template = ""
     if precision_level == "c":
