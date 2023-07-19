@@ -536,7 +536,7 @@ def redundancy_score(d_tokens):
             m[i][j] = smallest_intercluster_distance(d_tokens[k[i]]["embs"], d_tokens[k[j]]["embs"])
     m = np.triu(m)
     m = m + m.T - np.diag(np.diag(m))
-    return np.reciprocal(m)
+    return np.reciprocal(m, where=m!=0)
 
 def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
@@ -782,7 +782,6 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     except:
         pass
     output = "Maximize\nscore:"
-    
     for i in range(len(sfc)):
         if sfc[i] < 0:
             output += f" - {-sfc[i]} c{i}"
@@ -794,7 +793,8 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
     for i, k in enumerate(sorted(sentences_map.keys())):
         output += f"index_{i}:"
         for sentence_index in sorted(sentences_map[k]):
-            output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
+            #output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
+            output += f" s{sentence_index} +"
         #output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
         output = output[:-2] + f" - c{i} >= 0" + "\n"
         

@@ -3,7 +3,7 @@ Rows:       167
 Columns:    300 (300 integer, 300 binary)
 Non-zeros:  1851
 Status:     INTEGER OPTIMAL
-Objective:  score = 15171.311 (MAXimum)
+Objective:  score = 15171.364 (MAXimum)
 
    No.   Row name        Activity     Lower bound   Upper bound
 ------ ------------    ------------- ------------- -------------
@@ -42,7 +42,7 @@ Objective:  score = 15171.311 (MAXimum)
     33 index_32                    0             0               
     34 index_33                    1             0               
     35 index_34                    0             0               
-    36 index_35                    3             0               
+    36 index_35                    1             0               
     37 index_36                    0             0               
     38 index_37                    0             0               
     39 index_38                    0             0               
@@ -51,10 +51,10 @@ Objective:  score = 15171.311 (MAXimum)
     42 index_41                    0             0               
     43 index_42                    0             0               
     44 index_43                    0             0               
-    45 index_44                   10             0               
-    46 index_45                    1             0               
+    45 index_44                    1             0               
+    46 index_45                    0             0               
     47 index_46                    0             0               
-    48 index_47                    6             0               
+    48 index_47                    2             0               
     49 index_48                    0             0               
     50 index_49                    1             0               
     51 index_50                    0             0               
@@ -71,16 +71,16 @@ Objective:  score = 15171.311 (MAXimum)
     62 index_61                    0             0               
     63 index_62                    0             0               
     64 index_63                    0             0               
-    65 index_64                    4             0               
+    65 index_64                    1             0               
     66 index_65                    0             0               
     67 index_66                    0             0               
     68 index_67                    0             0               
-    69 index_68                    1             0               
+    69 index_68                    0             0               
     70 index_69                    0             0               
     71 index_70                    0             0               
     72 index_71                    0             0               
     73 index_72                    3             0               
-    74 index_73                    1             0               
+    74 index_73                    0             0               
     75 index_74                    3             0               
     76 index_75                    0             0               
     77 index_76                    0             0               
@@ -92,7 +92,7 @@ Objective:  score = 15171.311 (MAXimum)
     83 index_82                    0             0               
     84 index_83                    0             0               
     85 index_84                    0             0               
-    86 index_85                    1             0               
+    86 index_85                    0             0               
     87 index_86                    0             0               
     88 index_87                    0             0               
     89 index_88                    0             0               
@@ -110,7 +110,7 @@ Objective:  score = 15171.311 (MAXimum)
    101 index_100                   0             0               
    102 index_101                   0             0               
    103 index_102                   0             0               
-   104 index_103                   1             0               
+   104 index_103                   0             0               
    105 index_104                   0             0               
    106 index_105                   0             0               
    107 index_106                   0             0               
@@ -118,22 +118,22 @@ Objective:  score = 15171.311 (MAXimum)
    109 index_108                   0             0               
    110 index_109                   0             0               
    111 index_110                   2             0               
-   112 index_111                   4             0               
+   112 index_111                   0             0               
    113 index_112                   0             0               
    114 index_113                   0             0               
    115 index_114                   0             0               
-   116 index_115                   2             0               
+   116 index_115                   0             0               
    117 index_116                   0             0               
-   118 index_117                   1             0               
+   118 index_117                   0             0               
    119 index_118                   0             0               
    120 index_119                   0             0               
-   121 index_120                   3             0               
-   122 index_121                   1             0               
+   121 index_120                   2             0               
+   122 index_121                   0             0               
    123 index_122                   0             0               
    124 index_123                   0             0               
    125 index_124                   0             0               
    126 index_125                   0             0               
-   127 index_126                   4             0               
+   127 index_126                   3             0               
    128 index_127                   0             0               
    129 index_128                   0             0               
    130 index_129                   0             0               
@@ -152,27 +152,27 @@ Objective:  score = 15171.311 (MAXimum)
    143 index_142                   0             0               
    144 index_143                   0             0               
    145 index_144                   0             0               
-   146 index_145                   2             0               
+   146 index_145                   0             0               
    147 index_146                   0             0               
    148 index_147                   0             0               
    149 index_148                   0             0               
-   150 index_149                   2             0               
-   151 index_150                   1             0               
+   150 index_149                   0             0               
+   151 index_150                   0             0               
    152 index_151                   0             0               
    153 index_152                   0             0               
    154 index_153                   0             0               
    155 index_154                   0             0               
-   156 index_155                  10             0               
+   156 index_155                   2             0               
    157 index_156                   0             0               
    158 index_157                   0             0               
-   159 index_158                   2             0               
-   160 index_159                   7             0               
+   159 index_158                   0             0               
+   160 index_159                   1             0               
    161 index_160                   1             0               
-   162 index_161                   2             0               
-   163 index_162                  13             0               
+   162 index_161                   1             0               
+   163 index_162                   2             0               
    164 index_163                   1             0               
    165 index_164                   0             0               
-   166 index_165                   2             0               
+   166 index_165                   1             0               
    167 length                      7                           7 
 
    No. Column name       Activity     Lower bound   Upper bound
