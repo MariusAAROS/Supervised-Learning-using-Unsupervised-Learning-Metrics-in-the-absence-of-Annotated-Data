@@ -461,17 +461,37 @@ def rotatingCaliper(points, convex_hull):
     # Return the result distance
     return res
 
-def biggerDistance(points):
+def maxInnerClusterDistance(points):
+    """
+    :param1 points (list): List of N-dimensional points.
+
+    :output (float): Greatest in-cluster distance. 
+    """
+    dist_mat = [[0 for i in range(len(points))] for j in range(len(points))]
+    for i in range(len(points)):
+        for j in range(i, len(points)):
+            dist_mat[i][j] = np.linalg.norm(points[j] - points[i])
+    dist_mat = np.triu(dist_mat)
+    dist_mat = dist_mat + dist_mat.T - np.diag(np.diag(dist_mat))
+    return dist_mat.max()
+
+def biggerDistance(points, method="regular"):
     """
     Returns the bigger point-to-point distance in a list of points.
 
     :param1 points (list): List of N-dimensional points.
+    :param2 method (str): Method to computer the bigger distance between multiple points. method can be {"regular": Nested for loop computing distances
+                                                                                                         "convexh": Convex Hull and Rotating calipers computation}
     
-    :output: Greatest in-group distance.
+    :output dist (float): Greatest in-cluster distance.
     """
     points = np.array(points)
-    convex_hull = ConvexHull(points)
-    return rotatingCaliper(points, convex_hull)
+    if method == "regular":
+        dist = maxInnerClusterDistance(points)
+    elif method == "convexh":
+        convex_hull = ConvexHull(points)
+        dist = rotatingCaliper(points, convex_hull)
+    return dist
 
 def relevancy_score(tokens_dict, clusters_tfs):
     """
