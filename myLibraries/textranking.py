@@ -48,7 +48,7 @@ init_time = datetime.now()
 ms = TextRanker(subset["text"].to_list(), subset["summary"].to_list(), expe_params=params)
 ms.compute(limit_phrases=4, limit_sentences=7)
 
-runtime = (datetime.now() - init_time).total_seconds()/60
+runtime = datetime.now() - init_time
 
 if not(save):
     _=ms.assess()
