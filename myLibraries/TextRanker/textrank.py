@@ -5,7 +5,7 @@ from math import sqrt
 import bert_score
 from rouge_score import rouge_scorer
 from scipy.stats import pearsonr
-from TextRanker.utils import get_git_root, nostd
+from TextRanker.utils import *
 import pandas as pd
 import numpy as np
 
@@ -21,12 +21,12 @@ from custom_score.utils import model_load
 
 
 class TextRanker():
-    def __init__(self, corpus, gold, model="en_core_web_sm") -> None:
+    def __init__(self, corpus, gold, model="en_core_web_sm", expe_params=None) -> None:
         self.corpus = corpus
         self.gold = gold
         self.model = model
         self.summaries = []
-
+        self.expe_params = expe_params
     def compute(self, limit_phrases=4, limit_sentences=2):
         nlp = spacy.load(self.model)
         nlp.add_pipe("textrank", last=True)
@@ -167,3 +167,62 @@ class TextRanker():
             print(printout)
 
         return {"scores": dfCustom, "correlations": dfCor}
+    
+    def save(self, runtime=None, new=True, pace=50):
+            """
+            Saves MARScore output to a local folder.
+
+            :param1 self (MARScore): Refiner Object (see __init__ function for more details).
+            :param2 new (bool): Indicates if a new folder should be created. If false, output is append to the most recent ouput folder.
+            """
+            #evaluation
+            start = 0
+            stop = len(self.summaries)
+            assessement = self.assess(start=start, stop=stop)
+
+            #mainDf = self.to_dataframe()
+            scoreDf = assessement["scores"]
+            corDf = assessement["correlations"]
+
+            #write statistics
+            if self.expe_params == None:
+                main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\textrank_compare\result")
+            elif "shuffled" in self.expe_params.keys():
+                if self.expe_params["shuffled"]:
+                    main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\textrank_compare\shuffled")
+                else:
+                    main_folder_path = os.path.join(get_git_root(), r"myLibraries\MARScore_output\textrank_compare\regular")
+            countfile_name = r"count.txt"
+            if new:
+                count = updateFileCount(os.path.join(main_folder_path, countfile_name))
+            else:
+                count = readFileCount(os.path.join(main_folder_path, countfile_name))
+
+            current_path = os.path.join(main_folder_path, f"experimentation_{count}")
+            try:
+                os.mkdir(current_path)
+            except FileExistsError:
+                pass
+
+            #mainDf.to_csv(os.path.join(current_path, "main.csv"))
+            scoreDf.to_csv(os.path.join(current_path, "scores.csv"))
+            corDf.to_csv(os.path.join(current_path, "correlations.csv"))
+            with open(os.path.join(current_path, "runtimes.txt"), "w") as f:
+                f.write(str(runtime))
+            
+            #write summaries
+            try:
+                os.mkdir(os.path.join(current_path, f"summaries"))
+            except FileExistsError:
+                pass
+            
+            sum_path = os.path.join(current_path, f"summaries")
+            
+
+            for i, summary in enumerate(self.summaries):
+                if new:
+                    arg = "w"
+                else:
+                    arg = "a"
+                with open(os.path.join(sum_path, f"{i}.txt"), arg) as f:
+                    f.write(summary)
