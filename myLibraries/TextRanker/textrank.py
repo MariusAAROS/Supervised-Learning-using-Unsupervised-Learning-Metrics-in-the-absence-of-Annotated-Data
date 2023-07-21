@@ -168,7 +168,7 @@ class TextRanker():
 
         return {"scores": dfCustom, "correlations": dfCor}
     
-    def save(self, runtime=None, new=True, pace=50):
+    def save(self, runtime=None, new=True):
             """
             Saves MARScore output to a local folder.
 
