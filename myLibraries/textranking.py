@@ -39,7 +39,7 @@ elif dataset_name == "Pubmed":
     dataset.loc[:,"article_text"] = dataset["article_text"].map(format_dot)
     dataset = dataset.rename(columns={"abstract_text": "summary",
                             "article_text": "text"})
-    
+
 subset = dataset.iloc[:size, :]
 init_time = datetime.now()
 

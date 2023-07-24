@@ -68,6 +68,7 @@ class MARSCore():
         self.vectors = []
         self.reduced_vectors = []
         self.labels = []
+        self.sentenced_labels = []
         self.clusters_labels = []
         self.clusters_tfs = []
         self.tokens_tfs = []
@@ -102,10 +103,15 @@ class MARSCore():
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
             v = vectorizeCorpus(o, method=self.extraction_method)
-            v, l = cleanAll(v, l)
+            v, l = cleanMarkers(v, l)
             if not(self.low_memory):
                 self.vectors.append(v)
                 self.labels.append(l)
+            
+            sentenced_tokens = corpusToSentences(indiv)
+            if not(self.low_memory):
+                self.sentenced_labels.append(sentenced_tokens)
+            sentences_mask = [i for i, sent in enumerate(sentenced_tokens) for _ in sent.split(" ")]
 
             #clusterization
             if not(self.low_memory):
@@ -141,7 +147,7 @@ class MARSCore():
                     save_path_in = os.path.join(dirpath, "ilp_in_regular.ilp")
                     save_path_out = os.path.join(dirpath, "ilp_out_regular.sol")
 
-            _ = to_ilp_format_V2(save_path_in, reduced_v, l, clabels, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements, self.lambda_param)
+            _ = to_ilp_format_V3(save_path_in, reduced_v, l, clabels, sentences_mask, clusters_tf_values, self.ratio, self.precision_level, self.n_allowed_elements, self.lambda_param)
             
             os.system(f'glpsol --tmlim 100 --lp "{save_path_in}" -o "{save_path_out}"')
             selected = readILP(path=save_path_out)
