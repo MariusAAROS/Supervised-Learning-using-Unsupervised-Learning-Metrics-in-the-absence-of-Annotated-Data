@@ -1,7 +1,7 @@
 import os, io
 import git
 from contextlib import contextmanager
-import sys
+import sys, pickle
 
 def get_git_root():
     """

@@ -27,7 +27,7 @@ class MARSCore():
                  model=BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True), 
                  tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'),
                  clusterizer=hdbscan.HDBSCAN(),
-                 dim_reductor=UMAP(n_components=2, init='random', random_state=0),
+                 dim_reductor=deserialize(r"C:\Pro\Stages\A4 - DVRC\Work\Ressources\umap2D.pkl"),
                  ratio=2,
                  n_allowed_elements=None,
                  printRange = range(1),

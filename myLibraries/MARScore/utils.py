@@ -1,6 +1,6 @@
 from transformers import BertTokenizer, BertModel
 import torch
-from umap import UMAP
+#from umap import UMAP
 import plotly.graph_objects as go
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -12,6 +12,7 @@ import re
 import io
 import sys
 import git
+import pickle
 from contextlib import contextmanager
 from matplotlib import colormaps
 import spacy
@@ -291,7 +292,7 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
 
     if dim == 1:
         if len(embs[0]) != 1:
-            umap1D = UMAP(n_components=1, init='random', random_state=0)
+            umap1D = deserialize(r"C:\Pro\Stages\A4 - DVRC\Work\Ressources\umap1D.pkl")
             proj1D = umap1D.fit_transform(formated_embs).T
         else:
             proj1D = np.transpose(embs)
@@ -354,7 +355,7 @@ def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, la
 
     elif dim == 2:
         if len(embs[0]) != 2:
-            umap2D = UMAP(n_components=2, init='random', random_state=0)
+            umap2D = deserialize(r"C:\Pro\Stages\A4 - DVRC\Work\Ressources\umap2D.pkl")
             proj2D = umap2D.fit_transform(formated_embs).T
         else:
             proj2D = np.transpose(embs)
@@ -1104,3 +1105,13 @@ def readFileCount(path):
         with open(path, "r") as f:
             value = int(f.read())
     return value
+
+def serialize(obj, path):
+    with open(path, 'wb') as f:
+        pickle.dump(obj, f)
+        f.close()
+
+def deserialize(path):
+    with open(path, 'rb') as f:
+        obj = pickle.load(f) # deserialize using load()
+    return obj
