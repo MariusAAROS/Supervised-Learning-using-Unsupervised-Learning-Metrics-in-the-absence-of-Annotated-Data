@@ -11,7 +11,7 @@ from datetime import datetime
 
 #params
 size = 4
-dataset_name = "Billsum"
+dataset_name = "Pubmed"
 savePace = 2
 save = True
 params = {"shuffled": False}
