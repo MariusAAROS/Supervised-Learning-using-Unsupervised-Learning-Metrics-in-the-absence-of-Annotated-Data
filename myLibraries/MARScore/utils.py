@@ -14,7 +14,7 @@ import sys
 import git
 from contextlib import contextmanager
 from matplotlib import colormaps
-import random
+import spacy
 
 
 def tokenizeCorpus(corpus, model=BertModel.from_pretrained('bert-base-uncased', 
@@ -191,6 +191,38 @@ def cleanAll(embs, labels, mode="all", ignore=["."]):
         return new_labels
     else:
         return -1
+    
+def cleanMarkers(embs, labels, mode="all", ignore=["."]):
+    """
+    Removes vectors associated with BERT structure tokens.
+
+    :param1 embs (list): List of words embeddings.
+    :param2 labels (list): List of text token associated with each embedding.
+
+    :output1 new_embs (list): Cleansed list of words embeddings.
+    :output2 new_labels (list): Cleansed list of tokens.
+    :output3 -1 (int): Error output.
+    """
+    token_indexes = [i for i in range(len(labels)) if (labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]") or labels[i] in ignore]
+    new_embs = [embs[i] for i in range(len(embs)) if i in token_indexes]
+    new_labels = [labels[i] for i in range(len(labels)) if i in token_indexes]
+
+
+    if mode == "all":
+        return new_embs, new_labels
+    elif mode == "emb":
+        return new_embs
+    elif mode == "lab":
+        return new_labels
+    else:
+        return -1
+
+def corpusToSentences(corpus):
+    corpus_sentences = []
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(corpus)
+    corpus_sentences = [sent.text for sent in doc.sents]
+    return corpus_sentences
 
 def visualizeCorpus(reductor, embs, labels, embs_gold=None, labels_gold=None, labels_cluster=None, tf_values=None, dim=2):
     """
@@ -854,6 +886,151 @@ def to_ilp_format_V2(path, embs, labels, clabels, clusters_tf_values, ratio, pre
 
     return output
 
+def to_ilp_format_V3(path, embs, labels, clabels, sentences_mask, clusters_tf_values, ratio, precision_level, n_allowed_elements, lambda_param, save=True, verbose=False):
+    """
+    Transforms a text to an ILP model.
+
+    :param1 path (string): Absolute path where ILP output should be save. 
+    :param2 embs (list): List of embedding vectors for each token.
+    :param3 labels (list): List of text token associated with each embedding.
+    :param4 clabels (list): List of token's cluster index.
+    :param5 sentences_mask (list): Mask delimiting sentences boundaries.
+    :param6 clusters_tf_values (dict): Dictionnary of cumulated TF scores for each cluster.
+    :param7 save (bool): Save the output to file if set to True.
+    :param8 verbose (bool): Add verbose if set to True.
+
+    :output output (string): Text formatted to with respect to ILP's requirements.
+    """
+    
+    def tokens_per_cluster(tokens, clabels, embs):
+        """
+        Groups embeddings and tokens by cluster.
+
+        :param1 tokens (list): List of text tokens associated with each embedding.
+        :param2 clabels (list): List of token's cluster index.
+        :param3 embs (list): List of embedding vectors for each token.
+
+        :output d (dict): Dictionnary containing embeddings and associated tokens for each cluster.
+        """
+        d = {}
+        for token, clabel, emb in zip(tokens, clabels, embs):
+            if clabel in d.keys():
+                d[clabel]["tokens"].append(token)
+                d[clabel]["embs"].append(emb)
+            else:
+                d[clabel] = {"tokens": [token], "embs": [emb]}
+        for k, v in d.items():
+            d[k]["embs"] = np.array(v["embs"])
+        return d
+
+    #create sentence dictionnary for clusters
+    sentences_map = {0: []}
+    nb_sentences = sentences_mask[-1]+1
+    for cluster_index, token, smask in zip(clabels, labels, sentences_mask):
+        if cluster_index in sentences_map.keys():
+            sentences_map[cluster_index].append(smask)
+        else:
+            sentences_map[cluster_index] = [smask]
+    try:
+        sentences_map.pop(-1)
+    except KeyError:
+        pass
+
+    #create sentence count dictionnary for clusters
+    sentences_map_count = {}
+    for cluster_index in sentences_map.keys():
+        sentences_map_count[cluster_index] = {}
+        for sentence_index in sentences_map[cluster_index]:
+            sentences_map_count[cluster_index][sentence_index] = list(sentences_map[cluster_index]).count(sentence_index)
+
+    #transform sentence_map to set
+    for k in sentences_map.keys():
+        sentences_map[k] = set(sentences_map[k])
+
+    #create sentence dictionnary for length
+    sentences_lens = [0]*(nb_sentences)
+    for token, smask in zip(labels, sentences_mask):
+        sentences_lens[smask] += len(token)
+    if precision_level == "c":
+        total_len = np.sum(sentences_lens)
+    elif precision_level == "s":
+        total_len = nb_sentences
+    if n_allowed_elements == None:
+        target_len = int(total_len/ratio)
+    else:
+        target_len = int(n_allowed_elements)
+
+    #compute clusters fitness coefficients
+    d_tokens = tokens_per_cluster(labels, clabels, embs)
+    rel = relevancy_score(d_tokens, clusters_tf_values)
+    red = np.median(redundancy_score(d_tokens), axis=0)
+    sfc = [round((lambda_param*rel[i]) - ((1-lambda_param)*red[i]), 3) for i in range(len(red))]
+    #define scoring function
+    try:
+        clusters_tf_values.pop(-1)
+    except KeyError:
+        pass
+    try:
+        d_tokens.pop(-1)
+    except:
+        pass
+    try:
+        rel.pop(-1)
+    except:
+        pass
+    output = "Maximize\nscore:"
+    for i in range(len(sfc)):
+        if sfc[i] < 0:
+            output += f" - {-sfc[i]} c{i}"
+        else:
+            output += f" + {sfc[i]} c{i}"
+
+    #define constraints
+    output += "\n\nSubject To\n"
+    for i, k in enumerate(sorted(sentences_map.keys())):
+        output += f"index_{i}:"
+        for sentence_index in sorted(sentences_map[k]):
+            #output += f" {sentences_map_count[k][sentence_index]} s{sentence_index} +"
+            output += f" s{sentence_index} +"
+        #output = output[:-2] + f" - {clusters_tf_values[k]} c{i} >= 0" + "\n"
+        output = output[:-2] + f" - c{i} >= 0" + "\n"
+        
+    #define sentence length
+    len_template = ""
+    if precision_level == "c":
+        for i in range(nb_sentences):
+            len_template += f" {int(sentences_lens[i])} s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
+        #output += "length_min:" + len_template + f" >= {int(0.75*target_len)}" + "\n"
+    elif precision_level == "s":
+        for i in range(nb_sentences):
+            len_template += f" s{i} +"
+        len_template = len_template[:-2]
+        output += "length:" + len_template + f" <= {target_len}" + "\n"
+
+    #declare cluster variables
+    output += "\n\n\nBinary\n"
+    for i in range(len(clusters_tf_values.keys())):
+        output += f"c{i}\n"
+
+    #declare sentences variables
+    for i in range(nb_sentences):
+        output += f"s{i}\n"
+    output = output[:-1]
+
+    #end file
+    output += "\nEnd"
+
+    if save:
+        with open(path, "w") as text_file:
+            text_file.write(output)
+            text_file.close()
+        if verbose:
+            print("\nSave successful")
+
+    return output
+
 def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
     """
     Reads and parses the output value of an ILP model.
@@ -875,6 +1052,8 @@ def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
     sorted_lines = sorted(sentences_lines, key=lambda line: int(line.split()[1][1:]))
     result = [int(sorted_line.split()[3]) for sorted_line in sorted_lines]
     return result
+
+
 
 def get_git_root():
     """
