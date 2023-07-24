@@ -40,7 +40,7 @@ elif dataset_name == "Pubmed":
     dataset.loc[:,"article_text"] = dataset["article_text"].map(format_dot)
     dataset = dataset.rename(columns={"abstract_text": "summary",
                             "article_text": "text"})
-    
+
 subset = dataset.iloc[:size, :]
 init_time = datetime.now()
 
@@ -53,4 +53,4 @@ runtime = datetime.now() - init_time
 if not(save):
     _=ms.assess()
 else:
-    ms.save(runtime=runtime, new=True, pace=savePace)
+    ms.save(runtime=runtime, new=True)
