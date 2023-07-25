@@ -10,15 +10,14 @@ from datasets_loaders.loaders import load_billsum
 from datetime import datetime
 
 #params
-size = 4
+size = 500
 dataset_name = "Pubmed"
-savePace = 2
 save = True
 params = {"shuffled": False}
 
 #url dictionnary
 datasets_list = {"Billsum": 'https://drive.google.com/file/d/1Wd0M3qepNF6B4YwFYrpo7CaSERpudAG_/view?usp=share_link', 
-                 "Pubmed": r'C:\Pro\Stages\A4 - DVRC\Work\Datasets\pubmed\test.json'}
+                 "Pubmed": r'D:\COURS\A4\S8 - ESILV\Stage\Work\Datasets\Summary Evaluation\Pubmed\test.json'}
 
 #load dataset
 if dataset_name == "Billsum":
