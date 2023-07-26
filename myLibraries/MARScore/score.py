@@ -111,7 +111,15 @@ class MARSCore():
             sentenced_tokens = corpusToSentences(indiv)
             if not(self.low_memory):
                 self.sentenced_labels.append(sentenced_tokens)
-            sentences_mask = [i for i, sent in enumerate(sentenced_tokens) for _ in sent.split(" ")]
+            indiv_mask = [i for i, sent in enumerate(sentenced_tokens) for _ in sent.split(" ")]
+            i=0
+            j=0
+            sentences_mask = []
+            while i < len(indiv_mask):
+                sentences_mask.append(indiv_mask[i])
+                if "#" not in l[j]:
+                    i+=1
+                j+=1
 
             #clusterization
             if not(self.low_memory):
@@ -153,13 +161,13 @@ class MARSCore():
             selected = readILP(path=save_path_out)
 
             #summaries construction
-            sentences = [sentence.strip() for sentence in indiv.split(".")]
-            sentences.pop()
+            #sentences = [sentence.strip() for sentence in indiv.split(".")]
+            sentences = corpusToSentences(indiv)
             sum_sentences = []
             selected_indexes_temp = []
             for i, value in enumerate(selected):
                 if value == 1:
-                    sum_sentences.append(sentences[i]+".")
+                    sum_sentences.append(sentences[i])
                     selected_indexes_temp.append(i)
             self.summaries.append(" ".join(sum_sentences))
             if not(self.low_memory):
