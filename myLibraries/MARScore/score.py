@@ -104,13 +104,8 @@ class MARSCore():
             o, l = tokenizeCorpus(indiv)
             v = vectorizeCorpus(o, method=self.extraction_method)
             clean_indexes = cleanAll2(l)
-            if not(self.low_memory):
-                self.vectors.append(v)
-                self.labels.append(l)
             
             sentenced_tokens = corpusToSentences(indiv)
-            if not(self.low_memory):
-                self.sentenced_labels.append(sentenced_tokens)
             indiv_mask = [i for i, sent in enumerate(sentenced_tokens) for _ in sent.split(" ")]
             i=0
             j=0
@@ -124,6 +119,11 @@ class MARSCore():
             v = [v[i] for i in range(len(v)) if i in clean_indexes]
             l = [l[i] for i in range(len(l)) if i in clean_indexes]
             sentences_mask = [sentences_mask[i] for i in range(len(sentences_mask)) if i in clean_indexes]
+            if not(self.low_memory):
+                self.vectors.append(v)
+                self.labels.append(l)
+                self.sentenced_labels.append(sentenced_tokens)
+
 
             #clusterization
             if not(self.low_memory):
