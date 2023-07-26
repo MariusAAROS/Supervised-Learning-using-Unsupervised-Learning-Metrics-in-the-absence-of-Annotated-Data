@@ -1,0 +1,1 @@
+sequences were downloaded in february / march 2009 with scaffolding performed by aligning all bac and fosmid ends against contigs and then anchored and ordered primarily by optical mapping. 1 gb from a 5 kb mate pair library , then assembled using clcbio ( www. com ) and soap ( http://soap. genomics.

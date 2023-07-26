@@ -589,7 +589,8 @@ def redundancy_score(d_tokens):
             m[i][j] = smallest_intercluster_distance(d_tokens[k[i]]["embs"], d_tokens[k[j]]["embs"])
     m = np.triu(m)
     m = m + m.T - np.diag(np.diag(m))
-    return np.reciprocal(m, where=m!=0)
+    #return np.reciprocal(m, where=m!=0)
+    return m
 
 def to_ilp_format(path, labels, clabels, clusters_tf_values, ratio, precision_level, n_allowed_elements, save=True, verbose=False):
     """
@@ -965,7 +966,9 @@ def to_ilp_format_V3(path, embs, labels, clabels, sentences_mask, clusters_tf_va
     d_tokens = tokens_per_cluster(labels, clabels, embs)
     rel = relevancy_score(d_tokens, clusters_tf_values)
     red = np.median(redundancy_score(d_tokens), axis=0)
-    sfc = [round((lambda_param*rel[i]) - ((1-lambda_param)*red[i]), 3) for i in range(len(red))]
+    fit_score = lambda lambda_param, rel, red: round(abs((lambda_param*rel) - ((1-lambda_param)*red)), 3)
+    #fit_score = lambda lambda_param, rel, red: round((lambda_param*red) - ((1-lambda_param)*rel), 3)
+    sfc = [fit_score(lambda_param, rel[i], red[i]) if fit_score(lambda_param, rel[i], red[i]) != float('nan') else 0 for i in range(len(red))]
     #define scoring function
     try:
         clusters_tf_values.pop(-1)
@@ -1053,8 +1056,6 @@ def readILP(rel_path="myLibraries\MARScore_output\ilp_out.sol", path=None):
     sorted_lines = sorted(sentences_lines, key=lambda line: int(line.split()[1][1:]))
     result = [int(sorted_line.split()[3]) for sorted_line in sorted_lines]
     return result
-
-
 
 def get_git_root():
     """
