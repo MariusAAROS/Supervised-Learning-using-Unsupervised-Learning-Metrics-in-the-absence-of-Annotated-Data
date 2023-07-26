@@ -192,7 +192,18 @@ def cleanAll(embs, labels, mode="all", ignore=["."]):
         return new_labels
     else:
         return -1
-    
+
+def cleanAll2(labels, ignore=["."]):
+    """
+    Removes vectors associated with noisy words such as stop words, punctuation, and BERT separator tokens.
+
+    :param1 labels (list): List of text token associated with each embedding.
+
+    :output1 token_indexes (list): List of kept indexes.
+    """
+    token_indexes = [i for i in range(len(labels)) if (labels[i] != "[PAD]" and labels[i] != "[CLS]" and labels[i] != "[SEP]" and len(labels[i])>2) or labels[i] in ignore]
+    return token_indexes
+
 def cleanMarkers(embs, labels, mode="all", ignore=["."]):
     """
     Removes vectors associated with BERT structure tokens.

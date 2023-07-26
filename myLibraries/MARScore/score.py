@@ -103,7 +103,7 @@ class MARSCore():
             #creation of embeddings
             o, l = tokenizeCorpus(indiv)
             v = vectorizeCorpus(o, method=self.extraction_method)
-            v, l = cleanMarkers(v, l)
+            clean_indexes = cleanAll2(l)
             if not(self.low_memory):
                 self.vectors.append(v)
                 self.labels.append(l)
@@ -120,6 +120,10 @@ class MARSCore():
                 if "#" not in l[j]:
                     i+=1
                 j+=1
+            
+            v = [v[i] for i in range(len(v)) if i in clean_indexes]
+            l = [l[i] for i in range(len(l)) if i in clean_indexes]
+            sentences_mask = [sentences_mask[i] for i in range(len(sentences_mask)) if i in clean_indexes]
 
             #clusterization
             if not(self.low_memory):
@@ -162,17 +166,16 @@ class MARSCore():
 
             #summaries construction
             #sentences = [sentence.strip() for sentence in indiv.split(".")]
-            sentences = corpusToSentences(indiv)
             sum_sentences = []
             selected_indexes_temp = []
             for i, value in enumerate(selected):
                 if value == 1:
-                    sum_sentences.append(sentences[i])
+                    sum_sentences.append(sentenced_tokens[i])
                     selected_indexes_temp.append(i)
             self.summaries.append(" ".join(sum_sentences))
             if not(self.low_memory):
                 self.selectedIndexes.append(sorted(selected_indexes_temp))
-                self.processedCorpus.append(sentences)
+                self.processedCorpus.append(sentenced_tokens)
 
             #checkpoint verification
             if checkpoints:
