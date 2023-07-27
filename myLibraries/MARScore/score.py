@@ -106,19 +106,59 @@ class MARSCore():
             clean_indexes = cleanAll2(l)
             
             sentenced_tokens = corpusToSentences(indiv)
+            
+            #sentenced_tokens = [sent.replace(".", " .") for sent in sentenced_tokens]
+            #sentenced_tokens = [sent.replace("'", "' ") for sent in sentenced_tokens]
             indiv_mask = [i for i, sent in enumerate(sentenced_tokens) for _ in sent.split(" ")]
             i=0
             j=0
             sentences_mask = []
-            while i < len(indiv_mask):
+            while j < len(l):
                 sentences_mask.append(indiv_mask[i])
                 if "#" not in l[j]:
                     i+=1
                 j+=1
-            
+
+            """
+            i=-1
+            j=0
+            sentences_mask = []
+            while j < len(l):
+                if "#" not in l[j]:
+                    i+=1
+                sentences_mask.append(indiv_mask[i])
+                j+=1
+            """
+
+            """
+            ti = 0
+            si = 0
+            sentences_mask = []
+            flat_sentenced_tokens = [item for row in sentenced_tokens for item in row]
+            while ti < len(l) and si < len(indiv_mask)-1:
+                if "##" not in l[ti]:
+                    if len(l[ti]) == len(flat_sentenced_tokens[si]):
+                        sentences_mask.append(indiv_mask[si])
+                        si += 1
+                        ti += 1
+                    elif len(l[ti]) < len(flat_sentenced_tokens[si]) and l[ti] in flat_sentenced_tokens[si]:
+                        count = 1
+                        while l[ti + count] in flat_sentenced_tokens[si]:
+                            count += 1
+                            sentences_mask.append(indiv_mask[si])
+                        ti += count
+                        si += 1
+                    else:
+                        print("error")
+                else:
+                    sentences_mask.append(indiv_mask[si])
+                    ti += 1
+            """
             v = [v[i] for i in range(len(v)) if i in clean_indexes]
             l = [l[i] for i in range(len(l)) if i in clean_indexes]
             sentences_mask = [sentences_mask[i] for i in range(len(sentences_mask)) if i in clean_indexes]
+            sentenced_tokens = [sentenced_tokens[i] for i in range(len(sentenced_tokens)) if i in clean_indexes]
+
             if not(self.low_memory):
                 self.vectors.append(v)
                 self.labels.append(l)
